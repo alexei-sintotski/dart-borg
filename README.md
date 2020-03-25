@@ -1,2 +1,2 @@
 # dart-borg
-Command line tool to manage configuration of Dart monorepo
+Command line tool to manage configuration of Dart mono repo
