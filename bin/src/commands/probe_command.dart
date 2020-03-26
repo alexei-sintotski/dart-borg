@@ -26,8 +26,7 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:borg/src/find_inconsistent_dependencies.dart';
-import 'package:borg/src/package_usage_report.dart';
+import 'package:borg/borg.dart';
 import 'package:pubspec_lock/pubspec_lock.dart';
 
 import '../file_finder.dart';

@@ -34,9 +34,13 @@ part 'package_usage_report.g.dart';
 // ignore_for_file: avoid_annotating_with_dynamic
 // ignore_for_file: avoid_as
 
+/// Stores report data on dependency usage. Once instance stores data on usage of a single dependency across
+/// multiple Dart packages.
+
 @immutable
 @FunctionalData()
 class PackageUsageReport extends $PackageUsageReport {
+  /// The constructor is used to create report
   const PackageUsageReport({@required this.dependencyName, @required this.references});
 
   final String dependencyName;
