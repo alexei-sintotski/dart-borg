@@ -23,16 +23,17 @@
  *
  */
 
-import 'package:args/command_runner.dart';
+import 'package:args/args.dart';
 
-import 'src/commands/probe_command.dart';
+void addExcludeMultiOption(ArgParser argParser) => argParser.addMultiOption(
+      'exclude',
+      abbr: 'x',
+      help: 'list of paths to exclude from scan (glob syntax allowed)',
+      valueHelp: 'PATH1,PATH2,...',
+      defaultsTo: [],
+    );
 
-void main(List<String> args) => CommandRunner<void>(
-      'borg',
-      'Command-line tool to manage configuration of Dart mono repo\n'
-          'STILL UNDER DEVELOPMENT\n'
-          'This version supports the following features\n'
-          '* Consistency check of external dependencies across multiple pubspec.lock files',
-    )
-      ..addCommand(ProbeCommand())
-      ..run(args);
+// ignore: avoid_as
+Iterable<String> getExcludesMultiOption(ArgResults argResults) => argResults[_name] as Iterable<String>;
+
+const _name = 'exclude';

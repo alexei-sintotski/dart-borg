@@ -23,16 +23,24 @@
  *
  */
 
-import 'package:args/command_runner.dart';
+import 'package:collection/collection.dart';
+import 'package:functional_data/functional_data.dart';
+import 'package:meta/meta.dart';
+import 'package:pubspec_lock/pubspec_lock.dart';
 
-import 'src/commands/probe_command.dart';
+part 'package_usage_report.g.dart';
 
-void main(List<String> args) => CommandRunner<void>(
-      'borg',
-      'Command-line tool to manage configuration of Dart mono repo\n'
-          'STILL UNDER DEVELOPMENT\n'
-          'This version supports the following features\n'
-          '* Consistency check of external dependencies across multiple pubspec.lock files',
-    )
-      ..addCommand(ProbeCommand())
-      ..run(args);
+// ignore_for_file: annotate_overrides
+// ignore_for_file: avoid_annotating_with_dynamic
+// ignore_for_file: avoid_as
+
+@immutable
+@FunctionalData()
+class PackageUsageReport extends $PackageUsageReport {
+  const PackageUsageReport({@required this.dependencyName, @required this.references});
+
+  final String dependencyName;
+
+  @CustomEquality(DeepCollectionEquality())
+  final Map<PackageDependency, List<String>> references;
+}

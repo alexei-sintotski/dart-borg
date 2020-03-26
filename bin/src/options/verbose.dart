@@ -23,16 +23,11 @@
  *
  */
 
-import 'package:args/command_runner.dart';
+import 'package:args/args.dart';
 
-import 'src/commands/probe_command.dart';
+void addVerboseFlag(ArgParser argParser) => argParser.addFlag(_name, abbr: 'v', help: 'Verbose output');
 
-void main(List<String> args) => CommandRunner<void>(
-      'borg',
-      'Command-line tool to manage configuration of Dart mono repo\n'
-          'STILL UNDER DEVELOPMENT\n'
-          'This version supports the following features\n'
-          '* Consistency check of external dependencies across multiple pubspec.lock files',
-    )
-      ..addCommand(ProbeCommand())
-      ..run(args);
+// ignore: avoid_as
+bool getVerboseFlag(ArgResults argResults) => argResults[_name] as bool;
+
+const _name = 'verbose';
