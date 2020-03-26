@@ -23,15 +23,36 @@
  *
  */
 
-// ignore_for_file: avoid_print
+import 'dart:io';
 
-import 'package:args/command_runner.dart';
+import 'package:glob/glob.dart';
+import 'package:meta/meta.dart';
 
-import 'commands/probe_command.dart';
+@immutable
+class FileFinder {
+  const FileFinder(this.filename);
 
-void main(List<String> args) => CommandRunner<void>(
-      'borg',
-      'Command-line tool to manage configuration of Dart mono repo.',
-    )
-      ..addCommand(ProbeCommand())
-      ..run(args);
+  final String filename;
+
+  List<String> findFiles(Iterable<String> locationSpecs) =>
+      locationSpecs.expand(_findFilesAtLocationSpec).toSet().toList()..sort();
+
+  List<String> _findFilesAtLocationSpec(String locationSpec) {
+    final globbedLocations =
+        Glob(locationSpec).listSync().where((item) => item.statSync().type == FileSystemEntityType.directory);
+    final locationsToScan = <Directory>[
+      Directory(locationSpec),
+      ...globbedLocations.map((entity) => Directory(entity.path))
+    ];
+    return locationsToScan.expand(_findFilesInDirectory).toList();
+  }
+
+  List<String> _findFilesInDirectory(Directory dir) => [
+        if (dir.existsSync())
+          ...dir
+              .listSync(recursive: true)
+              .where((item) => item.statSync().type == FileSystemEntityType.file && item.path.endsWith(filename))
+              .map((entity) => entity.path)
+              .toList()
+      ];
+}
