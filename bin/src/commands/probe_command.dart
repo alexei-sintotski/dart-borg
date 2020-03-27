@@ -44,7 +44,7 @@ class ProbeCommand extends Command<void> {
   }
 
   @override
-  String get description => 'Checks consistency of Dart dependendencies across all packages';
+  String get description => 'Checks consistency of Dart dependendencies across multiple packages';
 
   @override
   String get name => 'probe';
