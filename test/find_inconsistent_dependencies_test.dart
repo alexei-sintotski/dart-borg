@@ -119,7 +119,7 @@ const _hostedDependencyAv2 = PackageDependency.hosted(HostedPackageDependency(
   version: '2.0.0',
   name: 'a',
   url: 'https://pub.dartlang.org',
-  type: DependencyType.direct,
+  type: DependencyType.development,
 ));
 
 final _reportAv1Av2 = [

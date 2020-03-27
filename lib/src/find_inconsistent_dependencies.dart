@@ -35,9 +35,10 @@ import 'package_usage_report.dart';
 List<PackageUsageReport> findInconsistentDependencies(Map<String, PubspecLock> pubspecLocks) {
   final dependencies = _collectAllDependencies(pubspecLocks).toSet();
   final externalDependencies = _filterOutPathOnlyDependencies(dependencies).toSet();
-  final normalizedDependencies = _normalizeDependencyType(externalDependencies).toSet();
+  final normalizedDependencyMap = _normalizeDependencyType(externalDependencies);
+  final normalizedDependencies = normalizedDependencyMap.keys.toSet();
   final inconsistentDependencies = _filterOutConsistentDependencies(normalizedDependencies).toSet();
-  return _createReport(inconsistentDependencies, pubspecLocks);
+  return _createReport(inconsistentDependencies, normalizedDependencyMap, pubspecLocks);
 }
 
 Iterable<PackageDependency> _collectAllDependencies(
@@ -52,18 +53,37 @@ Iterable<PackageDependency> _filterOutPathOnlyDependencies(
         .where((dd) => dd.package() == d.package())
         .any((dd) => dd.iswitcho(path: (_) => false, otherwise: () => true)));
 
-Iterable<PackageDependency> _normalizeDependencyType(Iterable<PackageDependency> dependencies) =>
-    dependencies.map((d) => d.iswitch(
-          sdk: (dd) => PackageDependency.sdk(dd.copyWith(type: DependencyType.direct)),
-          hosted: (dd) => PackageDependency.hosted(dd.copyWith(type: DependencyType.direct)),
-          git: (dd) => PackageDependency.git(dd.copyWith(type: DependencyType.direct)),
-          path: (dd) => PackageDependency.path(dd.copyWith(type: DependencyType.direct)),
-        ));
+Map<PackageDependency, PackageDependency> _normalizeDependencyType(Iterable<PackageDependency> dependencies) =>
+    Map.fromEntries(dependencies.map((d) => MapEntry(
+          d.iswitch(
+            sdk: (dd) => PackageDependency.sdk(dd.copyWith(type: DependencyType.direct)),
+            hosted: (dd) => PackageDependency.hosted(dd.copyWith(type: DependencyType.direct)),
+            git: (dd) => PackageDependency.git(dd.copyWith(type: DependencyType.direct)),
+            path: (dd) => PackageDependency.path(dd.copyWith(type: DependencyType.direct)),
+          ),
+          d,
+        )));
 
 Iterable<PackageDependency> _filterOutConsistentDependencies(
   Iterable<PackageDependency> externalDependencies,
 ) =>
     externalDependencies.where((d) => externalDependencies.where((dd) => dd.package() == d.package()).length > 1);
+
+List<PackageUsageReport> _createReport(
+  Iterable<PackageDependency> dependencies,
+  Map<PackageDependency, PackageDependency> normalizedDependencyMap,
+  Map<String, PubspecLock> pubspecLocks,
+) {
+  final names = dependencies.map((d) => d.package()).toSet();
+  return names
+      .map((name) => PackageUsageReport(
+          dependencyName: name,
+          references: Map.fromEntries(dependencies.where((d) => d.package() == name).map((d) => MapEntry(
+                normalizedDependencyMap[d],
+                _referencesToDependency(normalizedDependencyMap[d], pubspecLocks),
+              )))))
+      .toList();
+}
 
 List<String> _referencesToDependency(
   PackageDependency d,
@@ -72,17 +92,3 @@ List<String> _referencesToDependency(
     [
       for (final pubspecLock in pubspecLocks.entries) if (pubspecLock.value.packages.contains(d)) ...[pubspecLock.key]
     ];
-
-List<PackageUsageReport> _createReport(
-  Iterable<PackageDependency> inconsistentDependencies,
-  Map<String, PubspecLock> pubspecLocks,
-) {
-  final names = inconsistentDependencies.map((d) => d.package()).toSet();
-  return names
-      .map((name) => PackageUsageReport(
-          dependencyName: name,
-          references: Map.fromEntries(inconsistentDependencies
-              .where((d) => d.package() == name)
-              .map((d) => MapEntry(d, _referencesToDependency(d, pubspecLocks))))))
-      .toList();
-}
