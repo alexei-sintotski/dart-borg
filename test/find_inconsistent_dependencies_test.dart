@@ -86,6 +86,16 @@ void main() {
       expect(report.length, 1);
     });
   });
+
+  group('when provided with two dependencies with difference in dependency type only', () {
+    final report = findInconsistentDependencies({
+      'a1': const PubspecLock(packages: [_hostedDependencyAv1]),
+      'a2': const PubspecLock(packages: [_hostedDependencyAv1Transitive]),
+    });
+    test('it provides empty report', () {
+      expect(report, isEmpty);
+    });
+  });
 }
 
 const _hostedDependencyAv1 = PackageDependency.hosted(HostedPackageDependency(
@@ -94,6 +104,14 @@ const _hostedDependencyAv1 = PackageDependency.hosted(HostedPackageDependency(
   name: 'a',
   url: 'https://pub.dartlang.org',
   type: DependencyType.direct,
+));
+
+const _hostedDependencyAv1Transitive = PackageDependency.hosted(HostedPackageDependency(
+  package: 'a',
+  version: '1.0.0',
+  name: 'a',
+  url: 'https://pub.dartlang.org',
+  type: DependencyType.transitive,
 ));
 
 const _hostedDependencyAv2 = PackageDependency.hosted(HostedPackageDependency(
