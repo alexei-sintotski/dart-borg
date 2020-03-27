@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-#dart example/main.dart
+dart bin/main.dart probe
 dartanalyzer --fatal-hints .
 pub run test
 pub run dependency_validator --ignore=functional_data_generator,sum_types_generator,test_coverage
