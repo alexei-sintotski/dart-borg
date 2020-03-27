@@ -45,6 +45,7 @@ class PackageUsageReport extends $PackageUsageReport {
 
   final String dependencyName;
 
+  /// Usage map: Dependency version => list of pubspec.lock files using it
   @CustomEquality(DeepCollectionEquality())
   final Map<PackageDependency, List<String>> references;
 }
