@@ -1,6 +1,6 @@
 name: borg
 description: Command-line tool to support consistent configuration management of Dart packages in mono repository
-version: 0.1.2
+version: 0.1.2+1
 homepage: https://github.com/alexei-sintotski/dart-borg
 
 executables:
@@ -10,7 +10,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  args: ^1.6.0
+  args: ^1.5.0
   collection: ^1.14.0
   functional_data: ^0.2.0
   glob: ^1.2.0
