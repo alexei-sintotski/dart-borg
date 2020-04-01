@@ -16,6 +16,7 @@ dependencies:
   glob: ^1.2.0
   meta: ^1.1.0
   pubspec_lock: ^2.0.0
+  pubspec_yaml: ^2.0.0
 
 dev_dependencies:
   build_runner: ^1.8.0
