@@ -29,10 +29,11 @@ import 'src/commands/probe_command.dart';
 
 void main(List<String> args) => CommandRunner<void>(
       'borg',
-      'Command-line tool to support consistent configuration management of Dart packages in mono repository\n'
-          'STILL UNDER DEVELOPMENT\n'
-          'This version supports the following features\n'
-          '* Consistency check on use of Dart dependencies',
+      'Command-line tool to support consistent configuration management of Dart packages in mono repository'
+          '\n\nSTILL UNDER DEVELOPMENT'
+          '\nThis version supports the following features'
+          '\n* Consistency check on use of Dart dependencies'
+          '\n* Consistency check on package specifications in pubspec.yaml files\n',
     )
       ..addCommand(ProbeCommand())
       ..run(args);

@@ -27,11 +27,12 @@ import 'package:pubspec_yaml/pubspec_yaml.dart';
 
 import 'generic_dependency_usage_report.dart';
 
-/// Finds inconsistent set of external dependencies in the provided set of pubspec.yaml content and
-/// generates report on inconsistent package usage.
+/// Finds inconsistent set of external dependency specifications in the provided set of pubspec.yaml content and
+/// generates report on inconsistent references.
 /// As analysis focuses on consistency of external dependencies, consistency of path dependencies is ignored.
-/// However, if a dependency is specified by mix of path and other dependencies types in different pubspec.yaml files,
+/// However, if a dependency is specified by a mix of path and other dependency types in different pubspec.yaml files,
 /// this case is reported as inconsistency.
+///
 List<DependencyUsageReport<PackageDependencySpec>> findInconsistentDependencySpecs(
     Map<String, PubspecYaml> pubspecYamls) {
   final specsPerPubspecYaml = _collectAllDepSpecsPerPubspecYaml(pubspecYamls);
