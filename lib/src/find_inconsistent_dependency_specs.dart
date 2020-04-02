@@ -25,14 +25,15 @@
 
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
-import 'dependency_specification_report.dart';
+import 'generic_dependency_usage_report.dart';
 
 /// Finds inconsistent set of external dependencies in the provided set of pubspec.yaml content and
 /// generates report on inconsistent package usage.
 /// As analysis focuses on consistency of external dependencies, consistency of path dependencies is ignored.
 /// However, if a dependency is specified by mix of path and other dependencies types in different pubspec.yaml files,
 /// this case is reported as inconsistency.
-List<PackageDependencySpecReport> findInconsistentDependencySpecs(Map<String, PubspecYaml> pubspecYamls) {
+List<DependencyUsageReport<PackageDependencySpec>> findInconsistentDependencySpecs(
+    Map<String, PubspecYaml> pubspecYamls) {
   final specsPerPubspecYaml = _collectAllDepSpecsPerPubspecYaml(pubspecYamls);
 
   final allSpecs = _collectAllDepSpecs(specsPerPubspecYaml);
@@ -64,13 +65,13 @@ Iterable<PackageDependencySpec> _filterOutPathOnlySpecs(Iterable<PackageDependen
 Iterable<PackageDependencySpec> _filterOutSingularReferences(Iterable<PackageDependencySpec> allSpecs) =>
     allSpecs.where((s) => allSpecs.where((ss) => s.package() == ss.package()).length > 1);
 
-List<PackageDependencySpecReport> _createReport(
+List<DependencyUsageReport<PackageDependencySpec>> _createReport(
   Iterable<PackageDependencySpec> specs,
   Map<String, Iterable<PackageDependencySpec>> specsPerPubspecYaml,
 ) {
   final names = specs.map((d) => d.package()).toSet();
   return names
-      .map((name) => PackageDependencySpecReport(
+      .map((name) => DependencyUsageReport(
           dependencyName: name,
           references: Map.fromEntries(specs.where((d) => d.package() == name).map((d) => MapEntry(
                 d,

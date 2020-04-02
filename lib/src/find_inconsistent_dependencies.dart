@@ -25,14 +25,14 @@
 
 import 'package:pubspec_lock/pubspec_lock.dart';
 
-import 'package_usage_report.dart';
+import 'generic_dependency_usage_report.dart';
 
 /// Finds inconsistent set of external dependencies in the provided set of pubspec.lock content and
 /// generates report on inconsistent package usage.
 /// As analysis focuses on consistency of external dependencies, consistency of path dependencies is ignored.
 /// However, if a dependency is specified by mix of path and other dependencies types in different pubspec.lock files,
 /// this case is reported as inconsistency.
-List<PackageUsageReport> findInconsistentDependencies(Map<String, PubspecLock> pubspecLocks) {
+List<DependencyUsageReport<PackageDependency>> findInconsistentDependencies(Map<String, PubspecLock> pubspecLocks) {
   final dependencies = _collectAllDependencies(pubspecLocks).toSet();
   final externalDependencies = _filterOutPathOnlyDependencies(dependencies).toSet();
   final normalizedDependencyMap = _normalizeDependencyType(externalDependencies);
@@ -69,14 +69,14 @@ Iterable<PackageDependency> _filterOutConsistentDependencies(
 ) =>
     externalDependencies.where((d) => externalDependencies.where((dd) => dd.package() == d.package()).length > 1);
 
-List<PackageUsageReport> _createReport(
+List<DependencyUsageReport<PackageDependency>> _createReport(
   Iterable<PackageDependency> dependencies,
   Map<PackageDependency, PackageDependency> normalizedDependencyMap,
   Map<String, PubspecLock> pubspecLocks,
 ) {
   final names = dependencies.map((d) => d.package()).toSet();
   return names
-      .map((name) => PackageUsageReport(
+      .map((name) => DependencyUsageReport(
           dependencyName: name,
           references: Map.fromEntries(dependencies.where((d) => d.package() == name).map((d) => MapEntry(
                 normalizedDependencyMap[d],

@@ -50,10 +50,13 @@ void main() {
       final report = findInconsistentDependencySpecs({'x': pubspecYamlWithA, 'y': pubspecYamlWithVersionedA});
       test('it produces correct report', () {
         expect(report, [
-          PackageDependencySpecReport(dependencyName: 'a', references: {
-            pubspecYamlWithA.dependencies.first: const ['x'],
-            pubspecYamlWithVersionedA.dependencies.first: const ['y'],
-          })
+          DependencyUsageReport<PackageDependencySpec>(
+            dependencyName: 'a',
+            references: {
+              pubspecYamlWithA.dependencies.first: const ['x'],
+              pubspecYamlWithVersionedA.dependencies.first: const ['y'],
+            },
+          )
         ]);
       });
     });
@@ -73,10 +76,13 @@ void main() {
       final report = findInconsistentDependencySpecs({'x': pubspecYamlWithDep, 'y': pubspecYamlWithDevDep});
       test('it produces correct report', () {
         expect(report, [
-          PackageDependencySpecReport(dependencyName: 'a', references: {
-            pubspecYamlWithDep.dependencies.first: const ['x'],
-            pubspecYamlWithDevDep.devDependencies.first: const ['y'],
-          })
+          DependencyUsageReport<PackageDependencySpec>(
+            dependencyName: 'a',
+            references: {
+              pubspecYamlWithDep.dependencies.first: const ['x'],
+              pubspecYamlWithDevDep.devDependencies.first: const ['y'],
+            },
+          )
         ]);
       });
     });
