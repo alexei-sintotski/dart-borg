@@ -14,7 +14,7 @@ Feature roadmap (in the order of priority):
 | 1.1     | Consistent upgrade of external dependencies across repository                      |
 | 1.2     | Correction of configuration of a Dart package newly added to the mono repository   |
 
-*WARNING: This version is backwards-incompatible with version 0.1.0!*
+*WARNING: This version is backwards-incompatible with versions 0.1.x!*
 
 # Installation
 
