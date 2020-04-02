@@ -33,13 +33,17 @@ import 'package:pubspec_yaml/pubspec_yaml.dart';
 
 import '../file_finder.dart';
 import '../options/exclude.dart';
+import '../options/lock.dart';
 import '../options/paths.dart';
 import '../options/verbose.dart';
+import '../options/yaml.dart';
 
 // ignore_for_file: avoid_print
 
 class ProbeCommand extends Command<void> {
   ProbeCommand() {
+    addPubspecYamlFlag(argParser);
+    addPubspecLockFlag(argParser);
     addPathsMultiOption(argParser);
     addExcludeMultiOption(argParser);
     addVerboseFlag(argParser);
@@ -53,28 +57,27 @@ class ProbeCommand extends Command<void> {
 
   @override
   void run() {
-    _checkPubspecYamlFiles();
+    if (getPubspecYamlFlag(argResults)) {
+      _checkPubspecYamlFiles();
+    } else {
+      print('Analysis of pubspec.yaml files is skipped');
+    }
     print('');
-    _checkPubspecLockFiles();
-    print('\nSUCCESS: All packages use consistent set of external dependencies');
+    if (getPubspecLockFlag(argResults)) {
+      _checkPubspecLockFiles();
+    } else {
+      print('Analysis of pubspec.lock files is skipped');
+    }
+    if (getPubspecYamlFlag(argResults) || getPubspecLockFlag(argResults)) {
+      print('\nSUCCESS: All packages use consistent set of external dependencies');
+    } else {
+      print('\nWARNING: Nothing to do!');
+      exit(2);
+    }
   }
 
   void _checkPubspecYamlFiles() {
-    print('==> Scanning for pubspec.yaml files...');
-    final pubspecYamlLocations = _locationsToScan('pubspec.yaml');
-
-    if (pubspecYamlLocations.isEmpty) {
-      print('\nWARNING: No pubspec.yaml files selected for analysis');
-      exit(2);
-    }
-
-    print('Found ${pubspecYamlLocations.length} pubspec.yaml files, loading...');
-    if (getVerboseFlag(argResults)) {
-      for (final location in pubspecYamlLocations) {
-        print('\t$location');
-      }
-    }
-
+    final pubspecYamlLocations = _locatePubspecFiles(filename: 'pubspec.yaml');
     final pubspecYamls = Map.fromEntries(pubspecYamlLocations.map((location) => MapEntry(
           location,
           File(location).readAsStringSync().toPubspecYaml(),
@@ -94,20 +97,7 @@ class ProbeCommand extends Command<void> {
   }
 
   void _checkPubspecLockFiles() {
-    print('==> Scanning for pubspec.lock files...');
-    final pubspecLockLocations = _locationsToScan('pubspec.lock');
-    print('Found ${pubspecLockLocations.length} pubspec.lock files');
-    if (getVerboseFlag(argResults)) {
-      for (final location in pubspecLockLocations) {
-        print('\t$location');
-      }
-    }
-
-    if (pubspecLockLocations.isEmpty) {
-      print('\nWARNING: No configuration files selected for analysis');
-      exit(2);
-    }
-
+    final pubspecLockLocations = _locatePubspecFiles(filename: 'pubspec.lock');
     final pubspecLocks = Map.fromEntries(pubspecLockLocations.map((location) => MapEntry(
           location,
           File(location).readAsStringSync().loadPubspecLockFromYaml(),
@@ -124,6 +114,26 @@ class ProbeCommand extends Command<void> {
       print('\nFAILURE: Inconsistent use of external dependencies detected!');
       exit(1);
     }
+  }
+
+  Iterable<String> _locatePubspecFiles({
+    @required String filename,
+  }) {
+    print('==> Scanning for $filename files...');
+    final pubspecFileLocations = _locationsToScan(filename);
+    print('Found ${pubspecFileLocations.length} $filename files');
+    if (getVerboseFlag(argResults)) {
+      for (final loc in pubspecFileLocations) {
+        print('\t$loc');
+      }
+    }
+
+    if (pubspecFileLocations.isEmpty) {
+      print('\nWARNING: No configuration files selected for analysis');
+      exit(2);
+    }
+
+    return pubspecFileLocations;
   }
 
   Iterable<String> _locationsToScan(String filename) {
