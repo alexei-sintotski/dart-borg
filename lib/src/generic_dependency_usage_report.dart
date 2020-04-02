@@ -24,29 +24,37 @@
  */
 
 import 'package:collection/collection.dart';
-import 'package:functional_data/functional_data.dart';
 import 'package:meta/meta.dart';
-import 'package:pubspec_yaml/pubspec_yaml.dart';
-
-part 'dependency_specification_report.g.dart';
-
-// ignore_for_file: annotate_overrides
-// ignore_for_file: avoid_annotating_with_dynamic
-// ignore_for_file: avoid_as
 
 /// Stores report data on dependency usage. Once instance stores data on usage of a single dependency across
 /// multiple Dart packages.
-
 @immutable
-@FunctionalData()
-class PackageDependencySpecReport extends $PackageDependencySpecReport {
+class DependencyUsageReport<DependencyType> {
   /// The constructor is used to create report
-  const PackageDependencySpecReport({@required this.dependencyName, @required this.references});
+  const DependencyUsageReport({@required this.dependencyName, @required this.references});
 
   /// Name of the package dependency
   final String dependencyName;
 
-  /// Usage map: Dependency version => list of pubspec.yaml files requiring it
-  @CustomEquality(DeepCollectionEquality())
-  final Map<PackageDependencySpec, List<String>> references;
+  /// Usage map: Dependency version => list of users
+  final Map<DependencyType, List<String>> references;
+
+  @override
+  String toString() =>
+      'DependencyUsageReport<$DependencyType>(dependencyName: $dependencyName, references: $references)';
+
+  @override
+  // ignore: avoid_annotating_with_dynamic
+  bool operator ==(dynamic other) =>
+      other.runtimeType == runtimeType &&
+      dependencyName == other.dependencyName &&
+      const DeepCollectionEquality().equals(references, other.references);
+
+  @override
+  int get hashCode {
+    var result = 17;
+    result = 37 * result + dependencyName.hashCode;
+    result = 37 * result + const DeepCollectionEquality().hash(references);
+    return result;
+  }
 }

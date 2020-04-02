@@ -24,7 +24,7 @@
  */
 
 import 'package:borg/src/find_inconsistent_dependencies.dart';
-import 'package:borg/src/package_usage_report.dart';
+import 'package:borg/src/generic_dependency_usage_report.dart';
 import 'package:pubspec_lock/pubspec_lock.dart';
 import 'package:test/test.dart';
 
@@ -124,7 +124,7 @@ const _hostedDependencyAv2 = PackageDependency.hosted(HostedPackageDependency(
 
 final _reportAv1Av2 = [
   //ignore: prefer_const_constructors, prefer_const_literals_to_create_immutables
-  PackageUsageReport(dependencyName: 'a', references: {
+  DependencyUsageReport<PackageDependency>(dependencyName: 'a', references: {
     // ignore: prefer_const_literals_to_create_immutables
     _hostedDependencyAv1: ['a1'],
     // ignore: prefer_const_literals_to_create_immutables

@@ -27,6 +27,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:borg/borg.dart';
+import 'package:meta/meta.dart';
 import 'package:pubspec_lock/pubspec_lock.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
@@ -83,21 +84,12 @@ class ProbeCommand extends Command<void> {
     final inconsistentSpecList = findInconsistentDependencySpecs(pubspecYamls);
 
     if (inconsistentSpecList.isNotEmpty) {
-      _printPackageSpecReport(inconsistentSpecList);
-      print('\nFAILUE: Inconsistent package dependency specifications detected!');
+      _printDependencyUsageReport(
+        report: inconsistentSpecList,
+        formatDependency: _formatDependencySpec,
+      );
+      print('\nFAILURE: Inconsistent package dependency specifications detected!');
       exit(1);
-    }
-  }
-
-  void _printPackageSpecReport(List<PackageDependencySpecReport> configuration) {
-    for (final use in configuration) {
-      print('\n${use.dependencyName}: inconsistent dependency specifications detected');
-      for (final dependency in use.references.keys) {
-        print('\tVersion ${_formatDependencySpec(dependency)} is used by:');
-        for (final user in use.references[dependency]) {
-          print('\t\t$user');
-        }
-      }
     }
   }
 
@@ -125,8 +117,11 @@ class ProbeCommand extends Command<void> {
     final inconsistentUsageList = findInconsistentDependencies(pubspecLocks);
 
     if (inconsistentUsageList.isNotEmpty) {
-      _printUsageReport(inconsistentUsageList);
-      print('\nFAILUE: Inconsistent use of external dependencies detected!');
+      _printDependencyUsageReport(
+        report: inconsistentUsageList,
+        formatDependency: _formatDependencyInfo,
+      );
+      print('\nFAILURE: Inconsistent use of external dependencies detected!');
       exit(1);
     }
   }
@@ -139,11 +134,14 @@ class ProbeCommand extends Command<void> {
   }
 }
 
-void _printUsageReport(List<PackageUsageReport> configuration) {
-  for (final use in configuration) {
-    print('\n${use.dependencyName}: inconsistent use detected');
+void _printDependencyUsageReport<DependencyType>({
+  @required List<DependencyUsageReport<DependencyType>> report,
+  @required String Function(DependencyType dependency) formatDependency,
+}) {
+  for (final use in report) {
+    print('\n${use.dependencyName}: inconsistent dependency specifications detected');
     for (final dependency in use.references.keys) {
-      print('\tVersion ${_formatDependencyInfo(dependency)} is used by:');
+      print('\tVersion ${formatDependency(dependency)} is used by:');
       for (final user in use.references[dependency]) {
         print('\t\t$user');
       }
