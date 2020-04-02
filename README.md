@@ -5,15 +5,16 @@ Command-line tool to support consistent configuration management of Dart package
 Features available in the current version:
 
 * Consistency check on use of Dart dependencies
+* Consistency check on package specifications in pubspec.yaml files
 
 Feature roadmap (in the order of priority):
 
 | version | Major feature                                                                      |
 |---------|------------------------------------------------------------------------------------|
-| 0.2     | Consistency check on use of SDKs (Dart, Flutter, etc.)                             |
-| 1.0     | Consistency check on package specifications in pubspec.yaml files                  |
 | 1.1     | Consistent upgrade of external dependencies across repository                      |
 | 1.2     | Correction of configuration of a Dart package newly added to the mono repository   |
+
+*WARNING: This version is backwards-incompatible with version 0.1.0!*
 
 # Installation
 
@@ -37,9 +38,12 @@ The tool is self documented, please execute it to get detailed information on th
 ```
 $ borg
 Command-line tool to support consistent configuration management of Dart packages in mono repository
+
 STILL UNDER DEVELOPMENT
 This version supports the following features
 * Consistency check on use of Dart dependencies
+* Consistency check on package specifications in pubspec.yaml files
+
 
 Usage: borg <command> [arguments]
 
@@ -60,6 +64,11 @@ In case of detected inconsistencies the tool provides aggregated report on detec
 
 ```
 $ borg probe 
+==> Scanning for pubspec.yaml files...
+Found 2 pubspec.yaml files
+Analyzing dependency specifications...
+
+==> Scanning for pubspec.lock files...
 Found 2 pubspec.lock files
 Analyzing dependencies...
 
@@ -78,6 +87,11 @@ In case of consistent usage of dependencies the tool returns with exit code 0:
 
 ```
 $ borg probe 
+==> Scanning for pubspec.yaml files...
+Found 1 pubspec.yaml files
+Analyzing dependency specifications...
+
+==> Scanning for pubspec.lock files...
 Found 1 pubspec.lock files
 Analyzing dependencies...
 
@@ -90,7 +104,8 @@ The tool issues a warning and exits with code 2 in case scan did not find pubspe
 
 ```
 $ borg probe --exclude .
-Found 0 pubspec.lock files
+==> Scanning for pubspec.yaml files...
+Found 0 pubspec.yaml files
 
 WARNING: No configuration files selected for analysis
 ```
@@ -104,7 +119,7 @@ In order to use it, just refer to the package `borg` as a dependency in your `pu
 
 This check is performed by a single function:
 
-`List<PackageUsageReport> findInconsistentDependencies(Map<String, PubspecLock> pubspecLocks)`.
+`List<DependencyUsageReport<PackageDependency>> findInconsistentDependencies(Map<String, PubspecLock> pubspecLocks)`.
 
 As input, this function accepts content of `pubspec.lock` files with labels identifying them (e.g., paths).
 Checkout the Dart package  [pubspec_lock](https://pub.dev/packages/pubspec_lock) for details on the input data format and
@@ -114,21 +129,33 @@ After execution, this function produces a report on inconsistent usage of extern
 
 If the report is empty, the usage of dependencies is consistent across all checked Dart packages.
 
+## Consistency check on package dependency specifications
+
+This check is performed by a single function:
+
+`List<DependencyUsageReport<PackageDependencySpec>> findInconsistentDependencySpecs(Map<String, PubspecYaml> pubspecYamls)`.
+
+As input, this function accepts content of `pubspec.yaml` files with labels identifying them (e.g., paths).
+Checkout the Dart package  [pubspec_yaml](https://pub.dev/packages/pubspec_yaml) for details on the input data format and
+options to import content of `pubspec.yaml` files.
+
+After execution, this function produces a report on inconsistent specifications of external dependencies.
+
+If the report is empty, the package dependency specs are consistent across all checked Dart packages.
+
+## DependencyUsageReport
+
+The data class used for reporting captures usage of a dependency by multiple Dart packages.
+
 ```
-/// Stores report data on dependency usage. Once instance stores data on usage of a single dependency across
-/// multiple Dart packages.
-
-@immutable
-@FunctionalData()
-class PackageUsageReport extends $PackageUsageReport {
+class DependencyUsageReport<DependencyType> {
   /// The constructor is used to create report
-  const PackageUsageReport({@required this.dependencyName, @required this.references});
+  const DependencyUsageReport({@required this.dependencyName, @required this.references});
 
+  /// Name of the package dependency
   final String dependencyName;
 
-  /// Usage map: Dependency version => list of pubspec.lock files using it
-  @CustomEquality(DeepCollectionEquality())
-  final Map<PackageDependency, List<String>> references;
+  /// Usage map: Dependency version => list of users
+  final Map<DependencyType, List<String>> references;
 }
 ```
-See Dart package [pubspec_lock](https://pub.dev/packages/pubspec_lock) for details on PackageDependency data structure.

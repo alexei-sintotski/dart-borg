@@ -30,8 +30,11 @@ import 'generic_dependency_usage_report.dart';
 /// Finds inconsistent set of external dependencies in the provided set of pubspec.lock content and
 /// generates report on inconsistent package usage.
 /// As analysis focuses on consistency of external dependencies, consistency of path dependencies is ignored.
-/// However, if a dependency is specified by mix of path and other dependencies types in different pubspec.lock files,
+/// However, if a dependency is specified by a mix of path and other dependency types in different pubspec.yaml files,
 /// this case is reported as inconsistency.
+///
+/// NB: To simplify implementation at this moment, version specifications are compared as strings, not semantically.
+///
 List<DependencyUsageReport<PackageDependency>> findInconsistentDependencies(Map<String, PubspecLock> pubspecLocks) {
   final dependencies = _collectAllDependencies(pubspecLocks).toSet();
   final externalDependencies = _filterOutPathOnlyDependencies(dependencies).toSet();

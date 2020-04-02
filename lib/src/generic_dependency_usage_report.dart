@@ -26,8 +26,7 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
-/// Stores report data on dependency usage. Once instance stores data on usage of a single dependency across
-/// multiple Dart packages.
+/// Data class to capture usage of a dependency by multiple Dart packages.
 @immutable
 class DependencyUsageReport<DependencyType> {
   /// The constructor is used to create report
