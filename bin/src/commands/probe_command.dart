@@ -160,10 +160,10 @@ void _printDependencyUsageReport<DependencyType>({
 }
 
 String _formatDependencySpec(PackageDependencySpec dependency) => dependency.iswitch(
-    git: (dep) => '${dep.url}:${dep.ref}',
+    git: (dep) => '${dep.url}${dep.ref.iif(some: (v) => ": $v", none: () => "")}',
     path: (dep) => '${dep.path}',
-    hosted: (dep) => '${dep.version}',
-    sdk: (dep) => '${dep.version}');
+    hosted: (dep) => '${dep.version.valueOr(() => "unspecified")}',
+    sdk: (dep) => '${dep.version.valueOr(() => "unspecified")}');
 
 String _formatDependencyInfo(PackageDependency dependency) => dependency.iswitcho(
       git: (dep) => '${dep.url}:${dep.resolvedRef}',
