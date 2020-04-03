@@ -39,7 +39,8 @@ List<DependencyUsageReport<PackageDependencySpec>> findInconsistentDependencySpe
 
   final allSpecs = _collectAllDepSpecs(specsPerPubspecYaml);
   final externalSpecs = _filterOutPathOnlySpecs(allSpecs).toSet();
-  final inconsistentSpecs = _filterOutSingularReferences(externalSpecs);
+  final specsWithRelevantHostedSpecs = _filterOutRedundantHostedSpecs(externalSpecs).toSet();
+  final inconsistentSpecs = _filterOutSingularReferences(specsWithRelevantHostedSpecs).toSet();
   return _createReport(inconsistentSpecs, specsPerPubspecYaml);
 }
 
@@ -58,13 +59,24 @@ Set<PackageDependencySpec> _getDependencySpecs(PubspecYaml pubspecYaml) => {
 PackageDependencySpec _correctForOverride(PackageDependencySpec dep, PubspecYaml pubspecYaml) =>
     pubspecYaml.dependencyOverrides.firstWhere((d) => d.package() == dep.package(), orElse: () => dep);
 
-Iterable<PackageDependencySpec> _filterOutPathOnlySpecs(Iterable<PackageDependencySpec> allSpecs) =>
-    allSpecs.where((spec) => allSpecs
+Iterable<PackageDependencySpec> _filterOutPathOnlySpecs(Iterable<PackageDependencySpec> specs) =>
+    specs.where((spec) => specs
         .where((s) => s.package() == spec.package())
         .any((spec) => spec.iswitcho(path: (_) => false, otherwise: () => true)));
 
-Iterable<PackageDependencySpec> _filterOutSingularReferences(Iterable<PackageDependencySpec> allSpecs) =>
-    allSpecs.where((s) => allSpecs.where((ss) => s.package() == ss.package()).length > 1);
+Iterable<PackageDependencySpec> _filterOutRedundantHostedSpecs(Iterable<PackageDependencySpec> specs) =>
+    specs.where((s) => s.iswitcho(
+          hosted: (hs) =>
+              hs.version.hasValue ||
+              specs.where((s) => s.package() == hs.package).every((s) => s.iswitcho(
+                    hosted: (h) => !h.version.hasValue,
+                    otherwise: () => true,
+                  )),
+          otherwise: () => true,
+        ));
+
+Iterable<PackageDependencySpec> _filterOutSingularReferences(Iterable<PackageDependencySpec> specs) =>
+    specs.where((s) => specs.where((ss) => s.package() == ss.package()).length > 1);
 
 List<DependencyUsageReport<PackageDependencySpec>> _createReport(
   Iterable<PackageDependencySpec> specs,
