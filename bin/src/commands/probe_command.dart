@@ -27,16 +27,16 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:borg/borg.dart';
-import 'package:meta/meta.dart';
 import 'package:pubspec_lock/pubspec_lock.dart';
-import 'package:pubspec_yaml/pubspec_yaml.dart';
 
-import '../file_finder.dart';
+import '../locate_pubspec_files.dart';
 import '../options/exclude.dart';
 import '../options/lock.dart';
 import '../options/paths.dart';
 import '../options/verbose.dart';
 import '../options/yaml.dart';
+import '../print_dependency_usage_report.dart';
+import '../pubspec_yaml_functions.dart';
 
 // ignore_for_file: avoid_print
 
@@ -77,27 +77,13 @@ class ProbeCommand extends Command<void> {
   }
 
   void _checkPubspecYamlFiles() {
-    final pubspecYamlLocations = _locatePubspecFiles(filename: 'pubspec.yaml');
-    final pubspecYamls = Map.fromEntries(pubspecYamlLocations.map((location) => MapEntry(
-          location,
-          File(location).readAsStringSync().toPubspecYaml(),
-        )));
-
+    final pubspecYamls = loadPubspecYamlFiles(argResults: argResults);
     print('Analyzing dependency specifications...');
-    final inconsistentSpecList = findInconsistentDependencySpecs(pubspecYamls);
-
-    if (inconsistentSpecList.isNotEmpty) {
-      _printDependencyUsageReport(
-        report: inconsistentSpecList,
-        formatDependency: _formatDependencySpec,
-      );
-      print('\nFAILURE: Inconsistent package dependency specifications detected!');
-      exit(1);
-    }
+    assertPubspecYamlConsistency(pubspecYamls);
   }
 
   void _checkPubspecLockFiles() {
-    final pubspecLockLocations = _locatePubspecFiles(filename: 'pubspec.lock');
+    final pubspecLockLocations = locatePubspecFiles(filename: 'pubspec.lock', argResults: argResults);
     final pubspecLocks = Map.fromEntries(pubspecLockLocations.map((location) => MapEntry(
           location,
           File(location).readAsStringSync().loadPubspecLockFromYaml(),
@@ -107,7 +93,7 @@ class ProbeCommand extends Command<void> {
     final inconsistentUsageList = findInconsistentDependencies(pubspecLocks);
 
     if (inconsistentUsageList.isNotEmpty) {
-      _printDependencyUsageReport(
+      printDependencyUsageReport(
         report: inconsistentUsageList,
         formatDependency: _formatDependencyInfo,
       );
@@ -115,55 +101,7 @@ class ProbeCommand extends Command<void> {
       exit(1);
     }
   }
-
-  Iterable<String> _locatePubspecFiles({
-    @required String filename,
-  }) {
-    print('==> Scanning for $filename files...');
-    final pubspecFileLocations = _locationsToScan(filename);
-    print('Found ${pubspecFileLocations.length} $filename files');
-    if (getVerboseFlag(argResults)) {
-      for (final loc in pubspecFileLocations) {
-        print('\t$loc');
-      }
-    }
-
-    if (pubspecFileLocations.isEmpty) {
-      print('\nWARNING: No configuration files selected for analysis');
-      exit(2);
-    }
-
-    return pubspecFileLocations;
-  }
-
-  Iterable<String> _locationsToScan(String filename) {
-    final pubspecLockFinder = FileFinder(filename);
-    final includedpubspecLockLocations = pubspecLockFinder.findFiles(getPathsMultiOption(argResults));
-    final excludedPubspecLockLocations = pubspecLockFinder.findFiles(getExcludesMultiOption(argResults));
-    return includedpubspecLockLocations.where((location) => !excludedPubspecLockLocations.contains(location));
-  }
 }
-
-void _printDependencyUsageReport<DependencyType>({
-  @required List<DependencyUsageReport<DependencyType>> report,
-  @required String Function(DependencyType dependency) formatDependency,
-}) {
-  for (final use in report) {
-    print('\n${use.dependencyName}: inconsistent dependency specifications detected');
-    for (final dependency in use.references.keys) {
-      print('\tVersion ${formatDependency(dependency)} is used by:');
-      for (final user in use.references[dependency]) {
-        print('\t\t$user');
-      }
-    }
-  }
-}
-
-String _formatDependencySpec(PackageDependencySpec dependency) => dependency.iswitch(
-    git: (dep) => '${dep.url}${dep.ref.iif(some: (v) => ": $v", none: () => "")}',
-    path: (dep) => '${dep.path}',
-    hosted: (dep) => '${dep.version.valueOr(() => "unspecified")}',
-    sdk: (dep) => '${dep.version.valueOr(() => "unspecified")}');
 
 String _formatDependencyInfo(PackageDependency dependency) => dependency.iswitcho(
       git: (dep) => '${dep.url}:${dep.resolvedRef}',
