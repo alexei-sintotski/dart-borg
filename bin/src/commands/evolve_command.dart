@@ -25,13 +25,21 @@
 
 import 'package:args/command_runner.dart';
 
-import 'src/commands/evolve_command.dart';
-import 'src/commands/probe_command.dart';
+import '../options/dry_run.dart';
 
-void main(List<String> args) => CommandRunner<void>(
-      'borg',
-      'Command-line tool to support consistent configuration management of Dart packages in a mono repository',
-    )
-      ..addCommand(ProbeCommand())
-      ..addCommand(EvolveCommand())
-      ..run(args);
+// ignore_for_file: avoid_print
+
+class EvolveCommand extends Command<void> {
+  EvolveCommand() {
+    addDryRunFlag(argParser);
+  }
+
+  @override
+  String get description => 'Upgrade Dart dependencies across multiple packages';
+
+  @override
+  String get name => 'evolve';
+
+  @override
+  void run() {}
+}

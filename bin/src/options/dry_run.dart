@@ -23,15 +23,15 @@
  *
  */
 
-import 'package:args/command_runner.dart';
+import 'package:args/args.dart';
 
-import 'src/commands/evolve_command.dart';
-import 'src/commands/probe_command.dart';
+void addDryRunFlag(ArgParser argParser) => argParser.addFlag(
+      _name,
+      abbr: 'd',
+      help: 'Preview results without modification of Dart packages',
+    );
 
-void main(List<String> args) => CommandRunner<void>(
-      'borg',
-      'Command-line tool to support consistent configuration management of Dart packages in a mono repository',
-    )
-      ..addCommand(ProbeCommand())
-      ..addCommand(EvolveCommand())
-      ..run(args);
+// ignore: avoid_as
+bool getDryRunFlag(ArgResults argResults) => argResults[_name] as bool;
+
+const _name = 'dry-run';
