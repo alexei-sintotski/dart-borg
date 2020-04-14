@@ -24,14 +24,23 @@
  */
 
 import 'package:args/command_runner.dart';
+import 'package:borg/borg.dart';
+import 'package:pubspec_yaml/src/package_dependency_spec/package_dependency_spec.dart';
 
 import '../options/dry_run.dart';
+import '../options/exclude.dart';
+import '../options/paths.dart';
+import '../options/verbose.dart';
+import '../pubspec_yaml_functions.dart';
 
 // ignore_for_file: avoid_print
 
 class EvolveCommand extends Command<void> {
   EvolveCommand() {
     addDryRunFlag(argParser);
+    addPathsMultiOption(argParser);
+    addExcludeMultiOption(argParser);
+    addVerboseFlag(argParser);
   }
 
   @override
@@ -41,5 +50,28 @@ class EvolveCommand extends Command<void> {
   String get name => 'evolve';
 
   @override
-  void run() {}
+  void run() {
+    final pubspecYamls = loadPubspecYamlFiles(argResults: argResults);
+    assertPubspecYamlConsistency(pubspecYamls);
+
+    final allHostedDependencies = getAllHostedPackageDependencySpecs(pubspecYamls.values);
+    print('Identified ${allHostedDependencies.length} external hosted dependencies');
+    if (getVerboseFlag(argResults)) {
+      _printDependencies(allHostedDependencies);
+    }
+  }
 }
+
+void _printDependencies(Iterable<PackageDependencySpec> deps) {
+  for (final dep in deps) {
+    print('\t${dep.package()}${_printVersion(dep)}');
+  }
+}
+
+String _printVersion(PackageDependencySpec dep) => dep.iswitcho(
+      hosted: (dep) => dep.version.iif(
+        some: (v) => ': $v',
+        none: () => '',
+      ),
+      otherwise: () => '',
+    );

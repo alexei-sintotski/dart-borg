@@ -19,5 +19,6 @@ dependencies:
 
 dev_dependencies:
   dependency_validator: ^1.4.0
+  plain_optional: ^0.1.0
   test: ^1.14.0
   test_coverage: ^0.4.0
