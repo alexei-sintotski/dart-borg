@@ -25,9 +25,12 @@
 
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
-Iterable<PackageDependencySpec> getAllExternalPackageDependencySpecs(Iterable<PubspecYaml> pubspecYamls) => {
-      for (final pubspecYaml in pubspecYamls) ..._getDependencySpecs(pubspecYaml),
-    }.where(_isExternal);
+Iterable<PackageDependencySpec> getAllExternalPackageDependencySpecs(Iterable<PubspecYaml> pubspecYamls) =>
+    _filterOutRedundantHostedSpecs(
+      {
+        for (final pubspecYaml in pubspecYamls) ..._getDependencySpecs(pubspecYaml),
+      }.where(_isExternal),
+    );
 
 bool _isExternal(PackageDependencySpec dep) => dep.iswitcho(path: (_) => false, otherwise: () => true);
 
@@ -38,3 +41,14 @@ Set<PackageDependencySpec> _getDependencySpecs(PubspecYaml pubspecYaml) => {
 
 PackageDependencySpec _correctForOverride(PackageDependencySpec dep, PubspecYaml pubspecYaml) =>
     pubspecYaml.dependencyOverrides.firstWhere((d) => d.package() == dep.package(), orElse: () => dep);
+
+Iterable<PackageDependencySpec> _filterOutRedundantHostedSpecs(Iterable<PackageDependencySpec> specs) =>
+    specs.where((s) => s.iswitcho(
+          hosted: (hs) =>
+              hs.version.hasValue ||
+              specs.where((s) => s.package() == hs.package).every((s) => s.iswitcho(
+                    hosted: (h) => !h.version.hasValue,
+                    otherwise: () => true,
+                  )),
+          otherwise: () => true,
+        ));
