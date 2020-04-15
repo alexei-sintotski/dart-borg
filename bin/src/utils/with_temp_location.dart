@@ -25,40 +25,16 @@
 
 import 'dart:io';
 
-import 'package:args/args.dart';
 import 'package:meta/meta.dart';
 
-import 'options/exclude.dart';
-import 'options/paths.dart';
-import 'options/verbose.dart';
-import 'utils/file_finder.dart';
-
-// ignore_for_file: avoid_print
-
-Iterable<String> locatePubspecFiles({
-  @required String filename,
-  @required ArgResults argResults,
+void withTempLocation({
+  @required void Function(Directory location) action,
 }) {
-  print('==> Scanning for $filename files...');
-  final pubspecFileLocations = _locationsToScan(filename, argResults);
-  print('Found ${pubspecFileLocations.length} $filename files');
-  if (getVerboseFlag(argResults)) {
-    for (final loc in pubspecFileLocations) {
-      print('\t$loc');
-    }
+  const tempPrefix = 'borg-evolve-temp-';
+  final tempLocation = Directory.systemTemp.createTempSync(tempPrefix);
+  try {
+    action(tempLocation);
+  } finally {
+    tempLocation.deleteSync(recursive: true);
   }
-
-  if (pubspecFileLocations.isEmpty) {
-    print('\nWARNING: No configuration files selected for analysis');
-    exit(2);
-  }
-
-  return pubspecFileLocations;
-}
-
-Iterable<String> _locationsToScan(String filename, ArgResults argResults) {
-  final fileFinder = FileFinder(filename);
-  final includedLocations = fileFinder.findFiles(getPathsMultiOption(argResults));
-  final excludedLocations = fileFinder.findFiles(getExcludesMultiOption(argResults));
-  return includedLocations.where((location) => !excludedLocations.contains(location));
 }

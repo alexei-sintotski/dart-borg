@@ -23,8 +23,14 @@
  *
  */
 
+import 'dart:io';
+
 import 'package:args/command_runner.dart';
 import 'package:borg/borg.dart';
+import 'package:meta/meta.dart';
+import 'package:path/path.dart' as path;
+import 'package:pubspec_lock/pubspec_lock.dart';
+import 'package:pubspec_yaml/pubspec_yaml.dart';
 import 'package:pubspec_yaml/src/package_dependency_spec/package_dependency_spec.dart';
 
 import '../options/dry_run.dart';
@@ -32,7 +38,9 @@ import '../options/exclude.dart';
 import '../options/paths.dart';
 import '../options/verbose.dart';
 import '../pubspec_yaml_functions.dart';
-
+import '../utils/borg_exception.dart';
+import '../utils/run_system_command.dart';
+import '../utils/with_temp_location.dart';
 // ignore_for_file: avoid_print
 
 class EvolveCommand extends Command<void> {
@@ -50,30 +58,75 @@ class EvolveCommand extends Command<void> {
   String get name => 'evolve';
 
   @override
-  void run() {
+  void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
+
+  void _run() {
     final pubspecYamls = loadPubspecYamlFiles(argResults: argResults);
     assertPubspecYamlConsistency(pubspecYamls);
 
     final allExternalDepSpecs = getAllExternalPackageDependencySpecs(pubspecYamls.values);
-    print('Identified ${allExternalDepSpecs.length} external dependencies');
+    print('Identified ${allExternalDepSpecs.length} direct external dependencies');
     if (getVerboseFlag(argResults)) {
-      _printDependencies(allExternalDepSpecs);
+      _printDependencySpecs(allExternalDepSpecs);
+    }
+
+    withTempLocation(action: (location) {
+      _createPackage(
+        name: 'borg_evolve_temp',
+        location: location,
+        depSpecs: allExternalDepSpecs,
+      );
+      _resolveDependencies(location);
+      final resolvedDeps = _getResolvedDependencies(location: location);
+      print('Resolved ${resolvedDeps.length} external dependencies');
+    });
+  }
+
+  void _createPackage({
+    @required String name,
+    @required Directory location,
+    @required Iterable<PackageDependencySpec> depSpecs,
+  }) {
+    if (getVerboseFlag(argResults)) {
+      print('Creating temporary package at ${location.path}');
+    }
+    File(path.join(location.path, 'pubspec.yaml')).writeAsStringSync(PubspecYaml(
+      name: name,
+      dependencies: depSpecs,
+    ).toYamlString());
+  }
+
+  void _resolveDependencies(Directory location) {
+    print('\n==> Resolving external dependencies...');
+    final result = runSystemCommand(
+      command: 'pub get',
+      workingDirectory: location,
+    );
+    if (result.exitCode != 0 || getVerboseFlag(argResults)) {
+      print(result.stdout);
+      print(result.stderr);
+    }
+    if (result.exitCode != 0) {
+      throw const BorgException('FAILURE: pub get failed');
     }
   }
+
+  Iterable<PackageDependency> _getResolvedDependencies({@required Directory location}) =>
+      File(path.join(location.path, 'pubspec.lock')).readAsStringSync().loadPubspecLockFromYaml().packages;
 }
 
-void _printDependencies(Iterable<PackageDependencySpec> deps) {
+void _printDependencySpecs(Iterable<PackageDependencySpec> deps) {
   for (final dep in deps.toList()..sort((a, b) => a.package().compareTo(b.package()))) {
-    print('\t${dep.package()}${_printDependencyDetail(dep)}');
+    print('\t${dep.package()}${_printDependencySpecDetail(dep)}');
   }
 }
 
-String _printDependencyDetail(PackageDependencySpec dep) => dep.iswitch(
+String _printDependencySpecDetail(PackageDependencySpec dep) => dep.iswitch(
       hosted: (dep) => dep.version.iif(
         some: (v) => ': $v',
         none: () => '',
       ),
-      sdk: (dep) => ': ${dep.sdk}',
+      sdk: (dep) => ': ${dep.sdk} SDK',
       git: (dep) => ': ${dep.url}',
       path: (_) => '',
     );
