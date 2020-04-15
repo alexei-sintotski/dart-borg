@@ -33,10 +33,12 @@ import 'package:pubspec_lock/pubspec_lock.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 import 'package:pubspec_yaml/src/package_dependency_spec/package_dependency_spec.dart';
 
+import '../options/dart_sdk.dart';
 import '../options/dry_run.dart';
 import '../options/exclude.dart';
 import '../options/paths.dart';
 import '../options/verbose.dart';
+import '../pub.dart';
 import '../pubspec_yaml_functions.dart';
 import '../utils/borg_exception.dart';
 import '../utils/run_system_command.dart';
@@ -49,6 +51,7 @@ class EvolveCommand extends Command<void> {
     addPathsMultiOption(argParser);
     addExcludeMultiOption(argParser);
     addVerboseFlag(argParser);
+    addDartSdkOption(argParser);
   }
 
   @override
@@ -99,7 +102,7 @@ class EvolveCommand extends Command<void> {
   void _resolveDependencies(Directory location) {
     print('\n==> Resolving external dependencies...');
     final result = runSystemCommand(
-      command: 'pub get',
+      command: '${pub(argResults)} get',
       workingDirectory: location,
     );
     if (result.exitCode != 0 || getVerboseFlag(argResults)) {
