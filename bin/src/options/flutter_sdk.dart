@@ -24,14 +24,16 @@
  */
 
 import 'package:args/args.dart';
-import 'package:path/path.dart' as path;
 
-import 'options/dart_sdk.dart';
-import 'options/flutter_sdk.dart';
+void addFlutterSdkOption(ArgParser argParser) => argParser.addOption(
+      _name,
+      abbr: 'f',
+      help: 'Path to Flutter SDK',
+      valueHelp: 'PATH',
+      defaultsTo: '',
+    );
 
-String pub(ArgResults argResults) {
-  final location = getDartSdkOption(argResults);
-  return location.isEmpty ? 'pub' : path.joinAll([location, 'bin', 'pub']);
-}
+// ignore: avoid_as
+String getFlutterSdkOption(ArgResults argResults) => argResults[_name] as String;
 
-Map<String, String> pubEnvironment(ArgResults argResults) => {'FLUTTER_ROOT': getFlutterSdkOption(argResults)};
+const _name = 'fluttersdk';
