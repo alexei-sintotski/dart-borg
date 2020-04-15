@@ -35,8 +35,8 @@ import '../options/lock.dart';
 import '../options/paths.dart';
 import '../options/verbose.dart';
 import '../options/yaml.dart';
-import '../print_dependency_usage_report.dart';
 import '../pubspec_yaml_functions.dart';
+import '../utils/print_dependency_usage_report.dart';
 
 // ignore_for_file: avoid_print
 

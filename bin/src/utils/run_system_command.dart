@@ -25,40 +25,18 @@
 
 import 'dart:io';
 
-import 'package:args/args.dart';
 import 'package:meta/meta.dart';
 
-import 'options/exclude.dart';
-import 'options/paths.dart';
-import 'options/verbose.dart';
-import 'utils/file_finder.dart';
-
-// ignore_for_file: avoid_print
-
-Iterable<String> locatePubspecFiles({
-  @required String filename,
-  @required ArgResults argResults,
+ProcessResult runSystemCommand({
+  @required String command,
+  @required Directory workingDirectory,
+  Map<String, String> environment = const {},
 }) {
-  print('==> Scanning for $filename files...');
-  final pubspecFileLocations = _locationsToScan(filename, argResults);
-  print('Found ${pubspecFileLocations.length} $filename files');
-  if (getVerboseFlag(argResults)) {
-    for (final loc in pubspecFileLocations) {
-      print('\t$loc');
-    }
-  }
-
-  if (pubspecFileLocations.isEmpty) {
-    print('\nWARNING: No configuration files selected for analysis');
-    exit(2);
-  }
-
-  return pubspecFileLocations;
-}
-
-Iterable<String> _locationsToScan(String filename, ArgResults argResults) {
-  final fileFinder = FileFinder(filename);
-  final includedLocations = fileFinder.findFiles(getPathsMultiOption(argResults));
-  final excludedLocations = fileFinder.findFiles(getExcludesMultiOption(argResults));
-  return includedLocations.where((location) => !excludedLocations.contains(location));
+  final commandList = command.split(' ');
+  return Process.runSync(
+    commandList.first,
+    commandList.sublist(1),
+    workingDirectory: workingDirectory.path,
+    environment: environment,
+  );
 }

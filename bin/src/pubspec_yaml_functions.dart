@@ -31,7 +31,7 @@ import 'package:meta/meta.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
 import 'locate_pubspec_files.dart';
-import 'print_dependency_usage_report.dart';
+import 'utils/print_dependency_usage_report.dart';
 
 // ignore_for_file: avoid_print
 
