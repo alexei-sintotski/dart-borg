@@ -25,11 +25,11 @@
 
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
-Iterable<PackageDependencySpec> getAllHostedPackageDependencySpecs(Iterable<PubspecYaml> pubspecYamls) => {
+Iterable<PackageDependencySpec> getAllExternalPackageDependencySpecs(Iterable<PubspecYaml> pubspecYamls) => {
       for (final pubspecYaml in pubspecYamls) ..._getDependencySpecs(pubspecYaml),
-    }.where(_isHosted);
+    }.where(_isExternal);
 
-bool _isHosted(PackageDependencySpec dep) => dep.iswitcho(hosted: (_) => true, otherwise: () => false);
+bool _isExternal(PackageDependencySpec dep) => dep.iswitcho(path: (_) => false, otherwise: () => true);
 
 Set<PackageDependencySpec> _getDependencySpecs(PubspecYaml pubspecYaml) => {
       ...pubspecYaml.dependencies,
