@@ -63,7 +63,7 @@ class EvolveCommand extends Command<void> {
 }
 
 void _printDependencies(Iterable<PackageDependencySpec> deps) {
-  for (final dep in deps) {
+  for (final dep in deps.toList()..sort((a, b) => a.package().compareTo(b.package()))) {
     print('\t${dep.package()}${_printDependencyDetail(dep)}');
   }
 }
