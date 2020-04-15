@@ -54,24 +54,26 @@ class EvolveCommand extends Command<void> {
     final pubspecYamls = loadPubspecYamlFiles(argResults: argResults);
     assertPubspecYamlConsistency(pubspecYamls);
 
-    final allHostedDependencies = getAllHostedPackageDependencySpecs(pubspecYamls.values);
-    print('Identified ${allHostedDependencies.length} external hosted dependencies');
+    final allExternalDepSpecs = getAllExternalPackageDependencySpecs(pubspecYamls.values);
+    print('Identified ${allExternalDepSpecs.length} external dependencies');
     if (getVerboseFlag(argResults)) {
-      _printDependencies(allHostedDependencies);
+      _printDependencies(allExternalDepSpecs);
     }
   }
 }
 
 void _printDependencies(Iterable<PackageDependencySpec> deps) {
   for (final dep in deps) {
-    print('\t${dep.package()}${_printVersion(dep)}');
+    print('\t${dep.package()}${_printDependencyDetail(dep)}');
   }
 }
 
-String _printVersion(PackageDependencySpec dep) => dep.iswitcho(
+String _printDependencyDetail(PackageDependencySpec dep) => dep.iswitch(
       hosted: (dep) => dep.version.iif(
         some: (v) => ': $v',
         none: () => '',
       ),
-      otherwise: () => '',
+      sdk: (dep) => ': ${dep.sdk}',
+      git: (dep) => ': ${dep.url}',
+      path: (_) => '',
     );

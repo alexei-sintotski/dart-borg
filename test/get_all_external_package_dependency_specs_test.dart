@@ -29,10 +29,10 @@ import 'package:pubspec_yaml/pubspec_yaml.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('$getAllHostedPackageDependencySpecs', () {
+  group('$getAllExternalPackageDependencySpecs', () {
     group('provided with pubspec.yaml with a single production hosted dependency', () {
       final pubspecYaml = PubspecYaml.loadFromYamlString('dependencies: {a: }');
-      final r = getAllHostedPackageDependencySpecs([pubspecYaml]);
+      final r = getAllExternalPackageDependencySpecs([pubspecYaml]);
 
       test('produces the specified dependency', () {
         expect(r, const [PackageDependencySpec.hosted(HostedPackageDependencySpec(package: 'a'))]);
@@ -41,16 +41,36 @@ void main() {
 
     group('provided with pubspec.yaml with a single production path dependency', () {
       final pubspecYaml = PubspecYaml.loadFromYamlString('dependencies: {a: {path: xx}}');
-      final r = getAllHostedPackageDependencySpecs([pubspecYaml]);
+      final r = getAllExternalPackageDependencySpecs([pubspecYaml]);
 
       test('produces empty result', () {
         expect(r, isEmpty);
       });
     });
 
+    group('provided with pubspec.yaml with a single production sdk dependency', () {
+      const sdk = 'xx';
+      final pubspecYaml = PubspecYaml.loadFromYamlString('dependencies: {a: {sdk: $sdk}}');
+      final r = getAllExternalPackageDependencySpecs([pubspecYaml]);
+
+      test('produces the specified dependency', () {
+        expect(r, const [PackageDependencySpec.sdk(SdkPackageDependencySpec(package: 'a', sdk: sdk))]);
+      });
+    });
+
+    group('provided with pubspec.yaml with a single production git dependency', () {
+      const url = 'xx';
+      final pubspecYaml = PubspecYaml.loadFromYamlString('dependencies: {a: {git: $url}}');
+      final r = getAllExternalPackageDependencySpecs([pubspecYaml]);
+
+      test('produces the specified dependency', () {
+        expect(r, const [PackageDependencySpec.git(GitPackageDependencySpec(package: 'a', url: url))]);
+      });
+    });
+
     group('provided with pubspec.yaml with a single development hosted dependency', () {
       final pubspecYaml = PubspecYaml.loadFromYamlString('dev_dependencies: {a: }');
-      final r = getAllHostedPackageDependencySpecs([pubspecYaml]);
+      final r = getAllExternalPackageDependencySpecs([pubspecYaml]);
 
       test('produces the specified dependency', () {
         expect(r, const [PackageDependencySpec.hosted(HostedPackageDependencySpec(package: 'a'))]);
@@ -61,7 +81,7 @@ void main() {
       const overridenVersion = '^2.0.0';
       final pubspecYaml = PubspecYaml.loadFromYamlString('dependencies: {a: ^1.0.0}\n'
           'dependency_overrides: {a: $overridenVersion}');
-      final r = getAllHostedPackageDependencySpecs([pubspecYaml]);
+      final r = getAllExternalPackageDependencySpecs([pubspecYaml]);
 
       test('produces the overriden dependency', () {
         expect(r, const [
