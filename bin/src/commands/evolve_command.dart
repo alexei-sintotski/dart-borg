@@ -36,6 +36,7 @@ import 'package:pubspec_yaml/src/package_dependency_spec/package_dependency_spec
 import '../options/dart_sdk.dart';
 import '../options/dry_run.dart';
 import '../options/exclude.dart';
+import '../options/flutter_sdk.dart';
 import '../options/paths.dart';
 import '../options/verbose.dart';
 import '../pub.dart';
@@ -52,6 +53,7 @@ class EvolveCommand extends Command<void> {
     addExcludeMultiOption(argParser);
     addVerboseFlag(argParser);
     addDartSdkOption(argParser);
+    addFlutterSdkOption(argParser);
   }
 
   @override
@@ -104,6 +106,7 @@ class EvolveCommand extends Command<void> {
     final result = runSystemCommand(
       command: '${pub(argResults)} get',
       workingDirectory: location,
+      environment: pubEnvironment(argResults),
     );
     if (result.exitCode != 0 || getVerboseFlag(argResults)) {
       print(result.stdout);
