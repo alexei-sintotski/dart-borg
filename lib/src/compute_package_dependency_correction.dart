@@ -23,18 +23,27 @@
  *
  */
 
-import 'dart:io';
+import 'package:pubspec_lock/pubspec_lock.dart';
 
-import 'package:meta/meta.dart';
+Iterable<PackageDependency> computePackageDependencyCorrection(
+  Iterable<PackageDependency> deps,
+  Iterable<PackageDependency> references,
+) =>
+    references
+        .map((ref) => _correctDependencyType(ref, deps))
+        .where((ref) => deps.any((dep) => dep.package() == ref.package() && dep != ref));
 
-T withTempLocation<T>({
-  @required T Function(Directory location) action,
-}) {
-  const tempPrefix = 'borg-evolve-temp-';
-  final tempLocation = Directory.systemTemp.createTempSync(tempPrefix);
-  try {
-    return action(tempLocation);
-  } finally {
-    tempLocation.deleteSync(recursive: true);
-  }
-}
+PackageDependency _correctDependencyType(
+  PackageDependency ref,
+  Iterable<PackageDependency> deps,
+) =>
+    ref.iswitch(
+      sdk: (r) => PackageDependency.sdk(
+          r.copyWith(type: deps.firstWhere((d) => d.package() == r.package, orElse: () => ref).type())),
+      hosted: (r) => PackageDependency.hosted(
+          r.copyWith(type: deps.firstWhere((d) => d.package() == r.package, orElse: () => ref).type())),
+      git: (r) => PackageDependency.git(
+          r.copyWith(type: deps.firstWhere((d) => d.package() == r.package, orElse: () => ref).type())),
+      path: (r) => PackageDependency.path(
+          r.copyWith(type: deps.firstWhere((d) => d.package() == r.package, orElse: () => ref).type())),
+    );

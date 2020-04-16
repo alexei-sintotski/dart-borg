@@ -31,7 +31,6 @@ import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:pubspec_lock/pubspec_lock.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
-import 'package:pubspec_yaml/src/package_dependency_spec/package_dependency_spec.dart';
 
 import '../options/dart_sdk.dart';
 import '../options/dry_run.dart';
@@ -44,6 +43,7 @@ import '../pubspec_yaml_functions.dart';
 import '../utils/borg_exception.dart';
 import '../utils/run_system_command.dart';
 import '../utils/with_temp_location.dart';
+
 // ignore_for_file: avoid_print
 
 class EvolveCommand extends Command<void> {
@@ -66,6 +66,10 @@ class EvolveCommand extends Command<void> {
   void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
 
   void _run() {
+    if (getDryRunFlag(argResults)) {
+      print('DRY RUN: no existing pubspec.lock files are going to be modified\n');
+    }
+
     final pubspecYamls = loadPubspecYamlFiles(argResults: argResults);
     assertPubspecYamlConsistency(pubspecYamls);
 
@@ -75,17 +79,40 @@ class EvolveCommand extends Command<void> {
       _printDependencySpecs(allExternalDepSpecs);
     }
 
-    withTempLocation(action: (location) {
-      _createPackage(
-        name: 'borg_evolve_temp',
-        location: location,
-        depSpecs: allExternalDepSpecs,
-      );
-      _resolveDependencies(location);
-      final resolvedDeps = _getResolvedDependencies(location: location);
-      print('Resolved ${resolvedDeps.length} external dependencies');
-    });
+    final references = _computeConsistentDependencySet(allExternalDepSpecs);
+    print('Resolved ${references.length} external dependencies');
+
+    if (getDryRunFlag(argResults)) {
+      print('\nDRY RUN: Previewing evolution of ${pubspecYamls.length} Dart packages...');
+    } else {
+      print('\nCommencing evolution of ${pubspecYamls.length} Dart packages...');
+    }
+
+    var i = 1;
+    for (final entry in pubspecYamls.entries) {
+      final packageLocation = path.dirname(entry.key);
+      print('[${i++}/${pubspecYamls.length}] ${path.absolute(packageLocation)}');
+      _evolvePackage(packageLocation, references);
+    }
+
+    if (getDryRunFlag(argResults)) {
+      print('\nSUCCESS: ${pubspecYamls.length} packages have been analyzed');
+    } else {
+      print('\nSUCCESS: ${pubspecYamls.length} packages have been upgraded');
+    }
   }
+
+  Iterable<PackageDependency> _computeConsistentDependencySet(Iterable<PackageDependencySpec> allExternalDepSpecs) =>
+      withTempLocation(action: (location) {
+        _createPackage(
+          name: 'borg_evolve_temp',
+          location: location,
+          depSpecs: allExternalDepSpecs,
+        );
+        print('\nResolving external dependencies...');
+        _resolveDependencies(location);
+        return _getResolvedDependencies(location: location);
+      });
 
   void _createPackage({
     @required String name,
@@ -102,7 +129,6 @@ class EvolveCommand extends Command<void> {
   }
 
   void _resolveDependencies(Directory location) {
-    print('\n==> Resolving external dependencies...');
     final result = runSystemCommand(
       command: '${pub(argResults)} get',
       workingDirectory: location,
@@ -117,8 +143,30 @@ class EvolveCommand extends Command<void> {
     }
   }
 
-  Iterable<PackageDependency> _getResolvedDependencies({@required Directory location}) =>
-      File(path.join(location.path, 'pubspec.lock')).readAsStringSync().loadPubspecLockFromYaml().packages;
+  void _evolvePackage(
+    String packageLocation,
+    Iterable<PackageDependency> references,
+  ) {
+    final pubspecLockFile = File(path.join(packageLocation, 'pubspec.lock'));
+    if (!pubspecLockFile.existsSync()) {
+      if (getVerboseFlag(argResults)) {
+        print('pubspec.lock does not exist, resolving dependencies...');
+      }
+      _resolveDependencies(Directory(packageLocation));
+    }
+    final pubspecLock = pubspecLockFile.readAsStringSync().loadPubspecLockFromYaml();
+    final depsCorrectionSet = computePackageDependencyCorrection(pubspecLock.packages, references);
+    if (getVerboseFlag(argResults) || getDryRunFlag(argResults)) {
+      _printDependencyCorrections(actualDependencies: pubspecLock.packages, correctionSet: depsCorrectionSet);
+    }
+    if (!getDryRunFlag(argResults)) {
+      final correctedPubspecLock = pubspecLock.copyWith(
+        packages: copyWithPackageDependenciesFromReference(pubspecLock.packages, references),
+      );
+      pubspecLockFile.writeAsStringSync(correctedPubspecLock.toYamlString());
+      _resolveDependencies(Directory(packageLocation));
+    }
+  }
 }
 
 void _printDependencySpecs(Iterable<PackageDependencySpec> deps) {
@@ -135,4 +183,28 @@ String _printDependencySpecDetail(PackageDependencySpec dep) => dep.iswitch(
       sdk: (dep) => ': ${dep.sdk} SDK',
       git: (dep) => ': ${dep.url}',
       path: (_) => '',
+    );
+
+Iterable<PackageDependency> _getResolvedDependencies({@required Directory location}) =>
+    File(path.join(location.path, 'pubspec.lock')).readAsStringSync().loadPubspecLockFromYaml().packages;
+
+void _printDependencyCorrections({
+  @required Iterable<PackageDependency> actualDependencies,
+  @required Iterable<PackageDependency> correctionSet,
+}) {
+  if (correctionSet.isEmpty) {
+    print('\tPackage uses the latest versions of all dependencies');
+  } else {
+    for (final correction in correctionSet.toList()..sort((a, b) => a.package().compareTo(b.package()))) {
+      final orgDep = actualDependencies.firstWhere((d) => d.package() == correction.package());
+      print('\t${correction.package()}: ${_formatDependencyDetail(orgDep)} => ${_formatDependencyDetail(correction)}');
+    }
+  }
+}
+
+String _formatDependencyDetail(PackageDependency dep) => dep.iswitch(
+      sdk: (d) => '${d.version}',
+      hosted: (d) => '${d.version}',
+      git: (d) => '${d.url}:${d.resolvedRef}',
+      path: (d) => '${d.path}',
     );

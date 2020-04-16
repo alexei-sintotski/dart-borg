@@ -23,18 +23,20 @@
  *
  */
 
-import 'dart:io';
+import 'package:pubspec_lock/pubspec_lock.dart';
 
-import 'package:meta/meta.dart';
-
-T withTempLocation<T>({
-  @required T Function(Directory location) action,
-}) {
-  const tempPrefix = 'borg-evolve-temp-';
-  final tempLocation = Directory.systemTemp.createTempSync(tempPrefix);
-  try {
-    return action(tempLocation);
-  } finally {
-    tempLocation.deleteSync(recursive: true);
-  }
-}
+Iterable<PackageDependency> copyWithPackageDependenciesFromReference(
+  Iterable<PackageDependency> deps,
+  Iterable<PackageDependency> references,
+) =>
+    deps.map((dep) => references
+        .firstWhere(
+          (ref) => ref.package() == dep.package(),
+          orElse: () => dep,
+        )
+        .iswitch(
+          sdk: (d) => PackageDependency.sdk(d.copyWith(type: dep.type())),
+          hosted: (d) => PackageDependency.hosted(d.copyWith(type: dep.type())),
+          git: (d) => PackageDependency.git(d.copyWith(type: dep.type())),
+          path: (d) => PackageDependency.path(d.copyWith(type: dep.type())),
+        ));
