@@ -23,6 +23,8 @@
  *
  */
 
+import 'dart:io';
+
 import 'package:args/args.dart';
 
 void addPathsMultiOption(ArgParser argParser) => argParser.addMultiOption(
@@ -30,7 +32,7 @@ void addPathsMultiOption(ArgParser argParser) => argParser.addMultiOption(
       abbr: 'p',
       help: 'list of paths to scan for Dart packages (glob syntax allowed)',
       valueHelp: 'PATH1,PATH2,...',
-      defaultsTo: ['.'],
+      defaultsTo: [Directory.current.path],
     );
 
 // ignore: avoid_as
