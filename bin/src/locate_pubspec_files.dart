@@ -39,9 +39,9 @@ Iterable<String> locatePubspecFiles({
   @required String filename,
   @required ArgResults argResults,
 }) {
-  print('Scanning for $filename files...');
+  stdout.write('Scanning for $filename files...');
   final pubspecFileLocations = _locationsToScan(filename, argResults);
-  print('Found ${pubspecFileLocations.length} $filename files');
+  print(' ${pubspecFileLocations.length} files found');
   if (getVerboseFlag(argResults)) {
     for (final loc in pubspecFileLocations) {
       print('\t$loc');
