@@ -24,8 +24,9 @@
  */
 
 import 'package:borg/borg.dart';
-import 'package:pubspec_lock/pubspec_lock.dart';
 import 'package:test/test.dart';
+
+import 'dependency_test_dataset.dart';
 
 void main() {
   group('$copyWithPackageDependenciesFromReference', () {
@@ -53,27 +54,3 @@ void main() {
     });
   });
 }
-
-const directHostedXv1 = PackageDependency.hosted(HostedPackageDependency(
-  package: 'x',
-  version: '1.0.0',
-  name: 'x',
-  url: 'url',
-  type: DependencyType.direct,
-));
-
-const directHostedXv2 = PackageDependency.hosted(HostedPackageDependency(
-  package: 'x',
-  version: '2.0.0',
-  name: 'x',
-  url: 'url',
-  type: DependencyType.direct,
-));
-
-const transitiveHostedXv2 = PackageDependency.hosted(HostedPackageDependency(
-  package: 'x',
-  version: '2.0.0',
-  name: 'x',
-  url: 'url',
-  type: DependencyType.transitive,
-));
