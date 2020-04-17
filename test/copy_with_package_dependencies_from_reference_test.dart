@@ -52,5 +52,26 @@ void main() {
         expect(r, [directHostedXv2]);
       });
     });
+
+    group('provided with matching sdk reference with different dependency type', () {
+      final r = copyWithPackageDependenciesFromReference([directSdkXv1], [transitiveSdkXv2]);
+      test('it corrects the reference without modifying dependency type', () {
+        expect(r, [directSdkXv2]);
+      });
+    });
+
+    group('provided with matching git reference with different dependency type', () {
+      final r = copyWithPackageDependenciesFromReference([directGitXv1], [transitiveGitXv2]);
+      test('it corrects the reference without modifying dependency type', () {
+        expect(r, [directGitXv2]);
+      });
+    });
+
+    group('provided with matching path reference with different dependency type', () {
+      final r = copyWithPackageDependenciesFromReference([directPathXv1], [transitivePathXv2]);
+      test('it corrects the reference without modifying dependency type', () {
+        expect(r, [directPathXv2]);
+      });
+    });
   });
 }
