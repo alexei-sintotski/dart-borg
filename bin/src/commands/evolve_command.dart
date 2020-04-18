@@ -202,6 +202,7 @@ void _printDependencyCorrections({
       final orgDep = actualDependencies.firstWhere((d) => d.package() == correction.package());
       print('\t${correction.package()}: ${_formatDependencyDetail(orgDep)} => ${_formatDependencyDetail(correction)}');
     }
+    stdout.write('\n');
   }
 }
 
