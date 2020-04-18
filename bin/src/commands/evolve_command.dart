@@ -195,7 +195,7 @@ void _printDependencyCorrections({
   @required Iterable<PackageDependency> correctionSet,
 }) {
   if (correctionSet.isEmpty) {
-    print(' => package is UP-TO-DATE');
+    print(' => up-to-date');
   } else {
     print(' => package upgrade is available:');
     for (final correction in correctionSet.toList()..sort((a, b) => a.package().compareTo(b.package()))) {
