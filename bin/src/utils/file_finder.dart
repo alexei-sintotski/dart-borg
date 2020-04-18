@@ -39,17 +39,16 @@ class FileFinder {
       locationSpecs.expand(_findFilesAtLocationSpec).toSet().toList()..sort();
 
   List<String> _findFilesAtLocationSpec(String locationSpec) {
-    final correctedSpec = locationSpec == '.'
-        ? Directory.current.path
-        : locationSpec == '..' ? path.dirname(Directory.current.path) : locationSpec;
-    final absoluteSpec = path.absolute(correctedSpec);
     final globbedLocations =
-        Glob(absoluteSpec).listSync().where((item) => item.statSync().type == FileSystemEntityType.directory);
+        Glob(locationSpec).listSync().where((item) => item.statSync().type == FileSystemEntityType.directory);
     final locationsToScan = <Directory>[
-      Directory(absoluteSpec),
+      Directory(locationSpec),
       ...globbedLocations.map((entity) => Directory(entity.path))
     ];
-    return locationsToScan.expand(_findFilesInDirectory).toList();
+    return locationsToScan
+        .expand(_findFilesInDirectory)
+        .map((location) => path.canonicalize(path.absolute(location)))
+        .toList();
   }
 
   List<String> _findFilesInDirectory(Directory dir) => [
