@@ -27,6 +27,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:meta/meta.dart';
+import 'package:path/path.dart' as path;
 
 import 'options/exclude.dart';
 import 'options/paths.dart';
@@ -60,5 +61,5 @@ Iterable<String> _locationsToScan(String filename, ArgResults argResults) {
   final fileFinder = FileFinder(filename);
   final includedLocations = fileFinder.findFiles(getPathsMultiOption(argResults));
   final excludedLocations = fileFinder.findFiles(getExcludesMultiOption(argResults));
-  return includedLocations.where((location) => !excludedLocations.contains(location));
+  return includedLocations.where((location) => !excludedLocations.contains(location)).map(path.relative);
 }

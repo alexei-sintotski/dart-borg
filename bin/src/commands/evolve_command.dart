@@ -86,9 +86,9 @@ class EvolveCommand extends Command<void> {
     for (final entry in pubspecYamls.entries) {
       final packageLocation = path.dirname(entry.key);
       if (getDryRunFlag(argResults)) {
-        stdout.write('[${i++}/${pubspecYamls.length}] ${path.absolute(packageLocation)}');
+        stdout.write('[${i++}/${pubspecYamls.length}] $packageLocation');
       } else {
-        stdout.write('[${i++}/${pubspecYamls.length}] Evolving ${path.absolute(packageLocation)}...');
+        stdout.write('[${i++}/${pubspecYamls.length}] Evolving $packageLocation...');
       }
       _evolvePackage(packageLocation, references);
       stdout.write('\n');
