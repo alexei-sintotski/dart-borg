@@ -91,7 +91,6 @@ class EvolveCommand extends Command<void> {
         stdout.write('[${i++}/${pubspecYamls.length}] Evolving $packageLocation...');
       }
       _evolvePackage(packageLocation, references);
-      stdout.write('\n');
     }
 
     if (getDryRunFlag(argResults)) {
@@ -135,6 +134,7 @@ class EvolveCommand extends Command<void> {
       workingDirectory: location,
       environment: pubEnvironment(argResults),
     );
+    stdout.write('\n');
     if (result.exitCode != 0 || getVerboseFlag(argResults)) {
       print(result.stdout);
       print(result.stderr);
