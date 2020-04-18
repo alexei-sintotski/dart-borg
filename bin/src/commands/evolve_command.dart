@@ -110,7 +110,7 @@ class EvolveCommand extends Command<void> {
         print('\nResolving ${directDepSpecs.length} direct external dependencies...');
         _resolveDependencies(location: location, arguments: '--no-precompile');
         final resolvedDeps = _getResolvedDependencies(location: location);
-        print('Resolved ${resolvedDeps.length} external dependencies');
+        print('\nResolved ${resolvedDeps.length} direct and transitive external dependencies');
         return resolvedDeps;
       });
 
