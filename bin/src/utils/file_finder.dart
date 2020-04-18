@@ -27,6 +27,7 @@ import 'dart:io';
 
 import 'package:glob/glob.dart';
 import 'package:meta/meta.dart';
+import 'package:path/path.dart' as path;
 
 @immutable
 class FileFinder {
@@ -38,10 +39,14 @@ class FileFinder {
       locationSpecs.expand(_findFilesAtLocationSpec).toSet().toList()..sort();
 
   List<String> _findFilesAtLocationSpec(String locationSpec) {
+    final correctedSpec = locationSpec == '.'
+        ? Directory.current.path
+        : locationSpec == '..' ? path.dirname(Directory.current.path) : locationSpec;
+    final absoluteSpec = path.absolute(correctedSpec);
     final globbedLocations =
-        Glob(locationSpec).listSync().where((item) => item.statSync().type == FileSystemEntityType.directory);
+        Glob(absoluteSpec).listSync().where((item) => item.statSync().type == FileSystemEntityType.directory);
     final locationsToScan = <Directory>[
-      Directory(locationSpec),
+      Directory(absoluteSpec),
       ...globbedLocations.map((entity) => Directory(entity.path))
     ];
     return locationsToScan.expand(_findFilesInDirectory).toList();
