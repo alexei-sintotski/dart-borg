@@ -1,0 +1,13 @@
+name: package_with_pubspec_lock
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  args: ^1.5.0
+  collection: ^1.14.0
+  glob: ^1.2.0
+  meta: ^1.1.0
+  path: ^1.6.0
+  pubspec_lock: ^2.0.0
+  pubspec_yaml: ^2.0.0

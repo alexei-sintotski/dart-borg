@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
-dart bin/main.dart probe
-dart bin/main.dart evolve --dry-run
+dart bin/main.dart probe --exclude test --verbose
+dart bin/main.dart evolve --dry-run --exclude test/evolve_integration_test_sets/package_with_inconsistent_dep_spec --verbose
 dartanalyzer --fatal-hints .
 pub run test
 pub run dependency_validator --ignore=functional_data_generator,sum_types_generator,test_coverage
