@@ -147,7 +147,7 @@ class EvolveCommand extends Command<void> {
   ) {
     final pubspecLockFile = File(path.join(packageLocation, 'pubspec.lock'));
     if (!pubspecLockFile.existsSync()) {
-      print('\n\tpubspec.lock does not exist, creating one...');
+      stdout.write('\n\tpubspec.lock does not exist, creating one...');
       _resolveDependencies(location: Directory(packageLocation));
     }
     final pubspecLock = pubspecLockFile.readAsStringSync().loadPubspecLockFromYaml();
