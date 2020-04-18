@@ -88,7 +88,7 @@ class EvolveCommand extends Command<void> {
       if (getDryRunFlag(argResults)) {
         stdout.write('[${i++}/${pubspecYamls.length}] $packageLocation');
       } else {
-        stdout.write('[${i++}/${pubspecYamls.length}] Evolving $packageLocation...');
+        stdout.write('[${i++}/${pubspecYamls.length}] Evolving $packageLocation ...');
       }
       _evolvePackage(packageLocation, references);
     }
@@ -134,7 +134,6 @@ class EvolveCommand extends Command<void> {
       workingDirectory: location,
       environment: pubEnvironment(argResults),
     );
-    stdout.write('\n');
     if (result.exitCode != 0 || getVerboseFlag(argResults)) {
       print(result.stdout);
       print(result.stderr);
@@ -150,9 +149,7 @@ class EvolveCommand extends Command<void> {
   ) {
     final pubspecLockFile = File(path.join(packageLocation, 'pubspec.lock'));
     if (!pubspecLockFile.existsSync()) {
-      if (getVerboseFlag(argResults)) {
-        print('\npubspec.lock does not exist, resolving dependencies...');
-      }
+      print('=> pubspec.lock does not exist, creating one...');
       _resolveDependencies(location: Directory(packageLocation));
     }
     final pubspecLock = pubspecLockFile.readAsStringSync().loadPubspecLockFromYaml();
@@ -166,6 +163,8 @@ class EvolveCommand extends Command<void> {
     }
     if (getVerboseFlag(argResults) || getDryRunFlag(argResults)) {
       _printDependencyCorrections(actualDependencies: pubspecLock.packages, correctionSet: depsCorrectionSet);
+    } else {
+      stdout.write('\n');
     }
   }
 }
