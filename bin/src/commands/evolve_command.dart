@@ -91,6 +91,7 @@ class EvolveCommand extends Command<void> {
         stdout.write('[${i++}/${pubspecYamls.length}] Evolving ${path.absolute(packageLocation)}...');
       }
       _evolvePackage(packageLocation, references);
+      stdout.write('\n');
     }
 
     if (getDryRunFlag(argResults)) {
