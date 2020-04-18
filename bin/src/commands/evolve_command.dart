@@ -66,10 +66,6 @@ class EvolveCommand extends Command<void> {
   void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
 
   void _run() {
-    if (getDryRunFlag(argResults)) {
-      print('DRY RUN: no existing pubspec.lock files are going to be modified\n');
-    }
-
     final pubspecYamls = loadPubspecYamlFiles(argResults: argResults);
     assertPubspecYamlConsistency(pubspecYamls);
 
@@ -112,7 +108,7 @@ class EvolveCommand extends Command<void> {
           depSpecs: directDepSpecs,
         );
         print('\nResolving ${directDepSpecs.length} direct external dependencies...');
-        _resolveDependencies(location);
+        _resolveDependencies(location: location, arguments: '--no-precompile');
         final resolvedDeps = _getResolvedDependencies(location: location);
         print('Resolved ${resolvedDeps.length} external dependencies');
         return resolvedDeps;
@@ -132,9 +128,9 @@ class EvolveCommand extends Command<void> {
     ).toYamlString());
   }
 
-  void _resolveDependencies(Directory location) {
+  void _resolveDependencies({@required Directory location, String arguments = ''}) {
     final result = runSystemCommand(
-      command: '${pub(argResults)} get',
+      command: '${pub(argResults)} get $arguments',
       workingDirectory: location,
       environment: pubEnvironment(argResults),
     );
@@ -156,7 +152,7 @@ class EvolveCommand extends Command<void> {
       if (getVerboseFlag(argResults)) {
         print('\npubspec.lock does not exist, resolving dependencies...');
       }
-      _resolveDependencies(Directory(packageLocation));
+      _resolveDependencies(location: Directory(packageLocation));
     }
     final pubspecLock = pubspecLockFile.readAsStringSync().loadPubspecLockFromYaml();
     final depsCorrectionSet = computePackageDependencyCorrection(pubspecLock.packages, references);
@@ -165,7 +161,7 @@ class EvolveCommand extends Command<void> {
         packages: copyWithPackageDependenciesFromReference(pubspecLock.packages, references),
       );
       pubspecLockFile.writeAsStringSync(correctedPubspecLock.toYamlString());
-      _resolveDependencies(Directory(packageLocation));
+      _resolveDependencies(location: Directory(packageLocation));
     }
     if (getVerboseFlag(argResults) || getDryRunFlag(argResults)) {
       _printDependencyCorrections(actualDependencies: pubspecLock.packages, correctionSet: depsCorrectionSet);
