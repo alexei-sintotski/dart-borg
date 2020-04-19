@@ -151,4 +151,4 @@ Alternatively, path to Flutter SDK can be set with the environment variable `FLU
 If the standard command-line tool does not fit your use cases, its essential logic can be accessed via Dart API.
 In order to use it, just refer to the package `borg` as a dependency in your `pubspec.yaml`.
 
-Please refer to the [generated borg library documentation](https://cdn.rawgit.com/alexei-sintotski/dart-borg/blob/master/doc/api/borg/borg-library.html) for details.
+Please refer to the generated borg library documentation at [pub.dev](https://pub.dev/packages/borg) for details.
