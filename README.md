@@ -151,47 +151,4 @@ Alternatively, path to Flutter SDK can be set with the environment variable `FLU
 If the standard command-line tool does not fit your use cases, its essential logic can be accessed via Dart API.
 In order to use it, just refer to the package `borg` as a dependency in your `pubspec.yaml`.
 
-## Consistency check on use of Dart dependencies
-
-This check is performed by a single function:
-
-`List<DependencyUsageReport<PackageDependency>> findInconsistentDependencies(Map<String, PubspecLock> pubspecLocks)`.
-
-As input, this function accepts content of `pubspec.lock` files with labels identifying them (e.g., paths).
-Checkout the Dart package  [pubspec_lock](https://pub.dev/packages/pubspec_lock) for details on the input data format and
-options to import content of `pubspec.lock` files.
-
-After execution, this function produces a report on inconsistent usage of external dependencies.
-
-If the report is empty, the usage of dependencies is consistent across all checked Dart packages.
-
-## Consistency check on package dependency specifications
-
-This check is performed by a single function:
-
-`List<DependencyUsageReport<PackageDependencySpec>> findInconsistentDependencySpecs(Map<String, PubspecYaml> pubspecYamls)`.
-
-As input, this function accepts content of `pubspec.yaml` files with labels identifying them (e.g., paths).
-Checkout the Dart package  [pubspec_yaml](https://pub.dev/packages/pubspec_yaml) for details on the input data format and
-options to import content of `pubspec.yaml` files.
-
-After execution, this function produces a report on inconsistent specifications of external dependencies.
-
-If the report is empty, the package dependency specs are consistent across all checked Dart packages.
-
-## DependencyUsageReport
-
-The data class used for reporting captures usage of a dependency by multiple Dart packages.
-
-```
-class DependencyUsageReport<DependencyType> {
-  /// The constructor is used to create report
-  const DependencyUsageReport({@required this.dependencyName, @required this.references});
-
-  /// Name of the package dependency
-  final String dependencyName;
-
-  /// Usage map: Dependency version => list of users
-  final Map<DependencyType, List<String>> references;
-}
-```
+Please refer to the [generated borg library documentation](doc/api/borg/borg-library.html) for details.
