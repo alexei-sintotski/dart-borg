@@ -1,20 +1,21 @@
 # Dart borg [![Build Status](https://travis-ci.org/alexei-sintotski/dart-borg.svg?branch=master)](https://travis-ci.org/alexei-sintotski/darf-borg) [![codecov](https://codecov.io/gh/alexei-sintotski/dart-borg/branch/master/graph/badge.svg)](https://codecov.io/gh/alexei-sintotski/dart-borg) [![pubspec_lock version](https://img.shields.io/pub/v/borg?label=borg)](https://pub.dev/packages/borg)
 
-Command-line tool to support consistent configuration management of Dart packages in mono repository
+Command-line tool for consistent configuration management of Dart packages in a mono repository
 
 Features available in the current version:
 
 * Consistency check on use of Dart dependencies
 * Consistency check on package specifications in pubspec.yaml files
+* Consistent upgrade of all external dependencies across repository
+* Flutter support
 
 Feature roadmap (in the order of priority):
 
-| version | Major feature                                                                      |
-|---------|------------------------------------------------------------------------------------|
-| 1.1     | Consistent upgrade of external dependencies across repository                      |
-| 1.2     | Correction of configuration of a Dart package newly added to the mono repository   |
-
-*WARNING: This version is backwards-incompatible with versions 0.1.x!*
+| version | Major feature                                                                                                            |
+|---------|--------------------------------------------------------------------------------------------------------------------------|
+| 1.2     | Getting dependencies for all Dart packages in repository                                                                 |
+| 1.3     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
+| 1.4     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
 
 # Installation
 
@@ -37,13 +38,7 @@ for recursive scans (the glob syntax is supported).
 The tool is self documented, please execute it to get detailed information on the command-line options:
 ```
 $ borg
-Command-line tool to support consistent configuration management of Dart packages in mono repository
-
-STILL UNDER DEVELOPMENT
-This version supports the following features
-* Consistency check on use of Dart dependencies
-* Consistency check on package specifications in pubspec.yaml files
-
+Command-line tool for consistent configuration management of Dart packages in a mono repository
 
 Usage: borg <command> [arguments]
 
@@ -51,25 +46,24 @@ Global options:
 -h, --help    Print this usage information.
 
 Available commands:
-  probe   Checks consistency of Dart dependendencies across multiple packages
+  evolve   Upgrade Dart dependencies consistently across multiple packages
+  probe    Checks consistency of Dart dependendencies across multiple packages
 
 Run "borg help <command>" for more information about a command.
 ```
 
-# Command: probe
+# Command: borg probe
 
 ## Inconsistency detection
 
 In case of detected inconsistencies the tool provides aggregated report on detected issues and returns with exit code 1:
 
 ```
-$ borg probe 
-==> Scanning for pubspec.yaml files...
-Found 2 pubspec.yaml files
+$ borg probe
+Scanning for pubspec.yaml files... 2 files found
 Analyzing dependency specifications...
 
-==> Scanning for pubspec.lock files...
-Found 2 pubspec.lock files
+Scanning for pubspec.lock files... 2 files found
 Analyzing dependencies...
 
 yaml: inconsistent use detected
@@ -87,12 +81,10 @@ In case of consistent usage of dependencies the tool returns with exit code 0:
 
 ```
 $ borg probe 
-==> Scanning for pubspec.yaml files...
-Found 1 pubspec.yaml files
+Scanning for pubspec.yaml files... 2 files found
 Analyzing dependency specifications...
 
-==> Scanning for pubspec.lock files...
-Found 1 pubspec.lock files
+Scanning for pubspec.lock files... 2 files found
 Analyzing dependencies...
 
 SUCCESS: All packages use consistent set of external dependencies
@@ -104,11 +96,55 @@ The tool issues a warning and exits with code 2 in case scan did not find pubspe
 
 ```
 $ borg probe --exclude .
-==> Scanning for pubspec.yaml files...
-Found 0 pubspec.yaml files
+Scanning for pubspec.yaml files... 0 files found
 
 WARNING: No configuration files selected for analysis
 ```
+
+# Command: borg evolve
+
+This command upgrades all external dependencies of all selected packages consistently across repository:
+
+```
+$ borg evolve
+Scanning for pubspec.yaml files... 3 files found
+
+Resolving 11 direct external dependencies used by all found packages...
+        resolved 61 direct and transitive external dependencies
+
+Commencing evolution of 3 Dart packages...
+[1/3] Evolving . ...
+        json_annotation: 3.0.0 => 3.0.1
+
+[2/3] Evolving test/evolve_integration_test_sets/package_with_pubspec_lock ... => up-to-date
+[3/3] Evolving test/evolve_integration_test_sets/package_without_pubspec_lock ...
+        pubspec.lock does not exist, creating one... => up-to-date
+
+SUCCESS: 3 packages have been processed
+```
+
+The command supports dry mode to preview upgrade without modifying existing pubspec files.
+
+## Path to Dart SDK
+
+Internally, `borg` relies on the Dart `pub` tool to manage configuration of Dart packages. By default, it assumes `pub`
+to be available at the path. If this is not the case, path to Dart SDK can be specified as a command-line argument:
+
+```
+borg evolve --dartsdk=~/dart
+```
+
+## Flutter support
+
+`borg` supports repositories with apps using Flutter. For such repositories, path to Flutter SDK should be supplied
+as a command-line argument.
+
+```
+borg evolve --fluttersdk=dev/flutter
+```
+
+Alternatively, path to Flutter SDK can be set in environment variable `FLUTTER_ROOT`. Usage of `fluttersdk` in
+`borg` command line is not required in this case.
 
 # API
 

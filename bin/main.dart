@@ -30,7 +30,7 @@ import 'src/commands/probe_command.dart';
 
 void main(List<String> args) => CommandRunner<void>(
       'borg',
-      'Command-line tool to support consistent configuration management of Dart packages in a mono repository',
+      'Command-line tool for consistent configuration management of Dart packages in a mono repository',
     )
       ..addCommand(ProbeCommand())
       ..addCommand(EvolveCommand())
