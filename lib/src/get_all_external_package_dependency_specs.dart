@@ -25,6 +25,10 @@
 
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
+/// This function returns all package dependency specifications used in a collection of pubspec.yaml files.
+///
+/// Package dependency overrides are taken into account.
+///
 Iterable<PackageDependencySpec> getAllExternalPackageDependencySpecs(Iterable<PubspecYaml> pubspecYamls) =>
     _filterOutRedundantHostedSpecs(
       {

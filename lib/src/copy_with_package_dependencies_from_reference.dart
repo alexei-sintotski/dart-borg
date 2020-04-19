@@ -25,6 +25,13 @@
 
 import 'package:pubspec_lock/pubspec_lock.dart';
 
+/// Given the collections of actual package dependencies (deps) and the reference dependencies (references),
+/// this function copies deps and for every dependency version different from references, it takes the one from
+/// references.
+///
+/// This function is intended to correct package configuration to make it consistent with other packages in a Dart
+/// mono repository.
+///
 Iterable<PackageDependency> copyWithPackageDependenciesFromReference(
   Iterable<PackageDependency> deps,
   Iterable<PackageDependency> references,

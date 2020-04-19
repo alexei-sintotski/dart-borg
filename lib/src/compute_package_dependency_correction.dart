@@ -25,6 +25,15 @@
 
 import 'package:pubspec_lock/pubspec_lock.dart';
 
+/// Given the collection of actual package dependencies (deps) and the reference dependencies (references),
+/// this function determines delta between the two collections and returns package versions to be used as package
+/// dependencies instead of the ones used in deps to make it consistent with references.
+///
+/// This function is intended to calculate correction to a package configuration to make it consistent with other
+/// packages in a Dart mono repository.
+///
+/// In case deps is already consistent with references, the empty set is returned.
+///
 Iterable<PackageDependency> computePackageDependencyCorrection(
   Iterable<PackageDependency> deps,
   Iterable<PackageDependency> references,
