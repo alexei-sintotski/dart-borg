@@ -143,7 +143,7 @@ as a command-line argument.
 borg evolve --fluttersdk=dev/flutter
 ```
 
-Alternatively, path to Flutter SDK can be set in environment variable `FLUTTER_ROOT`. Usage of `fluttersdk` in
+Alternatively, path to Flutter SDK can be set with the environment variable `FLUTTER_ROOT`. Usage of `fluttersdk` in
 `borg` command line is not required in this case.
 
 # API
