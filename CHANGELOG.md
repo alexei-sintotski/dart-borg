@@ -1,3 +1,6 @@
+## [1.1.0] - 2020-04-19
+* borg evolve -- command for consistent upgrade of all external dependencies across repository
+
 ## [1.0.0] - 2020-04-02
 * Consistency check on package specifications in pubspec.yaml files
 
