@@ -33,4 +33,7 @@ void _addDartSdkOption(ArgParser argParser) => argParser.addOption(
       defaultsTo: Platform.environment['DART_SDK'] ?? '',
     );
 
+// ignore: avoid_as
+String _getDartSdkOption(ArgResults argResults) => argResults[_nameDartSdkOption] as String;
+
 const _nameDartSdkOption = 'dartsdk';

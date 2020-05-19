@@ -33,4 +33,7 @@ void _addFlutterSdkOption(ArgParser argParser) => argParser.addOption(
       defaultsTo: '',
     );
 
+// ignore: avoid_as
+String _getFlutterSdkOption(ArgResults argResults) => argResults[_nameFlutterSdkOption] as String;
+
 const _nameFlutterSdkOption = 'fluttersdk';

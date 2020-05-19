@@ -23,9 +23,21 @@
  *
  */
 
-import 'package:args/args.dart';
+// ignore_for_file: public_member_api_docs
 
-// ignore: avoid_as
-String getDartSdkOption(ArgResults argResults) => argResults[_name] as String;
+import 'package:meta/meta.dart';
 
-const _name = 'dartsdk';
+@immutable
+class BorgConfiguration {
+  const BorgConfiguration({
+    @required this.dartSdkPath,
+    @required this.flutterSdkPath,
+    @required this.pathsToScan,
+    @required this.excludedPaths,
+  });
+
+  final String dartSdkPath;
+  final String flutterSdkPath;
+  final Iterable<String> pathsToScan;
+  final Iterable<String> excludedPaths;
+}

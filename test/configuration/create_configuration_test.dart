@@ -24,8 +24,31 @@
  */
 
 import 'package:args/args.dart';
+import 'package:borg/src/configuration/factory.dart';
+import 'package:test/test.dart';
 
-// ignore: avoid_as
-String getFlutterSdkOption(ArgResults argResults) => argResults[_name] as String;
+void main() {
+  group('$createConfiguration', () {
+    final argParser = ArgParser();
+    populateConfigurationArgs(argParser);
 
-const _name = 'fluttersdk';
+    final argResults = argParser.parse(['--dartsdk=x', '--fluttersdk=y', '--exclude=z']);
+    final configuration = createConfiguration(argResults);
+
+    test('produces correct Dart SDK path', () {
+      expect(configuration.dartSdkPath, argResults['dartsdk']);
+    });
+
+    test('produces correct Flutter SDK path', () {
+      expect(configuration.flutterSdkPath, argResults['fluttersdk']);
+    });
+
+    test('produces correct paths to scan', () {
+      expect(configuration.pathsToScan, argResults['paths']);
+    });
+
+    test('produces correct paths to exclude from scan', () {
+      expect(configuration.excludedPaths, argResults['exclude']);
+    });
+  });
+}

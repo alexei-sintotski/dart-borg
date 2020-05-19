@@ -23,15 +23,12 @@
  *
  */
 
-import 'package:args/args.dart';
+import 'package:borg/src/configuration/configuration.dart';
 import 'package:path/path.dart' as path;
 
-import 'options/dart_sdk.dart';
-import 'options/flutter_sdk.dart';
-
-String pub(ArgResults argResults) {
-  final location = getDartSdkOption(argResults);
+String pub(BorgConfiguration config) {
+  final location = config.dartSdkPath;
   return location.isEmpty ? 'pub' : path.joinAll([location, 'bin', 'pub']);
 }
 
-Map<String, String> pubEnvironment(ArgResults argResults) => {'FLUTTER_ROOT': getFlutterSdkOption(argResults)};
+Map<String, String> pubEnvironment(BorgConfiguration config) => {'FLUTTER_ROOT': config.flutterSdkPath};

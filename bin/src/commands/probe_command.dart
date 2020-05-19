@@ -27,6 +27,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:borg/borg.dart';
+import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/configuration/factory.dart';
 import 'package:pubspec_lock/pubspec_lock.dart';
 
@@ -53,8 +54,12 @@ class ProbeCommand extends Command<void> {
   @override
   String get name => 'probe';
 
+  BorgConfiguration configuration;
+
   @override
   void run() {
+    configuration = createConfiguration(argResults);
+
     if (getPubspecYamlFlag(argResults)) {
       _checkPubspecYamlFiles();
     } else {
@@ -75,13 +80,17 @@ class ProbeCommand extends Command<void> {
   }
 
   void _checkPubspecYamlFiles() {
-    final pubspecYamls = loadPubspecYamlFiles(argResults: argResults);
+    final pubspecYamls = loadPubspecYamlFiles(configuration: configuration, argResults: argResults);
     print('Analyzing dependency specifications...');
     assertPubspecYamlConsistency(pubspecYamls);
   }
 
   void _checkPubspecLockFiles() {
-    final pubspecLockLocations = locatePubspecFiles(filename: 'pubspec.lock', argResults: argResults);
+    final pubspecLockLocations = locatePubspecFiles(
+      filename: 'pubspec.lock',
+      configuration: configuration,
+      argResults: argResults,
+    );
     final pubspecLocks = Map.fromEntries(pubspecLockLocations.map((location) => MapEntry(
           location,
           File(location).readAsStringSync().loadPubspecLockFromYaml(),

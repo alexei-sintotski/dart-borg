@@ -27,6 +27,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:borg/borg.dart';
+import 'package:borg/src/configuration/configuration.dart';
 import 'package:meta/meta.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
@@ -35,8 +36,15 @@ import 'utils/print_dependency_usage_report.dart';
 
 // ignore_for_file: avoid_print
 
-Map<String, PubspecYaml> loadPubspecYamlFiles({@required ArgResults argResults}) {
-  final pubspecYamlLocations = locatePubspecFiles(filename: 'pubspec.yaml', argResults: argResults);
+Map<String, PubspecYaml> loadPubspecYamlFiles({
+  @required BorgConfiguration configuration,
+  @required ArgResults argResults,
+}) {
+  final pubspecYamlLocations = locatePubspecFiles(
+    filename: 'pubspec.yaml',
+    configuration: configuration,
+    argResults: argResults,
+  );
   final pubspecYamls = Map.fromEntries(pubspecYamlLocations.map((location) => MapEntry(
         location,
         File(location).readAsStringSync().toPubspecYaml(),

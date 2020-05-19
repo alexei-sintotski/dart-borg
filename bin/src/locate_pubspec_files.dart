@@ -26,11 +26,10 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:borg/src/configuration/configuration.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 
-import 'options/exclude.dart';
-import 'options/paths.dart';
 import 'options/verbose.dart';
 import 'utils/file_finder.dart';
 
@@ -38,10 +37,11 @@ import 'utils/file_finder.dart';
 
 Iterable<String> locatePubspecFiles({
   @required String filename,
+  @required BorgConfiguration configuration,
   @required ArgResults argResults,
 }) {
   stdout.write('Scanning for $filename files...');
-  final pubspecFileLocations = _locationsToScan(filename, argResults);
+  final pubspecFileLocations = _locationsToScan(filename, configuration);
   print(' ${pubspecFileLocations.length} files found');
   if (getVerboseFlag(argResults)) {
     for (final loc in pubspecFileLocations) {
@@ -57,9 +57,9 @@ Iterable<String> locatePubspecFiles({
   return pubspecFileLocations;
 }
 
-Iterable<String> _locationsToScan(String filename, ArgResults argResults) {
+Iterable<String> _locationsToScan(String filename, BorgConfiguration config) {
   final fileFinder = FileFinder(filename);
-  final includedLocations = fileFinder.findFiles(getPathsMultiOption(argResults));
-  final excludedLocations = fileFinder.findFiles(getExcludesMultiOption(argResults));
+  final includedLocations = fileFinder.findFiles(config.pathsToScan);
+  final excludedLocations = fileFinder.findFiles(config.excludedPaths);
   return includedLocations.where((location) => !excludedLocations.contains(location)).map(path.relative);
 }
