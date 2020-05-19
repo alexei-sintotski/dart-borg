@@ -27,6 +27,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:borg/borg.dart';
+import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/configuration/factory.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
@@ -59,8 +60,12 @@ class EvolveCommand extends Command<void> {
   @override
   void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
 
+  BorgConfiguration configuration;
+
   void _run() {
-    final pubspecYamls = loadPubspecYamlFiles(argResults: argResults);
+    configuration = createConfiguration(argResults);
+
+    final pubspecYamls = loadPubspecYamlFiles(configuration: configuration, argResults: argResults);
     assertPubspecYamlConsistency(pubspecYamls);
 
     final allExternalDepSpecs = getAllExternalPackageDependencySpecs(pubspecYamls.values);
@@ -121,9 +126,9 @@ class EvolveCommand extends Command<void> {
 
   void _resolveDependencies({@required Directory location, String arguments = ''}) {
     final result = runSystemCommand(
-      command: '${pub(argResults)} get $arguments',
+      command: '${pub(configuration)} get $arguments',
       workingDirectory: location,
-      environment: pubEnvironment(argResults),
+      environment: pubEnvironment(configuration),
     );
     if (result.exitCode != 0) {
       stdout.write('\n');

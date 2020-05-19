@@ -33,4 +33,8 @@ void _addExcludeMultiOption(ArgParser argParser) => argParser.addMultiOption(
       defaultsTo: [],
     );
 
+Iterable<String> _getExcludesMultiOption(ArgResults argResults) =>
+    // ignore: avoid_as
+    argResults[_nameExcludeMultiOption] as Iterable<String>;
+
 const _nameExcludeMultiOption = 'exclude';

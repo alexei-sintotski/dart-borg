@@ -27,6 +27,8 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
+import 'configuration.dart';
+
 part 'options/dart_sdk.dart';
 part 'options/exclude.dart';
 part 'options/flutter_sdk.dart';
@@ -40,3 +42,10 @@ void populateConfigurationArgs(ArgParser argParser) {
   _addPathsMultiOption(argParser);
   _addExcludeMultiOption(argParser);
 }
+
+BorgConfiguration createConfiguration(ArgResults argResults) => BorgConfiguration(
+      dartSdkPath: _getDartSdkOption(argResults),
+      flutterSdkPath: _getFlutterSdkOption(argResults),
+      pathsToScan: _getPathsMultiOption(argResults),
+      excludedPaths: _getExcludesMultiOption(argResults),
+    );
