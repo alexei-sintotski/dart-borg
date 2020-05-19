@@ -27,16 +27,13 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:borg/borg.dart';
+import 'package:borg/src/configuration/factory.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:pubspec_lock/pubspec_lock.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
-import '../options/dart_sdk.dart';
 import '../options/dry_run.dart';
-import '../options/exclude.dart';
-import '../options/flutter_sdk.dart';
-import '../options/paths.dart';
 import '../options/verbose.dart';
 import '../pub.dart';
 import '../pubspec_yaml_functions.dart';
@@ -48,12 +45,9 @@ import '../utils/with_temp_location.dart';
 
 class EvolveCommand extends Command<void> {
   EvolveCommand() {
+    populateConfigurationArgs(argParser);
     addDryRunFlag(argParser);
-    addPathsMultiOption(argParser);
-    addExcludeMultiOption(argParser);
     addVerboseFlag(argParser);
-    addDartSdkOption(argParser);
-    addFlutterSdkOption(argParser);
   }
 
   @override

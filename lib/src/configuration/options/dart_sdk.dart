@@ -23,9 +23,14 @@
  *
  */
 
-import 'package:args/args.dart';
+part of '../factory.dart';
 
-// ignore: avoid_as
-String getFlutterSdkOption(ArgResults argResults) => argResults[_name] as String;
+void _addDartSdkOption(ArgParser argParser) => argParser.addOption(
+      _nameDartSdkOption,
+      abbr: 's',
+      help: 'Path to Dart SDK',
+      valueHelp: 'PATH',
+      defaultsTo: Platform.environment['DART_SDK'] ?? '',
+    );
 
-const _name = 'fluttersdk';
+const _nameDartSdkOption = 'dartsdk';

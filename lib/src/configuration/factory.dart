@@ -23,9 +23,20 @@
  *
  */
 
+import 'dart:io';
+
 import 'package:args/args.dart';
 
-// ignore: avoid_as
-String getFlutterSdkOption(ArgResults argResults) => argResults[_name] as String;
+part 'options/dart_sdk.dart';
+part 'options/exclude.dart';
+part 'options/flutter_sdk.dart';
+part 'options/paths.dart';
 
-const _name = 'fluttersdk';
+// ignore_for_file: public_member_api_docs
+
+void populateConfigurationArgs(ArgParser argParser) {
+  _addDartSdkOption(argParser);
+  _addFlutterSdkOption(argParser);
+  _addPathsMultiOption(argParser);
+  _addExcludeMultiOption(argParser);
+}
