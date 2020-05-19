@@ -23,17 +23,7 @@
  *
  */
 
-import 'dart:io';
-
 import 'package:args/args.dart';
-
-void addDartSdkOption(ArgParser argParser) => argParser.addOption(
-      _name,
-      abbr: 's',
-      help: 'Path to Dart SDK',
-      valueHelp: 'PATH',
-      defaultsTo: Platform.environment['DART_SDK'] ?? '',
-    );
 
 // ignore: avoid_as
 String getDartSdkOption(ArgResults argResults) => argResults[_name] as String;

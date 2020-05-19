@@ -23,17 +23,7 @@
  *
  */
 
-import 'dart:io';
-
 import 'package:args/args.dart';
-
-void addPathsMultiOption(ArgParser argParser) => argParser.addMultiOption(
-      _name,
-      abbr: 'p',
-      help: 'list of paths to scan for Dart packages (glob syntax allowed)',
-      valueHelp: 'PATH1,PATH2,...',
-      defaultsTo: [Directory.current.path],
-    );
 
 // ignore: avoid_as
 Iterable<String> getPathsMultiOption(ArgResults argResults) => argResults[_name] as Iterable<String>;

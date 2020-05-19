@@ -27,12 +27,11 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:borg/borg.dart';
+import 'package:borg/src/configuration/factory.dart';
 import 'package:pubspec_lock/pubspec_lock.dart';
 
 import '../locate_pubspec_files.dart';
-import '../options/exclude.dart';
 import '../options/lock.dart';
-import '../options/paths.dart';
 import '../options/verbose.dart';
 import '../options/yaml.dart';
 import '../pubspec_yaml_functions.dart';
@@ -42,10 +41,9 @@ import '../utils/print_dependency_usage_report.dart';
 
 class ProbeCommand extends Command<void> {
   ProbeCommand() {
+    populateConfigurationArgs(argParser);
     addPubspecYamlFlag(argParser);
     addPubspecLockFlag(argParser);
-    addPathsMultiOption(argParser);
-    addExcludeMultiOption(argParser);
     addVerboseFlag(argParser);
   }
 

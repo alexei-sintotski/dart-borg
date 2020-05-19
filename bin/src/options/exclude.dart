@@ -25,14 +25,6 @@
 
 import 'package:args/args.dart';
 
-void addExcludeMultiOption(ArgParser argParser) => argParser.addMultiOption(
-      'exclude',
-      abbr: 'x',
-      help: 'list of paths to exclude from scan (glob syntax allowed)',
-      valueHelp: 'PATH1,PATH2,...',
-      defaultsTo: [],
-    );
-
 // ignore: avoid_as
 Iterable<String> getExcludesMultiOption(ArgResults argResults) => argResults[_name] as Iterable<String>;
 

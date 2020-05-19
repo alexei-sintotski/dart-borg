@@ -23,9 +23,14 @@
  *
  */
 
-import 'package:args/args.dart';
+part of '../factory.dart';
 
-// ignore: avoid_as
-String getFlutterSdkOption(ArgResults argResults) => argResults[_name] as String;
+void _addExcludeMultiOption(ArgParser argParser) => argParser.addMultiOption(
+      _nameExcludeMultiOption,
+      abbr: 'x',
+      help: 'list of paths to exclude from scan (glob syntax allowed)',
+      valueHelp: 'PATH1,PATH2,...',
+      defaultsTo: [],
+    );
 
-const _name = 'fluttersdk';
+const _nameExcludeMultiOption = 'exclude';

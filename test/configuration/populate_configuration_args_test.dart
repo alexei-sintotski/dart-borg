@@ -24,8 +24,28 @@
  */
 
 import 'package:args/args.dart';
+import 'package:borg/src/configuration/factory.dart';
+import 'package:test/test.dart';
 
-// ignore: avoid_as
-String getFlutterSdkOption(ArgResults argResults) => argResults[_name] as String;
+void main() {
+  group('$populateConfigurationArgs', () {
+    final argParser = ArgParser();
+    populateConfigurationArgs(argParser);
 
-const _name = 'fluttersdk';
+    test('adds option for Dart SDK path', () {
+      expect(argParser.options.keys, contains('dartsdk'));
+    });
+
+    test('adds option for Flutter SDK path', () {
+      expect(argParser.options.keys, contains('fluttersdk'));
+    });
+
+    test('adds option for locations included to configuration management', () {
+      expect(argParser.options.keys, contains('paths'));
+    });
+
+    test('adds option to exclude locations from configuration management', () {
+      expect(argParser.options.keys, contains('exclude'));
+    });
+  });
+}

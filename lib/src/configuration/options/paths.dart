@@ -23,9 +23,14 @@
  *
  */
 
-import 'package:args/args.dart';
+part of '../factory.dart';
 
-// ignore: avoid_as
-String getFlutterSdkOption(ArgResults argResults) => argResults[_name] as String;
+void _addPathsMultiOption(ArgParser argParser) => argParser.addMultiOption(
+      _name,
+      abbr: 'p',
+      help: 'list of paths to scan for Dart packages (glob syntax allowed)',
+      valueHelp: 'PATH1,PATH2,...',
+      defaultsTo: [Directory.current.path],
+    );
 
-const _name = 'fluttersdk';
+const _name = 'paths';
