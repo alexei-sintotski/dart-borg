@@ -26,6 +26,7 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:meta/meta.dart';
+import 'package:plain_optional/plain_optional.dart';
 
 @immutable
 class BorgConfiguration {
@@ -36,8 +37,8 @@ class BorgConfiguration {
     @required this.excludedPaths,
   });
 
-  final String dartSdkPath;
-  final String flutterSdkPath;
+  final Optional<String> dartSdkPath;
+  final Optional<String> flutterSdkPath;
   final Iterable<String> pathsToScan;
   final Iterable<String> excludedPaths;
 }

@@ -26,9 +26,12 @@
 import 'package:borg/src/configuration/configuration.dart';
 import 'package:path/path.dart' as path;
 
-String pub(BorgConfiguration config) {
-  final location = config.dartSdkPath;
-  return location.isEmpty ? 'pub' : path.joinAll([location, 'bin', 'pub']);
-}
+String pub(BorgConfiguration config) => config.dartSdkPath.iif(
+      some: (location) => path.joinAll([location, 'bin', 'pub']),
+      none: () => 'pub',
+    );
 
-Map<String, String> pubEnvironment(BorgConfiguration config) => {'FLUTTER_ROOT': config.flutterSdkPath};
+Map<String, String> pubEnvironment(BorgConfiguration config) => config.flutterSdkPath.iif(
+      some: (location) => {'FLUTTER_ROOT': location},
+      none: () => {},
+    );

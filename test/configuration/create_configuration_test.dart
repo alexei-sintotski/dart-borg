@@ -29,26 +29,48 @@ import 'package:test/test.dart';
 
 void main() {
   group('$createConfiguration', () {
-    final argParser = ArgParser();
-    populateConfigurationArgs(argParser);
+    group('given command line without options', () {
+      final argParser = ArgParser();
+      populateConfigurationArgs(argParser);
 
-    final argResults = argParser.parse(['--dartsdk=x', '--fluttersdk=y', '--exclude=z']);
-    final configuration = createConfiguration(argResults);
+      final argResults = argParser.parse(['--dartsdk=']);
+      final configuration = createConfiguration(argResults);
 
-    test('produces correct Dart SDK path', () {
-      expect(configuration.dartSdkPath, argResults['dartsdk']);
+      test('produces configuration without Dart SDK path specified', () {
+        expect(configuration.dartSdkPath.hasValue, isFalse);
+      });
+
+      test('produces configuration without Flutter SDK path specified', () {
+        expect(configuration.flutterSdkPath.hasValue, isFalse);
+      });
+
+      test('produces empty list of paths to exclude from scan', () {
+        expect(configuration.excludedPaths, isEmpty);
+      });
     });
 
-    test('produces correct Flutter SDK path', () {
-      expect(configuration.flutterSdkPath, argResults['fluttersdk']);
-    });
+    group('given command line with all options set', () {
+      final argParser = ArgParser();
+      populateConfigurationArgs(argParser);
 
-    test('produces correct paths to scan', () {
-      expect(configuration.pathsToScan, argResults['paths']);
-    });
+      final argResults = argParser.parse(['--dartsdk=x', '--fluttersdk=y', '--exclude=z']);
+      final configuration = createConfiguration(argResults);
 
-    test('produces correct paths to exclude from scan', () {
-      expect(configuration.excludedPaths, argResults['exclude']);
+      test('produces correct Dart SDK path', () {
+        expect(configuration.dartSdkPath.unsafe, argResults['dartsdk']);
+      });
+
+      test('produces correct Flutter SDK path', () {
+        expect(configuration.flutterSdkPath.unsafe, argResults['fluttersdk']);
+      });
+
+      test('produces correct paths to scan', () {
+        expect(configuration.pathsToScan, argResults['paths']);
+      });
+
+      test('produces correct paths to exclude from scan', () {
+        expect(configuration.excludedPaths, argResults['exclude']);
+      });
     });
   });
 }
