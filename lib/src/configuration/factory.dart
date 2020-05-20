@@ -26,6 +26,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:plain_optional/plain_optional.dart';
 
 import 'configuration.dart';
 
@@ -43,9 +44,13 @@ void populateConfigurationArgs(ArgParser argParser) {
   _addExcludeMultiOption(argParser);
 }
 
-BorgConfiguration createConfiguration(ArgResults argResults) => BorgConfiguration(
-      dartSdkPath: _getDartSdkOption(argResults),
-      flutterSdkPath: _getFlutterSdkOption(argResults),
-      pathsToScan: _getPathsMultiOption(argResults),
-      excludedPaths: _getExcludesMultiOption(argResults),
-    );
+BorgConfiguration createConfiguration(ArgResults argResults) {
+  final dartSdkOption = _getDartSdkOption(argResults);
+  final flutterSdkOption = _getFlutterSdkOption(argResults);
+  return BorgConfiguration(
+    dartSdkPath: dartSdkOption.isEmpty ? const Optional.none() : Optional(dartSdkOption),
+    flutterSdkPath: flutterSdkOption.isEmpty ? const Optional.none() : Optional(flutterSdkOption),
+    pathsToScan: _getPathsMultiOption(argResults),
+    excludedPaths: _getExcludesMultiOption(argResults),
+  );
+}
