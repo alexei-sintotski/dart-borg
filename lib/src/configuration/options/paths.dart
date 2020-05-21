@@ -30,10 +30,11 @@ void _addPathsMultiOption(ArgParser argParser) => argParser.addMultiOption(
       abbr: 'p',
       help: 'list of paths to scan for Dart packages (glob syntax allowed)',
       valueHelp: 'PATH1,PATH2,...',
-      defaultsTo: [Directory.current.path],
+      defaultsTo: _defaultPathsMultiOption,
     );
 
 // ignore: avoid_as
 Iterable<String> _getPathsMultiOption(ArgResults argResults) => argResults[_namePathsMultiOption] as Iterable<String>;
 
+final _defaultPathsMultiOption = [Directory.current.path];
 const _namePathsMultiOption = 'paths';

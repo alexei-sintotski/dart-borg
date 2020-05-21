@@ -30,10 +30,11 @@ void _addFlutterSdkOption(ArgParser argParser) => argParser.addOption(
       abbr: 'f',
       help: 'Path to Flutter SDK',
       valueHelp: 'PATH',
-      defaultsTo: '',
+      defaultsTo: _defaultFlutterSdkOption,
     );
 
 // ignore: avoid_as
 String _getFlutterSdkOption(ArgResults argResults) => argResults[_nameFlutterSdkOption] as String;
 
 const _nameFlutterSdkOption = 'fluttersdk';
+const _defaultFlutterSdkOption = '';

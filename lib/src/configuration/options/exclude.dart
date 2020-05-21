@@ -30,7 +30,7 @@ void _addExcludeMultiOption(ArgParser argParser) => argParser.addMultiOption(
       abbr: 'x',
       help: 'list of paths to exclude from scan (glob syntax allowed)',
       valueHelp: 'PATH1,PATH2,...',
-      defaultsTo: [],
+      defaultsTo: _defaultExcludeMultiOption,
     );
 
 Iterable<String> _getExcludesMultiOption(ArgResults argResults) =>
@@ -38,3 +38,4 @@ Iterable<String> _getExcludesMultiOption(ArgResults argResults) =>
     argResults[_nameExcludeMultiOption] as Iterable<String>;
 
 const _nameExcludeMultiOption = 'exclude';
+const _defaultExcludeMultiOption = <String>[];
