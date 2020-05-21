@@ -2,3 +2,4 @@ ignore:
   - "**/*.g.dart"
   - "example/*.dart"
   - "lib/src/generic_dependency_usage_report.dart"
+  - "lib/src/configuration/factory_default_file_io.dart"

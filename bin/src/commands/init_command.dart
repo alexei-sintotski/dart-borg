@@ -24,16 +24,20 @@
  */
 
 import 'package:args/command_runner.dart';
+import 'package:borg/src/configuration/factory.dart';
 
-import 'src/commands/evolve_command.dart';
-import 'src/commands/init_command.dart';
-import 'src/commands/probe_command.dart';
+// ignore_for_file: avoid_print
 
-void main(List<String> args) => CommandRunner<void>(
-      'borg',
-      'Command-line tool for consistent configuration management of Dart packages in a mono repository',
-    )
-      ..addCommand(ProbeCommand())
-      ..addCommand(EvolveCommand())
-      ..addCommand(InitCommand())
-      ..run(args);
+class InitCommand extends Command<void> {
+  @override
+  String get description => 'Generates initial .borg.yaml configuration file in current directory';
+
+  @override
+  String get name => 'init';
+
+  @override
+  void run() {
+    BorgConfigurationFactory().createInitialConfigurationFile();
+    print('Initial configuration file is created.');
+  }
+}

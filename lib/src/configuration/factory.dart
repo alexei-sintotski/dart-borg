@@ -33,6 +33,7 @@ import 'package:yaml/yaml.dart';
 
 import 'configuration.dart';
 
+part 'factory_default_file_io.dart';
 part 'options/dart_sdk.dart';
 part 'options/exclude.dart';
 part 'options/flutter_sdk.dart';
@@ -43,7 +44,7 @@ part 'options/paths.dart';
 @immutable
 class BorgConfigurationFactory {
   BorgConfigurationFactory({Optional<String> Function(String) tryToReadFileSync = _tryToReadFileSync})
-      : _configFromFile = tryToReadFileSync('.borg.yaml').iif(
+      : _configFromFile = tryToReadFileSync(_configurationFileName).iif(
           some: (s) => BorgConfiguration.fromJson(
               json.decode(json.encode(loadYaml(s))) as Map<String, dynamic>), // ignore: avoid_as
           none: () => const BorgConfiguration(),
@@ -56,7 +57,7 @@ class BorgConfigurationFactory {
       argParser: argParser,
       defaultsTo: _configFromFile.dartSdkPath.iif(
         some: (e) => e,
-        none: () => Platform.environment['DART_SDK'] ?? '',
+        none: () => _defaultDartSdkPath,
       ),
     );
     _addFlutterSdkOption(
@@ -86,13 +87,22 @@ class BorgConfigurationFactory {
       flutterSdkPath: flutterSdkOption.isEmpty ? const Optional.none() : Optional(flutterSdkOption),
     );
   }
-}
 
-Optional<String> _tryToReadFileSync(String filePath) {
-  final file = File(filePath);
-  if (file.existsSync() && [FileSystemEntityType.file].contains(file.statSync().type)) {
-    return Optional(file.readAsStringSync());
-  } else {
-    return const Optional.none();
+  void createInitialConfigurationFile({void Function(String, String) saveStringToFileSync = _saveStringToFileSync}) {
+    saveStringToFileSync(
+      _configurationFileName,
+      _initialConfigurationFileContent,
+    );
   }
 }
+
+const _configurationFileName = '.borg.yaml';
+final _defaultDartSdkPath = Platform.environment['DART_SDK'] ?? '';
+
+final _initialConfigurationFileContent = '''
+include: # list of locations processed by Borg, glob specifications are allowed
+  - .
+exclude: # specify here a list of locations to be ignored by Borg
+dart_sdk: $_defaultDartSdkPath # path to Dart SDK
+flutter_sdk: # path to the root of Flutter SDK
+''';

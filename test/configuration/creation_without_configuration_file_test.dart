@@ -29,7 +29,7 @@ import 'package:plain_optional/plain_optional.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('$BorgConfigurationFactory()', () {
+  group('$BorgConfigurationFactory', () {
     group('given no configuration file', () {
       final argParser = ArgParser();
       final factory = BorgConfigurationFactory(
