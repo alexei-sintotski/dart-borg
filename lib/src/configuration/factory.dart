@@ -23,10 +23,13 @@
  *
  */
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:collection/collection.dart';
 import 'package:plain_optional/plain_optional.dart';
+import 'package:yaml/yaml.dart';
 
 import 'configuration.dart';
 
@@ -44,13 +47,49 @@ void populateConfigurationArgs(ArgParser argParser) {
   _addExcludeMultiOption(argParser);
 }
 
-BorgConfiguration createConfiguration(ArgResults argResults) {
+BorgConfiguration createConfiguration(
+  ArgResults argResults, {
+  Optional<String> Function(String) tryToReadFileSync = _tryToReadFileSync,
+}) {
+  final configFromFile = tryToReadFileSync('.borg.yaml').iif(
+    some: (s) =>
+        BorgConfiguration.fromJson(json.decode(json.encode(loadYaml(s))) as Map<String, dynamic>), // ignore: avoid_as
+    none: () => const BorgConfiguration(),
+  );
+
   final dartSdkOption = _getDartSdkOption(argResults);
   final flutterSdkOption = _getFlutterSdkOption(argResults);
   return BorgConfiguration(
-    dartSdkPath: dartSdkOption.isEmpty ? const Optional.none() : Optional(dartSdkOption),
-    flutterSdkPath: flutterSdkOption.isEmpty ? const Optional.none() : Optional(flutterSdkOption),
-    pathsToScan: _getPathsMultiOption(argResults),
-    excludedPaths: _getExcludesMultiOption(argResults),
+    dartSdkPath: _getDartSdkOption(argResults) == _defaultDartSdkOption && configFromFile.dartSdkPath.hasValue
+        ? configFromFile.dartSdkPath
+        : dartSdkOption.isEmpty ? const Optional.none() : Optional(dartSdkOption),
+    flutterSdkPath:
+        _getFlutterSdkOption(argResults) == _defaultFlutterSdkOption && configFromFile.flutterSdkPath.hasValue
+            ? configFromFile.flutterSdkPath
+            : flutterSdkOption.isEmpty ? const Optional.none() : Optional(flutterSdkOption),
+    pathsToScan: [
+      if (_equals(_getPathsMultiOption(argResults), _defaultPathsMultiOption) && configFromFile.pathsToScan.isNotEmpty)
+        ...configFromFile.pathsToScan
+      else
+        ..._getPathsMultiOption(argResults)
+    ],
+    excludedPaths: [
+      if (_equals(_getExcludesMultiOption(argResults), _defaultExcludeMultiOption) &&
+          configFromFile.excludedPaths.isNotEmpty)
+        ...configFromFile.excludedPaths
+      else
+        ..._getExcludesMultiOption(argResults)
+    ],
   );
 }
+
+Optional<String> _tryToReadFileSync(String filePath) {
+  final file = File(filePath);
+  if (file.existsSync() && [FileSystemEntityType.file].contains(file.statSync().type)) {
+    return Optional(file.readAsStringSync());
+  } else {
+    return const Optional.none();
+  }
+}
+
+bool _equals(Iterable v1, Iterable v2) => const DeepCollectionEquality().equals(v1, v2);

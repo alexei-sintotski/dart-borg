@@ -18,6 +18,7 @@ dependencies:
   plain_optional: ^0.1.0
   pubspec_lock: ^2.0.0
   pubspec_yaml: ^2.0.0
+  yaml: ^2.2.0
 
 dev_dependencies:
   dependency_validator: ^1.4.0

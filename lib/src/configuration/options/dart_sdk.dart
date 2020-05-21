@@ -30,10 +30,11 @@ void _addDartSdkOption(ArgParser argParser) => argParser.addOption(
       abbr: 's',
       help: 'Path to Dart SDK',
       valueHelp: 'PATH',
-      defaultsTo: Platform.environment['DART_SDK'] ?? '',
+      defaultsTo: _defaultDartSdkOption,
     );
 
 // ignore: avoid_as
 String _getDartSdkOption(ArgResults argResults) => argResults[_nameDartSdkOption] as String;
 
 const _nameDartSdkOption = 'dartsdk';
+final _defaultDartSdkOption = Platform.environment['DART_SDK'] ?? '';

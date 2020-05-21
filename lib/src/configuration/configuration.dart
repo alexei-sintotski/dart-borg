@@ -28,17 +28,53 @@
 import 'package:meta/meta.dart';
 import 'package:plain_optional/plain_optional.dart';
 
+// ignore_for_file: sort_constructors_first
+
 @immutable
 class BorgConfiguration {
-  const BorgConfiguration({
-    @required this.dartSdkPath,
-    @required this.flutterSdkPath,
-    @required this.pathsToScan,
-    @required this.excludedPaths,
-  });
-
   final Optional<String> dartSdkPath;
   final Optional<String> flutterSdkPath;
   final Iterable<String> pathsToScan;
   final Iterable<String> excludedPaths;
+
+  const BorgConfiguration({
+    this.dartSdkPath = const Optional.none(),
+    this.flutterSdkPath = const Optional.none(),
+    this.pathsToScan = const [],
+    this.excludedPaths = const [],
+  });
+
+  factory BorgConfiguration.fromJson(Map<String, dynamic> json) => BorgConfiguration(
+        dartSdkPath: _getString(json, _dartSdkToken),
+        flutterSdkPath: _getString(json, _flutterSdkToken),
+        pathsToScan: _getStringIterable(json, _includeToken),
+        excludedPaths: _getStringIterable(json, _excludeToken),
+      );
 }
+
+Optional<String> _getString(Map<String, dynamic> json, String key) {
+  if (json.containsKey(key)) {
+    return Optional(json[key] as String); // ignore: avoid_as
+  } else {
+    return const Optional.none();
+  }
+}
+
+Iterable<String> _getStringIterable(Map<String, dynamic> json, String key) {
+  if (json.containsKey(key)) {
+    final dynamic value = json[key];
+    if (value is String) {
+      return [value];
+    } else {
+      // ignore: avoid_as, avoid_annotating_with_dynamic
+      return (value as Iterable).map((dynamic e) => e as String);
+    }
+  } else {
+    return [];
+  }
+}
+
+const _excludeToken = 'exclude';
+const _includeToken = 'include';
+const _dartSdkToken = 'dart_sdk';
+const _flutterSdkToken = 'flutter_sdk';
