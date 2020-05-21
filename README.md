@@ -9,13 +9,14 @@ Features available in the current version:
 * Consistent upgrade of all external dependencies across repository
 * Flutter support
 
-Feature roadmap (in the order of priority):
+Feature roadmap:
 
 | version | Major feature                                                                                                            |
 |---------|--------------------------------------------------------------------------------------------------------------------------|
-| 1.2     | Getting dependencies for all Dart packages in repository                                                                 |
-| 1.3     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
-| 1.4     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
+| 1.2     | Configuration file support                                                                                               |
+| 1.3     | Repository bootstrapping, list outdated packages                                                                         |
+| 1.4     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
+| 1.5     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
 
 # Installation
 
