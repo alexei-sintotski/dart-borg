@@ -146,6 +146,18 @@ borg evolve --fluttersdk=dev/flutter
 Alternatively, path to Flutter SDK can be set with the environment variable `FLUTTER_ROOT`. Usage of `fluttersdk` in
 `borg` command line is not required in this case.
 
+# Configuration file
+
+In case configuration options have to be specified for every run of the tool, `borg` provides possibility to avoid long command lines with configuration file `.borg.yaml`. Every time `borg` is executed, it checks out whether the file exists in the current directory, reads it out, and uses its content to provide default values for its arguments.
+
+The following configuration options can be specified in `.borg.yaml`:
+| YAML key    | Meaning                                                                         |
+|-------------|---------------------------------------------------------------------------------|
+| include     | List of locations to include for analysis (glob syntax supported)               |
+| exclude     | List of locations to exclude from analysis (glob syntax supported)              |
+| dart_sdk    | Path to Dart SDK                                                                |
+| flutter_sdk | Path to root directory of Flutter SDK                                           |
+
 # API
 
 If the standard command-line tool does not fit your use cases, its essential logic can be accessed via Dart API.
