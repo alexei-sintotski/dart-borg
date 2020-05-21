@@ -42,7 +42,7 @@ import '../utils/print_dependency_usage_report.dart';
 
 class ProbeCommand extends Command<void> {
   ProbeCommand() {
-    populateConfigurationArgs(argParser);
+    configurationFactory.populateConfigurationArgs(argParser);
     addPubspecYamlFlag(argParser);
     addPubspecLockFlag(argParser);
     addVerboseFlag(argParser);
@@ -54,11 +54,12 @@ class ProbeCommand extends Command<void> {
   @override
   String get name => 'probe';
 
+  final BorgConfigurationFactory configurationFactory = BorgConfigurationFactory();
   BorgConfiguration configuration;
 
   @override
   void run() {
-    configuration = createConfiguration(argResults);
+    configuration = configurationFactory.createConfiguration(argResults: argResults);
 
     if (getPubspecYamlFlag(argResults)) {
       _checkPubspecYamlFiles();
