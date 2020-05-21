@@ -53,24 +53,25 @@ class BorgConfiguration {
 }
 
 Optional<String> _getString(Map<String, dynamic> json, String key) {
-  if (json.containsKey(key)) {
-    return Optional(json[key] as String); // ignore: avoid_as
-  } else {
+  if (json == null || !json.containsKey(key)) {
     return const Optional.none();
   }
+  return Optional(json[key] as String); // ignore: avoid_as
 }
 
 Iterable<String> _getStringIterable(Map<String, dynamic> json, String key) {
-  if (json.containsKey(key)) {
-    final dynamic value = json[key];
-    if (value is String) {
-      return [value];
-    } else {
-      // ignore: avoid_as, avoid_annotating_with_dynamic
-      return (value as Iterable).map((dynamic e) => e as String);
-    }
-  } else {
+  if (json == null || !json.containsKey(key)) {
     return [];
+  }
+  final dynamic value = json[key];
+  if (value == null) {
+    return [];
+  }
+  if (value is String) {
+    return [value];
+  } else {
+    // ignore: avoid_as, avoid_annotating_with_dynamic
+    return (value as Iterable).map((dynamic e) => e as String);
   }
 }
 

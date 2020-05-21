@@ -1,2 +1,1 @@
-exclude:
-  - test/integration_test_sets/package_with_inconsistent_dep_spec
+exclude: test/integration_test_sets/package_with_inconsistent_dep_spec

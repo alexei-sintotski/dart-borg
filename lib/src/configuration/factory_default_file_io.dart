@@ -23,17 +23,17 @@
  *
  */
 
-import 'package:args/command_runner.dart';
+part of 'factory.dart';
 
-import 'src/commands/evolve_command.dart';
-import 'src/commands/init_command.dart';
-import 'src/commands/probe_command.dart';
+Optional<String> _tryToReadFileSync(String filePath) {
+  final file = File(filePath);
+  if (file.existsSync() && [FileSystemEntityType.file].contains(file.statSync().type)) {
+    return Optional(file.readAsStringSync());
+  } else {
+    return const Optional.none();
+  }
+}
 
-void main(List<String> args) => CommandRunner<void>(
-      'borg',
-      'Command-line tool for consistent configuration management of Dart packages in a mono repository',
-    )
-      ..addCommand(ProbeCommand())
-      ..addCommand(EvolveCommand())
-      ..addCommand(InitCommand())
-      ..run(args);
+void _saveStringToFileSync(String filePath, String content) {
+  File(filePath).writeAsStringSync(content);
+}
