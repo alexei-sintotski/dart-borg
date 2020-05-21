@@ -25,16 +25,19 @@
 
 part of '../factory.dart';
 
-void _addPathsMultiOption(ArgParser argParser) => argParser.addMultiOption(
+void _addPathsMultiOption({
+  @required ArgParser argParser,
+  @required Iterable<String> defaultsTo,
+}) =>
+    argParser.addMultiOption(
       _namePathsMultiOption,
       abbr: 'p',
       help: 'list of paths to scan for Dart packages (glob syntax allowed)',
       valueHelp: 'PATH1,PATH2,...',
-      defaultsTo: _defaultPathsMultiOption,
+      defaultsTo: defaultsTo,
     );
 
 // ignore: avoid_as
 Iterable<String> _getPathsMultiOption(ArgResults argResults) => argResults[_namePathsMultiOption] as Iterable<String>;
 
-final _defaultPathsMultiOption = [Directory.current.path];
 const _namePathsMultiOption = 'paths';

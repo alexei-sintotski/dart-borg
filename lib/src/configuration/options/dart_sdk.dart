@@ -25,16 +25,19 @@
 
 part of '../factory.dart';
 
-void _addDartSdkOption(ArgParser argParser) => argParser.addOption(
+void _addDartSdkOption({
+  @required ArgParser argParser,
+  @required String defaultsTo,
+}) =>
+    argParser.addOption(
       _nameDartSdkOption,
       abbr: 's',
       help: 'Path to Dart SDK',
       valueHelp: 'PATH',
-      defaultsTo: _defaultDartSdkOption,
+      defaultsTo: defaultsTo,
     );
 
 // ignore: avoid_as
 String _getDartSdkOption(ArgResults argResults) => argResults[_nameDartSdkOption] as String;
 
 const _nameDartSdkOption = 'dartsdk';
-final _defaultDartSdkOption = Platform.environment['DART_SDK'] ?? '';

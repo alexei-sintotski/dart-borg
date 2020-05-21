@@ -25,12 +25,16 @@
 
 part of '../factory.dart';
 
-void _addExcludeMultiOption(ArgParser argParser) => argParser.addMultiOption(
+void _addExcludeMultiOption({
+  @required ArgParser argParser,
+  @required Iterable<String> defaultsTo,
+}) =>
+    argParser.addMultiOption(
       _nameExcludeMultiOption,
       abbr: 'x',
       help: 'list of paths to exclude from scan (glob syntax allowed)',
       valueHelp: 'PATH1,PATH2,...',
-      defaultsTo: _defaultExcludeMultiOption,
+      defaultsTo: defaultsTo,
     );
 
 Iterable<String> _getExcludesMultiOption(ArgResults argResults) =>
@@ -38,4 +42,3 @@ Iterable<String> _getExcludesMultiOption(ArgResults argResults) =>
     argResults[_nameExcludeMultiOption] as Iterable<String>;
 
 const _nameExcludeMultiOption = 'exclude';
-const _defaultExcludeMultiOption = <String>[];

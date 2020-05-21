@@ -46,7 +46,7 @@ import '../utils/with_temp_location.dart';
 
 class EvolveCommand extends Command<void> {
   EvolveCommand() {
-    populateConfigurationArgs(argParser);
+    configurationFactory.populateConfigurationArgs(argParser);
     addDryRunFlag(argParser);
     addVerboseFlag(argParser);
   }
@@ -60,10 +60,11 @@ class EvolveCommand extends Command<void> {
   @override
   void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
 
+  final BorgConfigurationFactory configurationFactory = BorgConfigurationFactory();
   BorgConfiguration configuration;
 
   void _run() {
-    configuration = createConfiguration(argResults);
+    configuration = configurationFactory.createConfiguration(argResults: argResults);
 
     final pubspecYamls = loadPubspecYamlFiles(configuration: configuration, argResults: argResults);
     assertPubspecYamlConsistency(pubspecYamls);

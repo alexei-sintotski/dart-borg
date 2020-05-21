@@ -25,16 +25,19 @@
 
 part of '../factory.dart';
 
-void _addFlutterSdkOption(ArgParser argParser) => argParser.addOption(
+void _addFlutterSdkOption({
+  @required ArgParser argParser,
+  @required String defaultsTo,
+}) =>
+    argParser.addOption(
       _nameFlutterSdkOption,
       abbr: 'f',
       help: 'Path to Flutter SDK',
       valueHelp: 'PATH',
-      defaultsTo: _defaultFlutterSdkOption,
+      defaultsTo: defaultsTo,
     );
 
 // ignore: avoid_as
 String _getFlutterSdkOption(ArgResults argResults) => argResults[_nameFlutterSdkOption] as String;
 
 const _nameFlutterSdkOption = 'fluttersdk';
-const _defaultFlutterSdkOption = '';

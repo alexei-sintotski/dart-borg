@@ -27,7 +27,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 import 'package:plain_optional/plain_optional.dart';
 import 'package:yaml/yaml.dart';
 
@@ -40,47 +40,52 @@ part 'options/paths.dart';
 
 // ignore_for_file: public_member_api_docs
 
-void populateConfigurationArgs(ArgParser argParser) {
-  _addDartSdkOption(argParser);
-  _addFlutterSdkOption(argParser);
-  _addPathsMultiOption(argParser);
-  _addExcludeMultiOption(argParser);
-}
+@immutable
+class BorgConfigurationFactory {
+  BorgConfigurationFactory({Optional<String> Function(String) tryToReadFileSync = _tryToReadFileSync})
+      : _configFromFile = tryToReadFileSync('.borg.yaml').iif(
+          some: (s) => BorgConfiguration.fromJson(
+              json.decode(json.encode(loadYaml(s))) as Map<String, dynamic>), // ignore: avoid_as
+          none: () => const BorgConfiguration(),
+        );
 
-BorgConfiguration createConfiguration(
-  ArgResults argResults, {
-  Optional<String> Function(String) tryToReadFileSync = _tryToReadFileSync,
-}) {
-  final configFromFile = tryToReadFileSync('.borg.yaml').iif(
-    some: (s) =>
-        BorgConfiguration.fromJson(json.decode(json.encode(loadYaml(s))) as Map<String, dynamic>), // ignore: avoid_as
-    none: () => const BorgConfiguration(),
-  );
+  final BorgConfiguration _configFromFile;
 
-  final dartSdkOption = _getDartSdkOption(argResults);
-  final flutterSdkOption = _getFlutterSdkOption(argResults);
-  return BorgConfiguration(
-    dartSdkPath: _getDartSdkOption(argResults) == _defaultDartSdkOption && configFromFile.dartSdkPath.hasValue
-        ? configFromFile.dartSdkPath
-        : dartSdkOption.isEmpty ? const Optional.none() : Optional(dartSdkOption),
-    flutterSdkPath:
-        _getFlutterSdkOption(argResults) == _defaultFlutterSdkOption && configFromFile.flutterSdkPath.hasValue
-            ? configFromFile.flutterSdkPath
-            : flutterSdkOption.isEmpty ? const Optional.none() : Optional(flutterSdkOption),
-    pathsToScan: [
-      if (_equals(_getPathsMultiOption(argResults), _defaultPathsMultiOption) && configFromFile.pathsToScan.isNotEmpty)
-        ...configFromFile.pathsToScan
-      else
-        ..._getPathsMultiOption(argResults)
-    ],
-    excludedPaths: [
-      if (_equals(_getExcludesMultiOption(argResults), _defaultExcludeMultiOption) &&
-          configFromFile.excludedPaths.isNotEmpty)
-        ...configFromFile.excludedPaths
-      else
-        ..._getExcludesMultiOption(argResults)
-    ],
-  );
+  void populateConfigurationArgs(ArgParser argParser) {
+    _addDartSdkOption(
+      argParser: argParser,
+      defaultsTo: _configFromFile.dartSdkPath.iif(
+        some: (e) => e,
+        none: () => Platform.environment['DART_SDK'] ?? '',
+      ),
+    );
+    _addFlutterSdkOption(
+      argParser: argParser,
+      defaultsTo: _configFromFile.flutterSdkPath.iif(
+        some: (e) => e,
+        none: () => '',
+      ),
+    );
+    _addPathsMultiOption(
+      argParser: argParser,
+      defaultsTo: _configFromFile.pathsToScan.isNotEmpty ? _configFromFile.pathsToScan : [Directory.current.path],
+    );
+    _addExcludeMultiOption(
+      argParser: argParser,
+      defaultsTo: _configFromFile.excludedPaths.isNotEmpty ? _configFromFile.excludedPaths : [],
+    );
+  }
+
+  BorgConfiguration createConfiguration({@required ArgResults argResults}) {
+    final dartSdkOption = _getDartSdkOption(argResults);
+    final flutterSdkOption = _getFlutterSdkOption(argResults);
+    return BorgConfiguration(
+      pathsToScan: _getPathsMultiOption(argResults).map((e) => e.trim()).where((e) => e.isNotEmpty),
+      excludedPaths: _getExcludesMultiOption(argResults).map((e) => e.trim()).where((e) => e.isNotEmpty),
+      dartSdkPath: dartSdkOption.isEmpty ? const Optional.none() : Optional(dartSdkOption),
+      flutterSdkPath: flutterSdkOption.isEmpty ? const Optional.none() : Optional(flutterSdkOption),
+    );
+  }
 }
 
 Optional<String> _tryToReadFileSync(String filePath) {
@@ -91,5 +96,3 @@ Optional<String> _tryToReadFileSync(String filePath) {
     return const Optional.none();
   }
 }
-
-bool _equals(Iterable v1, Iterable v2) => const DeepCollectionEquality().equals(v1, v2);
