@@ -1,3 +1,6 @@
+## [1.2.0+1] - 2020-05-20
+* README.md formatting fix
+
 ## [1.2.0] - 2020-05-20
 * Configuration file support: borg.yaml
 
