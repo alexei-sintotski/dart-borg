@@ -119,7 +119,7 @@ BorgConfiguration _constructConfigFromFile({
   );
 }
 
-const _configurationFileName = '.borg.yaml';
+const _configurationFileName = 'borg.yml';
 final _defaultDartSdkPath = Platform.environment['DART_SDK'] ?? '';
 
 final _initialConfigurationFileContent = '''
