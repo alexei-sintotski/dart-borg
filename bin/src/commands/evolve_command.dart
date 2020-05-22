@@ -36,8 +36,8 @@ import 'package:pubspec_yaml/pubspec_yaml.dart';
 
 import '../options/dry_run.dart';
 import '../options/verbose.dart';
-import '../pub.dart';
 import '../pubspec_yaml_functions.dart';
+import '../resolve_dependencies.dart';
 import '../utils/borg_exception.dart';
 import '../utils/with_temp_location.dart';
 

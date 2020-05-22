@@ -34,25 +34,20 @@ import 'utils/run_system_command.dart';
 
 // ignore_for_file: avoid_print
 
-String pub(BorgConfiguration config) => config.dartSdkPath.iif(
-      some: (location) => path.joinAll([location, 'bin', 'pub']),
-      none: () => 'pub',
-    );
-
-Map<String, String> pubEnvironment(BorgConfiguration config) => config.flutterSdkPath.iif(
-      some: (location) => {'FLUTTER_ROOT': location},
-      none: () => {},
-    );
-
 void resolveDependencies({
   @required BorgConfiguration configuration,
   @required Directory location,
   String arguments = '',
 }) {
+  final command = configuration.flutterSdkPath.iif(
+    some: (e) => '${path.joinAll([e, 'bin', 'flutter'])} packages get $arguments',
+    none: () => '${_pub(configuration)} get $arguments',
+  );
+
   final result = runSystemCommand(
-    command: '${pub(configuration)} get $arguments',
+    command: command,
     workingDirectory: location,
-    environment: pubEnvironment(configuration),
+    environment: _pubEnvironment(configuration),
   );
   if (result.exitCode != 0) {
     stdout.write('\n');
@@ -63,3 +58,13 @@ void resolveDependencies({
     throw const BorgException('FAILURE: pub get failed');
   }
 }
+
+String _pub(BorgConfiguration config) => config.dartSdkPath.iif(
+      some: (location) => path.joinAll([location, 'bin', 'pub']),
+      none: () => 'pub',
+    );
+
+Map<String, String> _pubEnvironment(BorgConfiguration config) => config.flutterSdkPath.iif(
+      some: (location) => {'FLUTTER_ROOT': location},
+      none: () => {},
+    );

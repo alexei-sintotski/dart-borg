@@ -31,7 +31,7 @@ import 'package:path/path.dart' as path;
 
 import '../locate_pubspec_files.dart';
 import '../options/verbose.dart';
-import '../pub.dart';
+import '../resolve_dependencies.dart';
 import '../utils/borg_exception.dart';
 // ignore_for_file: avoid_print
 
