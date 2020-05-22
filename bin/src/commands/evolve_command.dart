@@ -39,7 +39,6 @@ import '../options/verbose.dart';
 import '../pub.dart';
 import '../pubspec_yaml_functions.dart';
 import '../utils/borg_exception.dart';
-import '../utils/run_system_command.dart';
 import '../utils/with_temp_location.dart';
 
 // ignore_for_file: avoid_print
@@ -106,7 +105,11 @@ class EvolveCommand extends Command<void> {
           location: location,
           depSpecs: directDepSpecs,
         );
-        _resolveDependencies(location: location, arguments: '--no-precompile');
+        resolveDependencies(
+          configuration: configuration,
+          location: location,
+          arguments: '--no-precompile',
+        );
         final resolvedDeps = _getResolvedDependencies(location: location);
         return resolvedDeps;
       });
@@ -125,22 +128,6 @@ class EvolveCommand extends Command<void> {
     ).toYamlString());
   }
 
-  void _resolveDependencies({@required Directory location, String arguments = ''}) {
-    final result = runSystemCommand(
-      command: '${pub(configuration)} get $arguments',
-      workingDirectory: location,
-      environment: pubEnvironment(configuration),
-    );
-    if (result.exitCode != 0) {
-      stdout.write('\n');
-      print(result.stdout);
-      print(result.stderr);
-    }
-    if (result.exitCode != 0) {
-      throw const BorgException('FAILURE: pub get failed');
-    }
-  }
-
   void _evolvePackage(
     String packageLocation,
     Iterable<PackageDependency> references,
@@ -148,7 +135,10 @@ class EvolveCommand extends Command<void> {
     final pubspecLockFile = File(path.join(packageLocation, 'pubspec.lock'));
     if (!pubspecLockFile.existsSync()) {
       stdout.write('\n\tpubspec.lock does not exist, creating one...');
-      _resolveDependencies(location: Directory(packageLocation));
+      resolveDependencies(
+        configuration: configuration,
+        location: Directory(packageLocation),
+      );
     }
     final pubspecLock = pubspecLockFile.readAsStringSync().loadPubspecLockFromYaml();
     final depsCorrectionSet = computePackageDependencyCorrection(pubspecLock.packages, references);
@@ -157,7 +147,10 @@ class EvolveCommand extends Command<void> {
         packages: copyWithPackageDependenciesFromReference(pubspecLock.packages, references),
       );
       pubspecLockFile.writeAsStringSync(correctedPubspecLock.toYamlString());
-      _resolveDependencies(location: Directory(packageLocation));
+      resolveDependencies(
+        configuration: configuration,
+        location: Directory(packageLocation),
+      );
     }
 
     _printDependencyCorrections(actualDependencies: pubspecLock.packages, correctionSet: depsCorrectionSet);

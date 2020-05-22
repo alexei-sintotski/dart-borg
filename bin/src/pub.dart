@@ -23,8 +23,16 @@
  *
  */
 
+import 'dart:io';
+
 import 'package:borg/src/configuration/configuration.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
+
+import 'utils/borg_exception.dart';
+import 'utils/run_system_command.dart';
+
+// ignore_for_file: avoid_print
 
 String pub(BorgConfiguration config) => config.dartSdkPath.iif(
       some: (location) => path.joinAll([location, 'bin', 'pub']),
@@ -35,3 +43,23 @@ Map<String, String> pubEnvironment(BorgConfiguration config) => config.flutterSd
       some: (location) => {'FLUTTER_ROOT': location},
       none: () => {},
     );
+
+void resolveDependencies({
+  @required BorgConfiguration configuration,
+  @required Directory location,
+  String arguments = '',
+}) {
+  final result = runSystemCommand(
+    command: '${pub(configuration)} get $arguments',
+    workingDirectory: location,
+    environment: pubEnvironment(configuration),
+  );
+  if (result.exitCode != 0) {
+    stdout.write('\n');
+    print(result.stdout);
+    print(result.stderr);
+  }
+  if (result.exitCode != 0) {
+    throw const BorgException('FAILURE: pub get failed');
+  }
+}
