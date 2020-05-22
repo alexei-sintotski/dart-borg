@@ -25,13 +25,18 @@
 
 // ignore_for_file: public_member_api_docs
 
+import 'package:functional_data/functional_data.dart';
 import 'package:meta/meta.dart';
 import 'package:plain_optional/plain_optional.dart';
 
+part 'configuration.g.dart';
+
 // ignore_for_file: sort_constructors_first
+// ignore_for_file: annotate_overrides
 
 @immutable
-class BorgConfiguration {
+@FunctionalData()
+class BorgConfiguration extends $BorgConfiguration {
   final Optional<String> dartSdkPath;
   final Optional<String> flutterSdkPath;
   final Iterable<String> pathsToScan;

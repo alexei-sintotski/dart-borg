@@ -37,3 +37,5 @@ Optional<String> _tryToReadFileSync(String filePath) {
 void _saveStringToFileSync(String filePath, String content) {
   File(filePath).writeAsStringSync(content);
 }
+
+String _absolutizePath(String location) => path.canonicalize(path.absolute(location));
