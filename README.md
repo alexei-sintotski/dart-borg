@@ -156,6 +156,7 @@ exists in the current directory, reads it out, and uses its content to provide d
 Since the configuration file defines default values for command-line arguments, it can be overriden by using command line.
 
 The following configuration options can be specified:
+
 | YAML key    | Meaning                                                                         |
 |-------------|---------------------------------------------------------------------------------|
 | include     | List of locations to include for analysis (glob syntax supported)               |
