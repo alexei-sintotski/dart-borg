@@ -25,6 +25,7 @@
 
 import 'package:args/command_runner.dart';
 
+import 'src/commands/boot_command.dart';
 import 'src/commands/evolve_command.dart';
 import 'src/commands/init_command.dart';
 import 'src/commands/probe_command.dart';
@@ -36,4 +37,5 @@ void main(List<String> args) => CommandRunner<void>(
       ..addCommand(ProbeCommand())
       ..addCommand(EvolveCommand())
       ..addCommand(InitCommand())
+      ..addCommand(BootCommand())
       ..run(args);
