@@ -1,3 +1,6 @@
+## [1.2.0] - 2020-05-20
+* Configuration file support: borg.yaml
+
 ## [1.1.0] - 2020-04-19
 * borg evolve -- command for consistent upgrade of all external dependencies across repository
 

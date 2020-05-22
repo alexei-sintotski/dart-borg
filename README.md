@@ -8,12 +8,12 @@ Features available in the current version:
 * Consistency check on package specifications in pubspec.yaml files
 * Consistent upgrade of all external dependencies across repository
 * Flutter support
+* Configuration file: borg.yaml
 
 Feature roadmap:
 
 | version | Major feature                                                                                                            |
 |---------|--------------------------------------------------------------------------------------------------------------------------|
-| 1.2     | Configuration file support                                                                                               |
 | 1.3     | Repository bootstrapping, list outdated packages                                                                         |
 | 1.4     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
 | 1.5     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
@@ -147,10 +147,10 @@ borg evolve --fluttersdk=dev/flutter
 Alternatively, path to Flutter SDK can be set with the environment variable `FLUTTER_ROOT`. Usage of `fluttersdk` in
 `borg` command line is not required in this case.
 
-# Configuration file: borg.yml
+# Configuration file: borg.yaml
 
 In case configuration options have to be specified for every run of the tool, `borg` provides possibility to avoid
-long command lines with configuration file `borg.yml`. Every time `borg` is executed, it checks out whether the file
+long command lines with configuration file `borg.yaml`. Every time `borg` is executed, it checks out whether the file
 exists in the current directory, reads it out, and uses its content to provide default values for its arguments.
 
 Since the configuration file defines default values for command-line arguments, it can be overriden by using command line.
