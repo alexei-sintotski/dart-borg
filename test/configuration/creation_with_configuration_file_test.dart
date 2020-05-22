@@ -34,6 +34,7 @@ void main() {
       final argParser = ArgParser();
       final factory = BorgConfigurationFactory(
         tryToReadFileSync: (_) => const Optional(_configurationWithIncludedLocation),
+        toAbsolutePath: (s) => s,
       )..populateConfigurationArgs(argParser);
 
       group('given no arguments in command line', () {
@@ -55,6 +56,7 @@ void main() {
       final argParser = ArgParser();
       final factory = BorgConfigurationFactory(
         tryToReadFileSync: (_) => const Optional(_configurationWithExcludedLocation),
+        toAbsolutePath: (s) => s,
       )..populateConfigurationArgs(argParser);
 
       group('given no arguments in command line', () {
@@ -76,6 +78,7 @@ void main() {
       final argParser = ArgParser();
       final factory = BorgConfigurationFactory(
         tryToReadFileSync: (_) => const Optional(_configurationWithDartSdkLocation),
+        toAbsolutePath: (s) => s,
       )..populateConfigurationArgs(argParser);
 
       group('given no arguments in command line', () {
@@ -97,6 +100,7 @@ void main() {
       final argParser = ArgParser();
       final factory = BorgConfigurationFactory(
         tryToReadFileSync: (_) => const Optional(_configurationWithFlutterSdkLocation),
+        toAbsolutePath: (s) => s,
       )..populateConfigurationArgs(argParser);
 
       group('given no arguments in command line', () {
@@ -119,6 +123,7 @@ void main() {
         final argParser = ArgParser();
         BorgConfigurationFactory(
           tryToReadFileSync: (_) => const Optional(_configurationWithAllOptionsSpecified),
+          toAbsolutePath: (s) => s,
         )
           ..populateConfigurationArgs(argParser)
           ..createConfiguration(argResults: argParser.parse([]));

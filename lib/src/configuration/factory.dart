@@ -28,6 +28,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:meta/meta.dart';
+import 'package:path/path.dart' as path;
 import 'package:plain_optional/plain_optional.dart';
 import 'package:yaml/yaml.dart';
 
@@ -43,11 +44,12 @@ part 'options/paths.dart';
 
 @immutable
 class BorgConfigurationFactory {
-  BorgConfigurationFactory({Optional<String> Function(String) tryToReadFileSync = _tryToReadFileSync})
-      : _configFromFile = tryToReadFileSync(_configurationFileName).iif(
-          some: (s) => BorgConfiguration.fromJson(
-              json.decode(json.encode(loadYaml(s))) as Map<String, dynamic>), // ignore: avoid_as
-          none: () => const BorgConfiguration(),
+  BorgConfigurationFactory({
+    Optional<String> Function(String) tryToReadFileSync = _tryToReadFileSync,
+    String Function(String) toAbsolutePath = _absolutizePath,
+  }) : _configFromFile = _constructConfigFromFile(
+          tryToReadFileSync: tryToReadFileSync,
+          toAbsolutePath: toAbsolutePath,
         );
 
   final BorgConfiguration _configFromFile;
@@ -94,6 +96,27 @@ class BorgConfigurationFactory {
       _initialConfigurationFileContent,
     );
   }
+}
+
+BorgConfiguration _constructConfigFromFile({
+  @required Optional<String> Function(String) tryToReadFileSync,
+  @required String Function(String) toAbsolutePath,
+}) {
+  final configFromFile = tryToReadFileSync(_configurationFileName).iif(
+    some: (s) =>
+        BorgConfiguration.fromJson(json.decode(json.encode(loadYaml(s))) as Map<String, dynamic>), // ignore: avoid_as
+    none: () => const BorgConfiguration(),
+  );
+  return configFromFile.copyWith(
+    dartSdkPath: configFromFile.dartSdkPath.iif(
+      some: (s) => Optional(toAbsolutePath(s)),
+      none: () => const Optional.none(),
+    ),
+    flutterSdkPath: configFromFile.flutterSdkPath.iif(
+      some: (s) => Optional(toAbsolutePath(s)),
+      none: () => const Optional.none(),
+    ),
+  );
 }
 
 const _configurationFileName = '.borg.yaml';
