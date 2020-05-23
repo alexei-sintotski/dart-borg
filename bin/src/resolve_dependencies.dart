@@ -42,11 +42,16 @@ void resolveDependencies({
   String arguments = '',
   VerbosityLevel verbosity = VerbosityLevel.short,
 }) {
-  final result = runSystemCommand(
-    command: '${_pub(configuration)} get $arguments',
-    workingDirectory: location,
-    environment: _pubEnvironment(configuration),
+  final command = configuration.flutterSdkPath.iif(
+    some: (flutterSdkPath) => '${path.joinAll([flutterSdkPath, 'bin', 'flutter'])} packages get',
+    none: () => '${_pub(configuration)} get $arguments',
   );
+
+  final result = runSystemCommand(
+    command: command,
+    workingDirectory: location,
+  );
+
   if (result.exitCode != 0 || verbosity == VerbosityLevel.verbose) {
     stdout.write('\n');
     print(result.stdout);
@@ -60,9 +65,4 @@ void resolveDependencies({
 String _pub(BorgConfiguration config) => config.dartSdkPath.iif(
       some: (location) => path.joinAll([location, 'bin', 'pub']),
       none: () => 'pub',
-    );
-
-Map<String, String> _pubEnvironment(BorgConfiguration config) => config.flutterSdkPath.iif(
-      some: (location) => {'FLUTTER_ROOT': location},
-      none: () => {},
     );
