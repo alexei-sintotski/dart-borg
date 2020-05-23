@@ -2,21 +2,24 @@
 
 Command-line tool for consistent configuration management of Dart packages in a mono repository
 
-Features available in the current version:
+Command available in the current version:
 
-* Consistency check on use of Dart dependencies
-* Consistency check on package specifications in pubspec.yaml files
-* Consistent upgrade of all external dependencies across repository
-* Flutter support
-* Configuration file: borg.yaml
+| Command | Description                                                                                            |
+|---------|--------------------------------------------------------------------------------------------------------|
+| probe   | Checks consistency of specified and resolved Dart dependencies across repository                       |
+| evolve  | Upgrades all external dependencies consistently across repository                                      |
+| boot    | Executes `pub get` / `flutter packages get`  for all (or selected) packages across repository          |
+| init    | Creates an initial borg configuration file to automate application of frequently used options          |
+
+The tool supports repositories containing Dart and Flutter packages.
 
 Feature roadmap:
 
 | version | Major feature                                                                                                            |
 |---------|--------------------------------------------------------------------------------------------------------------------------|
-| 1.3     | Repository bootstrapping, list outdated packages                                                                         |
-| 1.4     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
-| 1.5     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
+| 1.4     | List outdated packages (requires Dart 2.8)                                                                               |
+| 1.5     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
+| 1.6     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
 
 # Installation
 
@@ -47,7 +50,9 @@ Global options:
 -h, --help    Print this usage information.
 
 Available commands:
+  boot     Executes pub get / flutter packages get for multiple packages in repository
   evolve   Upgrade Dart dependencies consistently across multiple packages
+  init     Generates configuration file borg.yaml in current directory
   probe    Checks consistency of Dart dependendencies across multiple packages
 
 Run "borg help <command>" for more information about a command.
@@ -146,6 +151,13 @@ borg evolve --fluttersdk=dev/flutter
 
 Alternatively, path to Flutter SDK can be set with the environment variable `FLUTTER_ROOT`. Usage of `fluttersdk` in
 `borg` command line is not required in this case.
+
+# Command: borg boot
+
+Executes `pub get` / `flutter packages get` for multiple packages in a repository.
+
+Packages to bootstrap can be specified as arguments. If no arguments supplied, the command bootstraps all scanned packages.
+The command uses `flutter packages get` if path to the root of Flutter SDK is specified,`pub get` is used otherwise.
 
 # Configuration file: borg.yaml
 
