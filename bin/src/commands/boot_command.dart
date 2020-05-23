@@ -67,8 +67,11 @@ class BootCommand extends Command<void> {
         ? packages
         : packages.where((location) => argResults.rest.any((arg) => location.endsWith(arg)));
 
-    print('');
+    if (packagesToBoot.isEmpty) {
+      throw const BorgException('\nWARNING: Nothing to do!');
+    }
 
+    print('\nBootstrapping packages:');
     var i = 1;
     for (final packageLocation in packagesToBoot) {
       final counter = '[${i++}/${packagesToBoot.length}]';
