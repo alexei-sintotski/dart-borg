@@ -8,7 +8,7 @@ Command available in the current version:
 |---------|--------------------------------------------------------------------------------------------------------|
 | probe   | Checks consistency of specified and resolved Dart dependencies across repository                       |
 | evolve  | Upgrades all external dependencies consistently across repository                                      |
-| boot    | Executes `pub get`  for all (or selected) packages across repository                                   |
+| boot    | Executes `pub get`  for multiple packages across repository                                   |
 | init    | Creates an initial borg configuration file to automate application of frequently used options          |
 
 The tool supports repositories containing Dart and Flutter packages.

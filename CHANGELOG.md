@@ -1,3 +1,6 @@
+## [1.3.0] - 2020-05-23
+* borg boot -- Command to execute `pub get` for multiple packages across repository
+
 ## [1.2.0+1] - 2020-05-20
 * README.md formatting fix
 
