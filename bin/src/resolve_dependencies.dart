@@ -34,10 +34,13 @@ import 'utils/run_system_command.dart';
 
 // ignore_for_file: avoid_print
 
+enum VerbosityLevel { short, verbose }
+
 void resolveDependencies({
-  @required BorgConfiguration configuration,
   @required Directory location,
+  @required BorgConfiguration configuration,
   String arguments = '',
+  VerbosityLevel verbosity = VerbosityLevel.short,
 }) {
   final command = configuration.flutterSdkPath.iif(
     some: (e) => '${path.joinAll([e, 'bin', 'flutter'])} packages get $arguments',
@@ -49,7 +52,7 @@ void resolveDependencies({
     workingDirectory: location,
     environment: _pubEnvironment(configuration),
   );
-  if (result.exitCode != 0) {
+  if (result.exitCode != 0 || verbosity == VerbosityLevel.verbose) {
     stdout.write('\n');
     print(result.stdout);
     print(result.stderr);
