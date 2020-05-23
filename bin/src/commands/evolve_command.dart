@@ -106,8 +106,8 @@ class EvolveCommand extends Command<void> {
           depSpecs: directDepSpecs,
         );
         resolveDependencies(
-          configuration: configuration,
           location: location,
+          configuration: configuration,
           arguments: '--no-precompile',
         );
         final resolvedDeps = _getResolvedDependencies(location: location);
@@ -136,8 +136,8 @@ class EvolveCommand extends Command<void> {
     if (!pubspecLockFile.existsSync()) {
       stdout.write('\n\tpubspec.lock does not exist, creating one...');
       resolveDependencies(
-        configuration: configuration,
         location: Directory(packageLocation),
+        configuration: configuration,
       );
     }
     final pubspecLock = pubspecLockFile.readAsStringSync().loadPubspecLockFromYaml();
@@ -148,8 +148,8 @@ class EvolveCommand extends Command<void> {
       );
       pubspecLockFile.writeAsStringSync(correctedPubspecLock.toYamlString());
       resolveDependencies(
-        configuration: configuration,
         location: Directory(packageLocation),
+        configuration: configuration,
       );
     }
 

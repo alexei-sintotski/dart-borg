@@ -65,20 +65,24 @@ class BootCommand extends Command<void> {
       argResults: argResults,
     ).map(path.dirname);
 
-    final packagesToBoot = argResults.arguments.isEmpty
+    final packagesToBoot = argResults.rest.isEmpty
         ? packages
-        : packages.where((location) => argResults.arguments.any((arg) => location.endsWith(arg)));
+        : packages.where((location) => argResults.rest.any((arg) => location.endsWith(arg)));
 
     print('');
 
     var i = 1;
     for (final packageLocation in packagesToBoot) {
       final counter = '[${i++}/${packagesToBoot.length}]';
-      print('$counter Executing pub get for $packageLocation ...');
+      print('$counter Bootstrapping $packageLocation ...');
 
-      resolveDependencies(configuration: configuration, location: Directory(packageLocation));
+      resolveDependencies(
+        location: Directory(packageLocation),
+        configuration: configuration,
+        verbosity: getVerboseFlag(argResults) ? VerbosityLevel.verbose : VerbosityLevel.short,
+      );
     }
 
-    print('\nSUCCESS: ${packagesToBoot.length} packages have been booted');
+    print('\nSUCCESS: ${packagesToBoot.length} packages have been bootstrapped');
   }
 }
