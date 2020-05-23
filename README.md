@@ -8,7 +8,7 @@ Command available in the current version:
 |---------|--------------------------------------------------------------------------------------------------------|
 | probe   | Checks consistency of specified and resolved Dart dependencies across repository                       |
 | evolve  | Upgrades all external dependencies consistently across repository                                      |
-| boot    | Executes `pub get`  for multiple packages across repository                                   |
+| boot    | Executes `pub get` / `flutter packages get` for multiple packages across repository                                   |
 | init    | Creates an initial borg configuration file to automate application of frequently used options          |
 
 The tool supports repositories containing Dart and Flutter packages.
@@ -50,7 +50,7 @@ Global options:
 -h, --help    Print this usage information.
 
 Available commands:
-  boot     Executes pub get / flutter packages get for multiple packages in repository
+  boot     Executes "pub get" for multiple packages in repository
   evolve   Upgrade Dart dependencies consistently across multiple packages
   init     Generates configuration file borg.yaml in current directory
   probe    Checks consistency of Dart dependendencies across multiple packages
@@ -157,6 +157,7 @@ Alternatively, path to Flutter SDK can be set with the environment variable `FLU
 Executes `pub get` for multiple packages in a repository.
 
 Packages to bootstrap can be specified as arguments. If no arguments supplied, the command bootstraps all scanned packages.
+If path to Flutter SDK is defined, "flutter packages get" is used to resolve dependencies.
 
 # Configuration file: borg.yaml
 

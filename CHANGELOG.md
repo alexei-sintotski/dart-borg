@@ -1,3 +1,6 @@
+## [1.3.1] - 2020-05-23
+* Bugfix: Incorrect bootstrapping of Flutter packages
+
 ## [1.3.0] - 2020-05-23
 * borg boot -- Command to execute `pub get` for multiple packages across repository
 
