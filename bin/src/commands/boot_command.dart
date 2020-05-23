@@ -42,11 +42,9 @@ class BootCommand extends Command<void> {
   }
 
   @override
-  String get description => 'Executes pub get / flutter packages get for multiple packages in repository\n\n'
+  String get description => 'Executes "pub get" for multiple packages in repository\n\n'
       'Packages to bootstrap can be specified as arguments. '
-      'If no arguments are supplied, the command bootstraps all scanned packages.\n'
-      'The command uses \'flutter packages get\' if path to the root of Flutter SDK is specified, '
-      '\'pub get\' is used otherwise';
+      'If no arguments are supplied, the command bootstraps all scanned packages.';
 
   @override
   String get name => 'boot';
@@ -74,7 +72,7 @@ class BootCommand extends Command<void> {
     var i = 1;
     for (final packageLocation in packagesToBoot) {
       final counter = '[${i++}/${packagesToBoot.length}]';
-      print('$counter Bootstrapping $packageLocation ...');
+      print('$counter pub get $packageLocation ...');
 
       resolveDependencies(
         location: Directory(packageLocation),

@@ -42,13 +42,8 @@ void resolveDependencies({
   String arguments = '',
   VerbosityLevel verbosity = VerbosityLevel.short,
 }) {
-  final command = configuration.flutterSdkPath.iif(
-    some: (e) => '${path.joinAll([e, 'bin', 'flutter'])} packages get $arguments',
-    none: () => '${_pub(configuration)} get $arguments',
-  );
-
   final result = runSystemCommand(
-    command: command,
+    command: '${_pub(configuration)} get $arguments',
     workingDirectory: location,
     environment: _pubEnvironment(configuration),
   );
