@@ -61,5 +61,6 @@ Iterable<String> _locationsToScan(String filename, BorgConfiguration config) {
   final fileFinder = FileFinder(filename);
   final includedLocations = fileFinder.findFiles(config.pathsToScan);
   final excludedLocations = fileFinder.findFiles(config.excludedPaths);
-  return includedLocations.where((location) => !excludedLocations.contains(location)).map(path.relative);
+  final packages = includedLocations.where((location) => !excludedLocations.contains(location)).map(path.relative);
+  return packages.toList()..sort();
 }
