@@ -23,25 +23,22 @@
  *
  */
 
-import 'dart:io';
-
-import 'package:meta/meta.dart';
-import 'package:path/path.dart';
-import 'package:pubspec_yaml/pubspec_yaml.dart';
-
-import '../utils/lazy_data.dart';
-
 // ignore_for_file: public_member_api_docs
 
-@immutable
-class DartPackage {
-  DartPackage({@required this.path}) : _pubspecYaml = LazyData(populate: () => _loadPubspecYaml(packageLocation: path));
+import 'package:meta/meta.dart';
+import 'package:plain_optional/plain_optional.dart';
 
-  final String path;
-  PubspecYaml get pubspecYaml => _pubspecYaml.entry;
+class LazyData<T> {
+  LazyData({@required this.populate});
 
-  final LazyData<PubspecYaml> _pubspecYaml;
+  final T Function() populate;
+  Optional<T> _entry = Optional<T>.none();
+
+  T get entry => _entry.iif(
+      some: (e) => e,
+      none: () {
+        final data = populate();
+        _entry = Optional(data);
+        return data;
+      });
 }
-
-PubspecYaml _loadPubspecYaml({@required String packageLocation}) =>
-    File(join(packageLocation, 'pubspec.yaml')).readAsStringSync().toPubspecYaml();
