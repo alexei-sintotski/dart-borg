@@ -23,50 +23,40 @@
  *
  */
 
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:borg/borg.dart';
 import 'package:borg/src/configuration/configuration.dart';
+import 'package:borg/src/dart_package/dart_package.dart';
+import 'package:borg/src/dart_package/discover_dart_packages.dart';
 import 'package:meta/meta.dart';
-import 'package:pubspec_yaml/pubspec_yaml.dart';
 
-import 'locate_pubspec_files.dart';
-import 'utils/print_dependency_usage_report.dart';
+import 'options/verbose.dart';
+import 'utils/borg_exception.dart';
 
-// ignore_for_file: avoid_print
-
-Map<String, PubspecYaml> loadPubspecYamlFiles({
+Iterable<DartPackage> scanForPackages({
   @required BorgConfiguration configuration,
   @required ArgResults argResults,
 }) {
-  final pubspecYamlLocations = locatePubspecFiles(
-    filename: 'pubspec.yaml',
-    configuration: configuration,
-    argResults: argResults,
-  );
-  final pubspecYamls = Map.fromEntries(pubspecYamlLocations.map((location) => MapEntry(
-        location,
-        File(location).readAsStringSync().toPubspecYaml(),
-      )));
-  return pubspecYamls;
-}
+  stdout.write('Scanning for Dart packages...');
 
-void assertPubspecYamlConsistency(Map<String, PubspecYaml> pubspecYamls) {
-  final inconsistentSpecList = findInconsistentDependencySpecs(pubspecYamls);
+  final packages = discoverDartPackages(configuration: configuration);
 
-  if (inconsistentSpecList.isNotEmpty) {
-    printDependencyUsageReport(
-      report: inconsistentSpecList,
-      formatDependency: _formatDependencySpec,
-    );
-    print('\nFAILURE: Inconsistent package dependency specifications detected!');
-    exit(1);
+  print(' ${packages.length} packages found');
+
+  if (packages.isEmpty) {
+    throw const BorgException('FATAL: No Dart packages found, check borg configuration and command-line!');
   }
-}
 
-String _formatDependencySpec(PackageDependencySpec dependency) => dependency.iswitch(
-    git: (dep) => '${dep.url}${dep.ref.iif(some: (v) => ": $v", none: () => "")}',
-    path: (dep) => '${dep.path}',
-    hosted: (dep) => '${dep.version.valueOr(() => "unspecified")}',
-    sdk: (dep) => '${dep.version.valueOr(() => "unspecified")}');
+  if (getVerboseFlag(argResults)) {
+    for (final package in packages) {
+      print('\t${package.path}');
+    }
+  }
+
+  print('');
+
+  return packages;
+}

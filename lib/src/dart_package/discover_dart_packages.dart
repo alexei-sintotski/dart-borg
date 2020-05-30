@@ -23,47 +23,25 @@
  *
  */
 
-import 'dart:io';
+// ignore_for_file: public_member_api_docs
 
-import 'package:borg/src/configuration/configuration.dart';
-import 'package:borg/src/dart_package/dart_package.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 
-import 'utils/borg_exception.dart';
-import 'utils/run_system_command.dart';
+import '../configuration/configuration.dart';
+import '../utils/file_finder.dart';
+import 'dart_package.dart';
 
-// ignore_for_file: avoid_print
-
-enum VerbosityLevel { short, verbose }
-
-void resolveDependencies({
-  @required DartPackage package,
+Iterable<DartPackage> discoverDartPackages({
   @required BorgConfiguration configuration,
-  String arguments = '',
-  VerbosityLevel verbosity = VerbosityLevel.short,
-}) {
-  final command = configuration.flutterSdkPath.iif(
-    some: (flutterSdkPath) => '${path.joinAll([flutterSdkPath, 'bin', 'flutter'])} packages get',
-    none: () => '${_pub(configuration)} get $arguments',
-  );
+}) =>
+    _locationsToScan(configuration).map((location) => DartPackage(path: location));
 
-  final result = runSystemCommand(
-    command: command,
-    workingDirectory: Directory(package.path),
-  );
-
-  if (result.exitCode != 0 || verbosity == VerbosityLevel.verbose) {
-    stdout.write('\n');
-    print(result.stdout);
-    print(result.stderr);
-  }
-  if (result.exitCode != 0) {
-    throw const BorgException('FAILURE: pub get failed');
-  }
+Iterable<String> _locationsToScan(BorgConfiguration config) {
+  const fileFinder = FileFinder('pubspec.yaml');
+  final includedLocations = fileFinder.findFiles(config.pathsToScan);
+  final excludedLocations = fileFinder.findFiles(config.excludedPaths);
+  final packages =
+      includedLocations.where((location) => !excludedLocations.contains(location)).map(path.relative).map(path.dirname);
+  return packages.toList()..sort();
 }
-
-String _pub(BorgConfiguration config) => config.dartSdkPath.iif(
-      some: (location) => path.joinAll([location, 'bin', 'pub']),
-      none: () => 'pub',
-    );

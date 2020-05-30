@@ -29,13 +29,16 @@ import 'package:args/command_runner.dart';
 import 'package:borg/borg.dart';
 import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/configuration/factory.dart';
+import 'package:borg/src/dart_package/dart_package.dart';
+import 'package:path/path.dart' as path;
 import 'package:pubspec_lock/pubspec_lock.dart';
 
-import '../locate_pubspec_files.dart';
+import '../assert_pubspec_yaml_consistency.dart';
 import '../options/lock.dart';
 import '../options/verbose.dart';
 import '../options/yaml.dart';
-import '../pubspec_yaml_functions.dart';
+import '../scan_for_packages.dart';
+import '../utils/borg_exception.dart';
 import '../utils/print_dependency_usage_report.dart';
 
 // ignore_for_file: avoid_print
@@ -54,12 +57,20 @@ class ProbeCommand extends Command<void> {
   @override
   String get name => 'probe';
 
+  @override
+  void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
+
   final BorgConfigurationFactory configurationFactory = BorgConfigurationFactory();
   BorgConfiguration configuration;
+  Iterable<DartPackage> packages;
 
-  @override
-  void run() {
+  void _run() {
     configuration = configurationFactory.createConfiguration(argResults: argResults);
+
+    packages = scanForPackages(
+      configuration: configuration,
+      argResults: argResults,
+    );
 
     if (getPubspecYamlFlag(argResults)) {
       _checkPubspecYamlFiles();
@@ -75,27 +86,23 @@ class ProbeCommand extends Command<void> {
     if (getPubspecYamlFlag(argResults) || getPubspecLockFlag(argResults)) {
       print('\nSUCCESS: All packages use consistent set of external dependencies');
     } else {
-      print('\nWARNING: Nothing to do!');
-      exit(2);
+      throw const BorgException('FATAL: Nothing to do!');
     }
   }
 
   void _checkPubspecYamlFiles() {
-    final pubspecYamls = loadPubspecYamlFiles(configuration: configuration, argResults: argResults);
     print('Analyzing dependency specifications...');
-    assertPubspecYamlConsistency(pubspecYamls);
+    assertPubspecYamlConsistency(packages);
   }
 
   void _checkPubspecLockFiles() {
-    final pubspecLockLocations = locatePubspecFiles(
-      filename: 'pubspec.lock',
-      configuration: configuration,
-      argResults: argResults,
-    );
-    final pubspecLocks = Map.fromEntries(pubspecLockLocations.map((location) => MapEntry(
-          location,
-          File(location).readAsStringSync().loadPubspecLockFromYaml(),
-        )));
+    final pubspecLocks = Map.fromEntries(packages
+        .map((p) => File(path.join(p.path, 'pubspec.lock')))
+        .where((f) => f.existsSync() && [FileSystemEntityType.file].contains(f.statSync().type))
+        .map((f) => MapEntry(
+              f.path,
+              f.readAsStringSync().loadPubspecLockFromYaml(),
+            )));
 
     print('Analyzing dependencies...');
     final inconsistentUsageList = findInconsistentDependencies(pubspecLocks);
@@ -105,8 +112,7 @@ class ProbeCommand extends Command<void> {
         report: inconsistentUsageList,
         formatDependency: _formatDependencyInfo,
       );
-      print('\nFAILURE: Inconsistent use of external dependencies detected!');
-      exit(1);
+      throw const BorgException('FAILURE: Inconsistent use of external dependencies detected!');
     }
   }
 }
