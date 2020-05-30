@@ -23,47 +23,31 @@
  *
  */
 
-import 'dart:io';
-
-import 'package:borg/src/configuration/configuration.dart';
+import 'package:borg/borg.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
-import 'package:meta/meta.dart';
-import 'package:path/path.dart' as path;
+import 'package:pubspec_yaml/pubspec_yaml.dart';
 
 import 'utils/borg_exception.dart';
-import 'utils/run_system_command.dart';
+import 'utils/print_dependency_usage_report.dart';
 
 // ignore_for_file: avoid_print
 
-enum VerbosityLevel { short, verbose }
+void assertPubspecYamlConsistency(Iterable<DartPackage> packages) {
+  final inconsistentSpecList =
+      findInconsistentDependencySpecs(Map.fromEntries(packages.map((p) => MapEntry(p.path, p.pubspecYaml))));
 
-void resolveDependencies({
-  @required DartPackage package,
-  @required BorgConfiguration configuration,
-  String arguments = '',
-  VerbosityLevel verbosity = VerbosityLevel.short,
-}) {
-  final command = configuration.flutterSdkPath.iif(
-    some: (flutterSdkPath) => '${path.joinAll([flutterSdkPath, 'bin', 'flutter'])} packages get',
-    none: () => '${_pub(configuration)} get $arguments',
-  );
+  if (inconsistentSpecList.isNotEmpty) {
+    printDependencyUsageReport(
+      report: inconsistentSpecList,
+      formatDependency: _formatDependencySpec,
+    );
 
-  final result = runSystemCommand(
-    command: command,
-    workingDirectory: Directory(package.path),
-  );
-
-  if (result.exitCode != 0 || verbosity == VerbosityLevel.verbose) {
-    stdout.write('\n');
-    print(result.stdout);
-    print(result.stderr);
-  }
-  if (result.exitCode != 0) {
-    throw const BorgException('FAILURE: pub get failed');
+    throw const BorgException('FAILURE: Inconsistent package dependency specifications detected!');
   }
 }
 
-String _pub(BorgConfiguration config) => config.dartSdkPath.iif(
-      some: (location) => path.joinAll([location, 'bin', 'pub']),
-      none: () => 'pub',
-    );
+String _formatDependencySpec(PackageDependencySpec dependency) => dependency.iswitch(
+    git: (dep) => '${dep.url}${dep.ref.iif(some: (v) => ": $v", none: () => "")}',
+    path: (dep) => '${dep.path}',
+    hosted: (dep) => '${dep.version.valueOr(() => "unspecified")}',
+    sdk: (dep) => '${dep.version.valueOr(() => "unspecified")}');

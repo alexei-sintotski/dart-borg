@@ -23,15 +23,13 @@
  *
  */
 
-import 'dart:io';
-
 import 'package:args/command_runner.dart';
 import 'package:borg/src/configuration/factory.dart';
-import 'package:path/path.dart' as path;
+import 'package:borg/src/dart_package/dart_package.dart';
 
-import '../locate_pubspec_files.dart';
 import '../options/verbose.dart';
 import '../resolve_dependencies.dart';
+import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
 // ignore_for_file: avoid_print
 
@@ -54,32 +52,31 @@ class BootCommand extends Command<void> {
   void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
 
   final BorgConfigurationFactory configurationFactory = BorgConfigurationFactory();
+  Iterable<DartPackage> packages;
 
   void _run() {
     final configuration = configurationFactory.createConfiguration(argResults: argResults);
 
-    final packages = locatePubspecFiles(
-      filename: 'pubspec.yaml',
+    packages = scanForPackages(
       configuration: configuration,
       argResults: argResults,
-    ).map(path.dirname);
+    );
 
-    final packagesToBoot = argResults.rest.isEmpty
-        ? packages
-        : packages.where((location) => argResults.rest.any((arg) => location.endsWith(arg)));
+    final packagesToBoot =
+        argResults.rest.isEmpty ? packages : packages.where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)));
 
     if (packagesToBoot.isEmpty) {
-      throw const BorgException('\nWARNING: Nothing to do!');
+      throw const BorgException('\nFATAL: Nothing to do, please check command line');
     }
 
     print('\nBootstrapping packages:');
     var i = 1;
-    for (final packageLocation in packagesToBoot) {
+    for (final package in packagesToBoot) {
       final counter = '[${i++}/${packagesToBoot.length}]';
-      print('$counter pub get $packageLocation ...');
+      print('$counter pub get ${package.path} ...');
 
       resolveDependencies(
-        location: Directory(packageLocation),
+        package: package,
         configuration: configuration,
         verbosity: getVerboseFlag(argResults) ? VerbosityLevel.verbose : VerbosityLevel.short,
       );

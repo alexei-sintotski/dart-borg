@@ -25,38 +25,17 @@
 
 import 'dart:io';
 
-import 'package:glob/glob.dart';
 import 'package:meta/meta.dart';
-import 'package:path/path.dart' as path;
+import 'package:path/path.dart';
+import 'package:pubspec_yaml/pubspec_yaml.dart';
+
+// ignore_for_file: public_member_api_docs
 
 @immutable
-class FileFinder {
-  const FileFinder(this.filename);
+class DartPackage {
+  DartPackage({@required this.path})
+      : pubspecYaml = File(join(path, 'pubspec.yaml')).readAsStringSync().toPubspecYaml();
 
-  final String filename;
-
-  List<String> findFiles(Iterable<String> locationSpecs) =>
-      locationSpecs.expand(_findFilesAtLocationSpec).toSet().toList()..sort();
-
-  List<String> _findFilesAtLocationSpec(String locationSpec) {
-    final globbedLocations =
-        Glob(locationSpec).listSync().where((item) => item.statSync().type == FileSystemEntityType.directory);
-    final locationsToScan = <Directory>[
-      Directory(locationSpec),
-      ...globbedLocations.map((entity) => Directory(entity.path))
-    ];
-    return locationsToScan
-        .expand(_findFilesInDirectory)
-        .map((location) => path.canonicalize(path.absolute(location)))
-        .toList();
-  }
-
-  List<String> _findFilesInDirectory(Directory dir) => [
-        if (dir.existsSync())
-          ...dir
-              .listSync(recursive: true)
-              .where((item) => item.statSync().type == FileSystemEntityType.file && item.path.endsWith(filename))
-              .map((entity) => entity.path)
-              .toList()
-      ];
+  final String path;
+  final PubspecYaml pubspecYaml;
 }
