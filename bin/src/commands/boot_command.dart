@@ -73,7 +73,7 @@ class BootCommand extends Command<void> {
     var i = 1;
     for (final package in packagesToBoot) {
       final counter = '[${i++}/${packagesToBoot.length}]';
-      print('$counter pub get ${package.path} ...');
+      print('$counter ${package.isFlutterPackage ? 'Flutter' : 'Dart'} package ${package.path}...');
 
       resolveDependencies(
         package: package,

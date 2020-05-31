@@ -23,29 +23,40 @@
  *
  */
 
-import 'dart:io';
-
-import 'package:meta/meta.dart';
-import 'package:path/path.dart';
-import 'package:pubspec_yaml/pubspec_yaml.dart';
-
-import '../utils/lazy_data.dart';
-
 // ignore_for_file: public_member_api_docs
 
-@immutable
-class DartPackage {
-  DartPackage({
-    @required this.path,
-    String Function(String) readFileSync = _readFileSync,
-  }) : _pubspecYaml = LazyData(populate: () => readFileSync(path).toPubspecYaml());
+import 'package:borg/src/dart_package/dart_package.dart';
+import 'package:test/test.dart';
 
-  final String path;
-  PubspecYaml get pubspecYaml => _pubspecYaml.entry;
+void main() {
+  group('$DartPackage', () {
+    group('given a Dart package definition', () {
+      final package = DartPackage(path: packagePath, readFileSync: (_) => dartPackageDefinition);
 
-  bool get isFlutterPackage => pubspecYaml.dependencies.any((d) => d.package() == 'flutter');
+      test('it provides correct package path', () {
+        expect(package.path, packagePath);
+      });
 
-  final LazyData<PubspecYaml> _pubspecYaml;
+      test('it identifies package as a Dart package', () {
+        expect(package.isFlutterPackage, false);
+      });
+    });
+  });
+
+  group('given a Flutter package definition', () {
+    final package = DartPackage(path: packagePath, readFileSync: (_) => flutterPackageDefinition);
+
+    test('it identifies package as a Flutter package', () {
+      expect(package.isFlutterPackage, true);
+    });
+  });
 }
 
-String _readFileSync(String filePath) => File(join(filePath, 'pubspec.yaml')).readAsStringSync();
+const packageName = 'some_package';
+const packagePath = '.';
+const dartPackageDefinition = 'name: $packageName';
+const flutterPackageDefinition = '''
+name: $packageName
+dependencies:
+  flutter:
+''';
