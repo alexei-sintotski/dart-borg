@@ -33,9 +33,10 @@ import 'package:path/path.dart' as path;
 
 @immutable
 class FileFinder {
-  const FileFinder(this.filename);
+  const FileFinder({@required this.filename, @required this.ignored});
 
   final String filename;
+  final Iterable<String> ignored;
 
   List<String> findFiles(Iterable<String> locationSpecs) =>
       locationSpecs.expand(_findFilesAtLocationSpec).toSet().toList()..sort();
@@ -46,7 +47,7 @@ class FileFinder {
     final locationsToScan = <Directory>[
       Directory(locationSpec),
       ...globbedLocations.map((entity) => Directory(entity.path))
-    ];
+    ].where(_isNotIgnored);
     return locationsToScan
         .expand(_findFilesInDirectory)
         .map((location) => path.canonicalize(path.absolute(location)))
@@ -57,8 +58,11 @@ class FileFinder {
         if (dir.existsSync())
           ...dir
               .listSync(recursive: true)
+              .where(_isNotIgnored)
               .where((item) => item.statSync().type == FileSystemEntityType.file && item.path.endsWith(filename))
               .map((entity) => entity.path)
               .toList()
       ];
+
+  bool _isNotIgnored(FileSystemEntity f) => !ignored.any((x) => f.path.contains(x));
 }
