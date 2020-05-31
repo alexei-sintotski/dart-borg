@@ -52,9 +52,12 @@ void resolveDependencies({
       : '${_pub(configuration)} get $arguments';
 
   final result = runSystemCommand(
-    command: createPubCommandLine(package),
-    workingDirectory: Directory(package.path),
-  );
+      command: createPubCommandLine(package),
+      workingDirectory: Directory(package.path),
+      environment: configuration.flutterSdkPath.iif(
+        some: (flutterSdkPath) => {'FLUTTER_ROOT': flutterSdkPath},
+        none: () => {},
+      ));
 
   if (result.exitCode != 0 || verbosity == VerbosityLevel.verbose) {
     stdout.write('\n');
