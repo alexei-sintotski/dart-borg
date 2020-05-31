@@ -69,7 +69,7 @@ class BootCommand extends Command<void> {
       throw const BorgException('\nFATAL: Nothing to do, please check command line');
     }
 
-    print('\nBootstrapping packages:');
+    print('Bootstrapping packages:');
     var i = 1;
     for (final package in packagesToBoot) {
       final counter = '[${i++}/${packagesToBoot.length}]';
