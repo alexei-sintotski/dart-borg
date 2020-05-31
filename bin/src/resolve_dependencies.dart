@@ -43,13 +43,16 @@ void resolveDependencies({
   String arguments = '',
   VerbosityLevel verbosity = VerbosityLevel.short,
 }) {
-  final command = configuration.flutterSdkPath.iif(
-    some: (flutterSdkPath) => '${path.joinAll([flutterSdkPath, 'bin', 'flutter'])} packages get',
-    none: () => '${_pub(configuration)} get $arguments',
-  );
+  String createPubCommandLine(DartPackage package) => package.isFlutterPackage
+      ? configuration.flutterSdkPath.iif(
+          some: (flutterSdkPath) => '${path.joinAll([flutterSdkPath, 'bin', 'flutter'])} packages get',
+          none: () => throw BorgException('FATAL: Cannot bootstrap Flutter package ${package.path}, '
+              'path to Flutter SDK is not defined'),
+        )
+      : '${_pub(configuration)} get $arguments';
 
   final result = runSystemCommand(
-    command: command,
+    command: createPubCommandLine(package),
     workingDirectory: Directory(package.path),
   );
 
