@@ -38,12 +38,10 @@ Iterable<DartPackage> discoverDartPackages({
     _locationsToScan(configuration).map((location) => DartPackage(path: location));
 
 Iterable<String> _locationsToScan(BorgConfiguration config) {
-  const fileFinder = FileFinder('pubspec.yaml');
-  final includedLocations = fileFinder.findFiles(config.pathsToScan).where(_isNotGeneratedFlutterPluginDir);
-  final excludedLocations = fileFinder.findFiles(config.excludedPaths).where(_isNotGeneratedFlutterPluginDir);
+  const fileFinder = FileFinder(filename: 'pubspec.yaml', ignored: ['/.symlinks/']);
+  final includedLocations = fileFinder.findFiles(config.pathsToScan);
+  final excludedLocations = fileFinder.findFiles(config.excludedPaths);
   final packages =
       includedLocations.where((location) => !excludedLocations.contains(location)).map(path.relative).map(path.dirname);
   return packages.toList()..sort();
 }
-
-bool _isNotGeneratedFlutterPluginDir(String path) => !path.contains('/.symlinks/');
