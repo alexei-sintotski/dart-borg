@@ -32,7 +32,8 @@ import 'src/commands/probe_command.dart';
 
 void main(List<String> args) => CommandRunner<void>(
       'borg',
-      'Command-line tool for consistent configuration management of Dart packages in a mono repository',
+      'Dart borg is a command-line tool to support development teams working on '
+          'large scale Dart and Flutter mono repositories.',
     )
       ..addCommand(ProbeCommand())
       ..addCommand(EvolveCommand())

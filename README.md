@@ -1,8 +1,8 @@
 # Dart borg [![Build Status](https://travis-ci.org/alexei-sintotski/dart-borg.svg?branch=master)](https://travis-ci.org/alexei-sintotski/darf-borg) [![codecov](https://codecov.io/gh/alexei-sintotski/dart-borg/branch/master/graph/badge.svg)](https://codecov.io/gh/alexei-sintotski/dart-borg) [![pubspec_lock version](https://img.shields.io/pub/v/borg?label=borg)](https://pub.dev/packages/borg)
 
-Command-line tool for consistent configuration management of Dart packages in a mono repository
+Dart borg is a command-line tool to support development teams working on large scale Dart and Flutter mono repositories.
 
-Command available in the current version:
+Commands available in the latest release:
 
 | Command | Description                                                                                            |
 |---------|--------------------------------------------------------------------------------------------------------|
@@ -11,15 +11,15 @@ Command available in the current version:
 | boot    | Executes `pub get` / `flutter packages get` for multiple packages across repository                                   |
 | init    | Creates an initial borg configuration file to automate application of frequently used options          |
 
-The tool supports repositories containing Dart and Flutter packages.
-
 Feature roadmap:
 
 | version | Major feature                                                                                                            |
 |---------|--------------------------------------------------------------------------------------------------------------------------|
-| 1.4     | List outdated packages (requires Dart 2.8)                                                                               |
-| 1.5     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
-| 1.6     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
+| 1.4     | Incremental bootstrapping                                                                                                |
+| 1.5     | Ability to define commands in the configuration file                                                                     |
+| 1.6     | List outdated packages (requires Dart 2.8)                                                                               |
+| 1.7     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
+| 1.8     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
 
 # Installation
 
@@ -157,7 +157,15 @@ Alternatively, path to Flutter SDK can be set with the environment variable `FLU
 Executes `pub get` for multiple packages in a repository.
 
 Packages to bootstrap can be specified as arguments. If no arguments supplied, the command bootstraps all scanned packages.
-If path to Flutter SDK is defined, "flutter packages get" is used to resolve dependencies.
+
+Borg supports bootstrapping of both Dart and Flutter packages:
+
+* Flutter packages are bootstrapped using `flutter packages get` command. The tool recognizes Flutter packages by their
+dependency on the package `flutter`. If path to the root of Flutter SDK is not specified, bootstrapping of such package
+results in fatal errors with message to the user.
+
+* Dart packages are always bootstrapped with `pub get`. The reason for this is that pub get has much higher performance
+than its Flutter counterpart.
 
 # Configuration file: borg.yaml
 
