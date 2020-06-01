@@ -1,3 +1,10 @@
+## [1.3.2] - 2020-06-01
+* Optimization: probe scans repository for packages only once
+* Optimization: more efficient scan of Flutter repositories by built-in filtering of
+  generated Flutter plug-in packages in .symlinks directories
+* Optimization: Automatic detection of Dart packages in Flutter repositories and
+  using faster `pub get` to bootstrap them i.s.o. `flutter packages get`
+
 ## [1.3.1] - 2020-05-23
 * Bugfix: Incorrect bootstrapping of Flutter packages
 
