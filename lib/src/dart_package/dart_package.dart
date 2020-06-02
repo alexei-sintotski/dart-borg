@@ -23,12 +23,12 @@
  *
  */
 
-import 'dart:io';
-
 import 'package:meta/meta.dart';
 import 'package:path/path.dart';
+import 'package:plain_optional/plain_optional.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
+import '../utils/file_io.dart';
 import '../utils/lazy_data.dart';
 
 // ignore_for_file: public_member_api_docs
@@ -37,8 +37,12 @@ import '../utils/lazy_data.dart';
 class DartPackage {
   DartPackage({
     @required this.path,
-    String Function(String) readFileSync = _readFileSync,
-  }) : _pubspecYaml = LazyData(populate: () => readFileSync(path).toPubspecYaml());
+    Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
+  }) : _pubspecYaml = LazyData(
+            populate: () => tryToReadFileSync(join(path, 'pubspec.yaml')).iif(
+                  some: (content) => content.toPubspecYaml(),
+                  none: () => null,
+                ));
 
   final String path;
   PubspecYaml get pubspecYaml => _pubspecYaml.entry;
@@ -47,5 +51,3 @@ class DartPackage {
 
   final LazyData<PubspecYaml> _pubspecYaml;
 }
-
-String _readFileSync(String filePath) => File(join(filePath, 'pubspec.yaml')).readAsStringSync();
