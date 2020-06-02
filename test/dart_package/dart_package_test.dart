@@ -26,12 +26,13 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:borg/src/dart_package/dart_package.dart';
+import 'package:plain_optional/plain_optional.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('$DartPackage', () {
     group('given a Dart package definition', () {
-      final package = DartPackage(path: packagePath, readFileSync: (_) => dartPackageDefinition);
+      final package = DartPackage(path: packagePath, tryToReadFileSync: (_) => const Optional(dartPackageDefinition));
 
       test('it provides correct package path', () {
         expect(package.path, packagePath);
@@ -44,7 +45,7 @@ void main() {
   });
 
   group('given a Flutter package definition', () {
-    final package = DartPackage(path: packagePath, readFileSync: (_) => flutterPackageDefinition);
+    final package = DartPackage(path: packagePath, tryToReadFileSync: (_) => const Optional(flutterPackageDefinition));
 
     test('it identifies package as a Flutter package', () {
       expect(package.isFlutterPackage, true);
