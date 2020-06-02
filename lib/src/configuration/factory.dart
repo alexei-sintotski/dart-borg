@@ -28,13 +28,12 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:meta/meta.dart';
-import 'package:path/path.dart' as path;
 import 'package:plain_optional/plain_optional.dart';
 import 'package:yaml/yaml.dart';
 
+import '../utils/file_io.dart';
 import 'configuration.dart';
 
-part 'factory_default_file_io.dart';
 part 'options/dart_sdk.dart';
 part 'options/exclude.dart';
 part 'options/flutter_sdk.dart';
@@ -45,8 +44,8 @@ part 'options/paths.dart';
 @immutable
 class BorgConfigurationFactory {
   BorgConfigurationFactory({
-    Optional<String> Function(String) tryToReadFileSync = _tryToReadFileSync,
-    String Function(String) toAbsolutePath = _absolutizePath,
+    Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
+    String Function(String) toAbsolutePath = absolutizePath,
   }) : _configFromFile = _constructConfigFromFile(
           tryToReadFileSync: tryToReadFileSync,
           toAbsolutePath: toAbsolutePath,
@@ -90,7 +89,7 @@ class BorgConfigurationFactory {
     );
   }
 
-  void createInitialConfigurationFile({void Function(String, String) saveStringToFileSync = _saveStringToFileSync}) {
+  void createInitialConfigurationFile({void Function(String, String) saveStringToFileSync = saveStringToFileSync}) {
     saveStringToFileSync(
       _configurationFileName,
       _initialConfigurationFileContent,

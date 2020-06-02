@@ -23,9 +23,14 @@
  *
  */
 
-part of 'factory.dart';
+// ignore_for_file: public_member_api_docs
 
-Optional<String> _tryToReadFileSync(String filePath) {
+import 'dart:io';
+
+import 'package:path/path.dart' as path;
+import 'package:plain_optional/plain_optional.dart';
+
+Optional<String> tryToReadFileSync(String filePath) {
   final file = File(filePath);
   if (file.existsSync() && [FileSystemEntityType.file].contains(file.statSync().type)) {
     return Optional(file.readAsStringSync());
@@ -34,8 +39,8 @@ Optional<String> _tryToReadFileSync(String filePath) {
   }
 }
 
-void _saveStringToFileSync(String filePath, String content) {
+void saveStringToFileSync(String filePath, String content) {
   File(filePath).writeAsStringSync(content);
 }
 
-String _absolutizePath(String location) => path.canonicalize(path.absolute(location));
+String absolutizePath(String location) => path.canonicalize(path.absolute(location));
