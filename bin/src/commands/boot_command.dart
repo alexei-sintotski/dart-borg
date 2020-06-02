@@ -25,6 +25,7 @@
 
 import 'package:args/command_runner.dart';
 import 'package:borg/src/configuration/factory.dart';
+import 'package:borg/src/context/borg_context_factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
 
 import '../options/verbose.dart';
@@ -56,6 +57,12 @@ class BootCommand extends Command<void> {
 
   void _run() {
     final configuration = configurationFactory.createConfiguration(argResults: argResults);
+    final context = BorgContextFactory().createBorgContext();
+
+    if (context.bootContext.hasValue) {
+      print('WARNING: Incremental bootstrapping is experimental feature, use with caution!');
+      print('         Please remove file "$pathToContextFile" to disable it');
+    }
 
     packages = scanForPackages(
       configuration: configuration,
