@@ -60,8 +60,8 @@ class BootCommand extends Command<void> {
 
   void _run() {
     final configuration = configurationFactory.createConfiguration(argResults: argResults);
-    final contextFactory = BorgContextFactory();
     // ignore: prefer_const_constructors
+    final contextFactory = BorgContextFactory();
     final context = contextFactory.createBorgContext();
 
     packages = scanForPackages(
