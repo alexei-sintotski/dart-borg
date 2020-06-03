@@ -23,25 +23,13 @@
  *
  */
 
-// ignore_for_file: public_member_api_docs
-
 import 'dart:io';
 
-import 'package:path/path.dart' as path;
-import 'package:plain_optional/plain_optional.dart';
+import 'run_system_command.dart';
 
-Optional<String> tryToReadFileSync(String filePath) {
-  final file = File(filePath);
-  if (file.existsSync() && [FileSystemEntityType.file].contains(file.statSync().type)) {
-    return Optional(file.readAsStringSync());
-  } else {
-    return const Optional.none();
-  }
-}
-
-void saveStringToFileSync(String filePath, String content) {
-  Directory(path.dirname(filePath)).createSync(recursive: true);
-  File(filePath).writeAsStringSync(content);
-}
-
-String absolutizePath(String location) => path.canonicalize(path.absolute(location));
+String gitHead() => (runSystemCommand(
+      command: 'git rev-parse --short HEAD',
+      workingDirectory: Directory.current,
+      // ignore: avoid_as
+    ).stdout as String)
+        .trim();

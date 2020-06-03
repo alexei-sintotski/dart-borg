@@ -39,6 +39,10 @@ class BorgBootContext {
   factory BorgBootContext.fromJson(Map<String, dynamic> json) =>
       // ignore: avoid_as
       BorgBootContext(gitref: json[_gitrefKey] as String);
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        _gitrefKey: gitref,
+      };
 }
 
 const _gitrefKey = 'gitref';

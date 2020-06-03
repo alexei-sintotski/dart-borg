@@ -27,6 +27,7 @@
 
 import 'dart:convert';
 
+import 'package:json2yaml/json2yaml.dart';
 import 'package:meta/meta.dart';
 import 'package:plain_optional/plain_optional.dart';
 import 'package:yaml/yaml.dart';
@@ -36,15 +37,24 @@ import 'borg_context.dart';
 
 @immutable
 class BorgContextFactory {
-  const BorgContextFactory({Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync})
-      : _tryToReadFileSync = tryToReadFileSync;
+  const BorgContextFactory({
+    Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
+    void Function(String, String) saveStringToFileSync = saveStringToFileSync,
+  })  : _tryToReadFileSync = tryToReadFileSync,
+        _saveStringToFileSync = saveStringToFileSync;
 
   final Optional<String> Function(String) _tryToReadFileSync;
+  final void Function(String, String) _saveStringToFileSync;
 
   BorgContext createBorgContext() => _tryToReadFileSync(pathToContextFile).iif(
         // ignore: avoid_as
         some: (content) => BorgContext.fromJson(json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>),
         none: () => const BorgContext(bootContext: Optional.none()),
+      );
+
+  void save({@required BorgContext context}) => _saveStringToFileSync(
+        pathToContextFile,
+        json2yaml(context.toJson()),
       );
 }
 

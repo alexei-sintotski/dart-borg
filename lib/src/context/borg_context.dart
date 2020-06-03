@@ -36,7 +36,10 @@ import 'borg_boot_context.dart';
 class BorgContext {
   final Optional<BorgBootContext> bootContext;
 
-  const BorgContext({@required this.bootContext});
+  const BorgContext({this.bootContext = const Optional.none()});
+
+  BorgContext copyWith({Optional<BorgBootContext> bootContext}) =>
+      BorgContext(bootContext: bootContext ?? this.bootContext);
 
   factory BorgContext.fromJson(Map<String, dynamic> json) => BorgContext(
         // ignore: avoid_as
@@ -46,6 +49,11 @@ class BorgContext {
                 // ignore: avoid_as
                 ? Optional(BorgBootContext.fromJson(json[_bootContextKey] as Map<String, dynamic>))
                 : const Optional.none(),
+      );
+
+  Map<String, dynamic> toJson() => bootContext.iif(
+        some: (bootCtx) => <String, dynamic>{_bootContextKey: bootCtx.toJson()},
+        none: () => const <String, dynamic>{},
       );
 }
 
