@@ -25,13 +25,16 @@
 
 import 'package:args/command_runner.dart';
 import 'package:borg/src/configuration/factory.dart';
+import 'package:borg/src/context/borg_boot_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
+import 'package:plain_optional/plain_optional.dart';
 
 import '../options/verbose.dart';
 import '../resolve_dependencies.dart';
 import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
+import '../utils/git.dart';
 // ignore_for_file: avoid_print
 
 class BootCommand extends Command<void> {
@@ -57,12 +60,9 @@ class BootCommand extends Command<void> {
 
   void _run() {
     final configuration = configurationFactory.createConfiguration(argResults: argResults);
-    final context = BorgContextFactory().createBorgContext();
-
-    if (context.bootContext.hasValue) {
-      print('WARNING: Incremental bootstrapping is experimental feature, use with caution!');
-      print('         Please remove file "$pathToContextFile" to disable it');
-    }
+    final contextFactory = BorgContextFactory();
+    // ignore: prefer_const_constructors
+    final context = contextFactory.createBorgContext();
 
     packages = scanForPackages(
       configuration: configuration,
@@ -88,6 +88,10 @@ class BootCommand extends Command<void> {
         verbosity: getVerboseFlag(argResults) ? VerbosityLevel.verbose : VerbosityLevel.short,
       );
     }
+
+    contextFactory.save(
+      context: context.copyWith(bootContext: Optional(BorgBootContext(gitref: gitHead()))),
+    );
 
     print('\nSUCCESS: ${packagesToBoot.length} packages have been bootstrapped');
   }

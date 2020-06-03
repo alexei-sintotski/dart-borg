@@ -23,9 +23,14 @@
  *
  */
 
+import 'dart:convert';
+
+import 'package:borg/src/context/borg_boot_context.dart';
+import 'package:borg/src/context/borg_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
 import 'package:plain_optional/plain_optional.dart';
 import 'package:test/test.dart';
+import 'package:yaml/yaml.dart';
 
 void main() {
   group('$BorgContextFactory', () {
@@ -63,6 +68,50 @@ void main() {
       final context = factory.createBorgContext();
       test('it provides context without boot context', () {
         expect(context.bootContext.hasValue, false);
+      });
+    });
+
+    group('given context object without boot context', () {
+      const context = BorgContext(bootContext: Optional.none());
+
+      test('it saves content to a file', () {
+        var savedToFile = false;
+        BorgContextFactory(saveStringToFileSync: (_, content) {
+          savedToFile = true;
+        }).save(context: context);
+        expect(savedToFile, isTrue);
+      });
+
+      test('it provides no content to save', () {
+        BorgContextFactory(saveStringToFileSync: (_, content) {
+          expect(content, isEmpty);
+        }).save(context: context);
+      });
+    });
+
+    group('given context object with boot context', () {
+      const context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitref)));
+
+      test('it provides content to save', () {
+        BorgContextFactory(saveStringToFileSync: (_, content) {
+          expect(content, isNotEmpty);
+        }).save(context: context);
+      });
+
+      test('it provides content with boot context', () {
+        BorgContextFactory(saveStringToFileSync: (_, content) {
+          // ignore: avoid_as
+          final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
+          expect(BorgContext.fromJson(jsonContent).bootContext.hasValue, isTrue);
+        }).save(context: context);
+      });
+
+      test('it provides boot context with correct gitref value', () {
+        BorgContextFactory(saveStringToFileSync: (_, content) {
+          // ignore: avoid_as
+          final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
+          expect(BorgContext.fromJson(jsonContent).bootContext.unsafe.gitref, gitref);
+        }).save(context: context);
       });
     });
   });
