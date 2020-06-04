@@ -125,11 +125,24 @@ class BootCommand extends Command<void> {
             .map(path.dirname)
             .map(path.canonicalize)
             .map(path.relative);
+
+        if (getVerboseFlag(argResults)) {
+          if (packagesChangedSinceLastSuccessfulBoot.isEmpty) {
+            print('No changes to pubspec files detected in the change set');
+          } else {
+            print('Changes of pubspec files are detected for the following packages:');
+            for (final package in packagesChangedSinceLastSuccessfulBoot) {
+              print('\t$package');
+            }
+          }
+          print('');
+        }
+
         return packages.where((p) => packagesChangedSinceLastSuccessfulBoot.contains(p.path));
       },
       none: () {
         print('\nNo information on the last successful bootstrapping is found.');
-        print('Bootstrapping all found packages...');
+        print('Bootstrapping all found packages...\n');
 
         if (packages.isEmpty) {
           throw const BorgException('\nFATAL: Nothing to do, please check command line');
