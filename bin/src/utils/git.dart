@@ -25,10 +25,17 @@
 
 import 'dart:io';
 
+import 'package:meta/meta.dart';
+
 import 'run_system_command.dart';
 
-String gitHead() => (runSystemCommand(
-      command: 'git rev-parse --short HEAD',
+String gitHead() => _runSystemCommandWithStringOutput('git rev-parse --short HEAD');
+
+Iterable<String> gitDiffFiles({@required String gitref}) =>
+    _runSystemCommandWithStringOutput('git diff --name-only').split(RegExp(r'\s+'));
+
+String _runSystemCommandWithStringOutput(String command) => (runSystemCommand(
+      command: command,
       workingDirectory: Directory.current,
       // ignore: avoid_as
     ).stdout as String)

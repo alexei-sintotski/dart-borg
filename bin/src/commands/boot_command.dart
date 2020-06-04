@@ -30,6 +30,7 @@ import 'package:borg/src/context/borg_boot_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
 import 'package:meta/meta.dart';
+import 'package:path/path.dart' as path;
 import 'package:plain_optional/plain_optional.dart';
 
 import '../options/boot_mode.dart';
@@ -118,18 +119,34 @@ class BootCommand extends Command<void> {
     print('WARNING: Incremental bootstrapping selected, this feature is still EXPERIMENTAL!\n');
 
     final packagesToBoot = context.iif(
-      some: (ctx) => packages,
+      some: (ctx) {
+        final packagesChangedSinceLastSuccessfulBoot = gitDiffFiles(gitref: ctx.gitref)
+            .where(_isPubspecFile)
+            .map(path.dirname)
+            .map(path.canonicalize)
+            .map(path.relative);
+        return packages.where((p) => packagesChangedSinceLastSuccessfulBoot.contains(p.path));
+      },
       none: () {
         print('\nNo information on the last successful bootstrapping is found.');
         print('Bootstrapping all found packages...');
+
+        if (packages.isEmpty) {
+          throw const BorgException('\nFATAL: Nothing to do, please check command line');
+        }
+
         return packages;
       },
     );
 
-    _bootstrapPackages(
-      packages: packagesToBoot,
-      configuration: configuration,
-    );
+    if (packagesToBoot.isEmpty) {
+      print('SUCCESS: Workspace is up-to-date, bootstrapping is not required');
+    } else {
+      _bootstrapPackages(
+        packages: packagesToBoot,
+        configuration: configuration,
+      );
+    }
   }
 
   void _bootstrapPackages({
@@ -152,3 +169,5 @@ class BootCommand extends Command<void> {
     print('\nSUCCESS: ${packages.length} packages have been bootstrapped');
   }
 }
+
+bool _isPubspecFile(String pathToFile) => path.basenameWithoutExtension(pathToFile) == 'pubspec';
