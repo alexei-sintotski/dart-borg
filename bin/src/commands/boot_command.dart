@@ -24,22 +24,27 @@
  */
 
 import 'package:args/command_runner.dart';
+import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/configuration/factory.dart';
 import 'package:borg/src/context/borg_boot_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
+import 'package:meta/meta.dart';
 import 'package:plain_optional/plain_optional.dart';
 
+import '../options/boot_mode.dart';
 import '../options/verbose.dart';
 import '../resolve_dependencies.dart';
 import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
 import '../utils/git.dart';
+
 // ignore_for_file: avoid_print
 
 class BootCommand extends Command<void> {
   BootCommand() {
     configurationFactory.populateConfigurationArgs(argParser);
+    addBootModeOption(argParser);
     addVerboseFlag(argParser);
   }
 
@@ -56,7 +61,6 @@ class BootCommand extends Command<void> {
   void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
 
   final BorgConfigurationFactory configurationFactory = BorgConfigurationFactory();
-  Iterable<DartPackage> packages;
 
   void _run() {
     final configuration = configurationFactory.createConfiguration(argResults: argResults);
@@ -64,11 +68,35 @@ class BootCommand extends Command<void> {
     final contextFactory = BorgContextFactory();
     final context = contextFactory.createBorgContext();
 
-    packages = scanForPackages(
+    final packages = scanForPackages(
       configuration: configuration,
       argResults: argResults,
     );
 
+    switch (getBootModeOption(argResults)) {
+      case BootMode.basic:
+        _executeBasicBootstrapping(
+          packages: packages,
+          configuration: configuration,
+        );
+        break;
+      case BootMode.incremental:
+        _executeIncrementalBootstrapping(
+          packages: packages,
+          configuration: configuration,
+          context: context.bootContext,
+        );
+    }
+
+    contextFactory.save(
+      context: context.copyWith(bootContext: Optional(BorgBootContext(gitref: gitHead()))),
+    );
+  }
+
+  void _executeBasicBootstrapping({
+    @required Iterable<DartPackage> packages,
+    @required BorgConfiguration configuration,
+  }) {
     final packagesToBoot =
         argResults.rest.isEmpty ? packages : packages.where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)));
 
@@ -76,10 +104,42 @@ class BootCommand extends Command<void> {
       throw const BorgException('\nFATAL: Nothing to do, please check command line');
     }
 
+    _bootstrapPackages(
+      packages: packagesToBoot,
+      configuration: configuration,
+    );
+  }
+
+  void _executeIncrementalBootstrapping({
+    @required Iterable<DartPackage> packages,
+    @required BorgConfiguration configuration,
+    @required Optional<BorgBootContext> context,
+  }) {
+    print('WARNING: Incremental bootstrapping selected, this feature is still EXPERIMENTAL!\n');
+
+    final packagesToBoot = context.iif(
+      some: (ctx) => packages,
+      none: () {
+        print('\nNo information on the last successful bootstrapping is found.');
+        print('Bootstrapping all found packages...');
+        return packages;
+      },
+    );
+
+    _bootstrapPackages(
+      packages: packagesToBoot,
+      configuration: configuration,
+    );
+  }
+
+  void _bootstrapPackages({
+    @required Iterable<DartPackage> packages,
+    @required BorgConfiguration configuration,
+  }) {
     print('Bootstrapping packages:');
     var i = 1;
-    for (final package in packagesToBoot) {
-      final counter = '[${i++}/${packagesToBoot.length}]';
+    for (final package in packages) {
+      final counter = '[${i++}/${packages.length}]';
       print('$counter ${package.isFlutterPackage ? 'Flutter' : 'Dart'} package ${package.path}...');
 
       resolveDependencies(
@@ -89,10 +149,6 @@ class BootCommand extends Command<void> {
       );
     }
 
-    contextFactory.save(
-      context: context.copyWith(bootContext: Optional(BorgBootContext(gitref: gitHead()))),
-    );
-
-    print('\nSUCCESS: ${packagesToBoot.length} packages have been bootstrapped');
+    print('\nSUCCESS: ${packages.length} packages have been bootstrapped');
   }
 }
