@@ -8,14 +8,15 @@ Commands available in the latest release:
 |---------|--------------------------------------------------------------------------------------------------------|
 | probe   | Checks consistency of specified and resolved Dart dependencies across repository                       |
 | evolve  | Upgrades all external dependencies consistently across repository                                      |
-| boot    | Executes `pub get` / `flutter packages get` for multiple packages across repository                                   |
+| boot    | Executes `pub get` / `flutter packages get` for multiple packages across repository                    |
 | init    | Creates an initial borg configuration file to automate application of frequently used options          |
 
 Feature roadmap:
 
 | version | Major feature                                                                                                            |
 |---------|--------------------------------------------------------------------------------------------------------------------------|
-| 1.4     | Incremental bootstrapping                                                                                                |
+| 1.4.1   | Incremental bootstrapping takes Dart and Flutter versions into account                                                   |
+| 1.4.2   | Production quality incremental bootstrapping with usability improvements                                                 |
 | 1.5     | Ability to define commands in the configuration file                                                                     |
 | 1.6     | List outdated packages (requires Dart 2.8)                                                                               |
 | 1.7     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
@@ -166,6 +167,21 @@ results in fatal errors with message to the user.
 
 * Dart packages are always bootstrapped with `pub get`. The reason for this is that pub get has much higher performance
 than its Flutter counterpart.
+
+## Experimental: Incremental bootstrapping
+
+Execution of `pub get` / `flutter packages get` can take several minutes for large repositories of tens and hundreds of
+packages. On the other hand, developer's workspace is updated typically in small steps, only several packages at the
+time. Therefore, there should be no need to bootstrap the entire repository all the time, only the packages with
+changed pubspec files.
+
+Every time `borg boot` is finished successfully, it records git commit at the end of its execution and stores to
+file `.dart_tool/borg/context.yaml`. When developer executes the command in incremental boostrapping mode
+(`borg boot --mode=incremental`), the tool compares the repository changes since the last successful boot and
+executes `pub get` / `flutter packages get` only for packages with changed configuration.
+
+As incremental bootstrapping is still under development, it should not be used in critical use cases, for example,
+in continuous integration pipelines.
 
 # Configuration file: borg.yaml
 

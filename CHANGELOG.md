@@ -1,3 +1,6 @@
+## [1.4.0] - 2020-06-04
+* Experimental support for incremental bootstrapping
+
 ## [1.3.2] - 2020-06-01
 * Optimization: probe scans repository for packages only once
 * Optimization: more efficient scan of Flutter repositories by built-in filtering of
