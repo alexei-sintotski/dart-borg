@@ -114,11 +114,24 @@ void main() {
         }).save(context: context);
       });
     });
+
+    group('given last successful boot gitref covertible to a number in YAML', () {
+      const context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitrefThatLooksLikeANumber)));
+      String contextString;
+      BorgContextFactory(saveStringToFileSync: (_, content) => contextString = content).save(context: context);
+
+      test('it does not crash while loading context containing this gitref', () {
+        expect(contextString, isNotNull);
+        BorgContextFactory(tryToReadFileSync: (_) => Optional(contextString)).createBorgContext();
+      });
+    });
   });
 }
 
-const gitref = 'gitref';
+const gitref = 'some_gitref';
 const contextWithBootContext = '''
 last_successful_bootstrap:
   gitref: $gitref
 ''';
+
+const gitrefThatLooksLikeANumber = '07014e169';

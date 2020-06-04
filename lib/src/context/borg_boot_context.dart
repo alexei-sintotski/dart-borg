@@ -41,7 +41,7 @@ class BorgBootContext {
       BorgBootContext(gitref: json[_gitrefKey] as String);
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        _gitrefKey: gitref,
+        _gitrefKey: '\'$gitref\'',
       };
 }
 
