@@ -29,6 +29,7 @@ import 'package:borg/src/configuration/factory.dart';
 import 'package:borg/src/context/borg_boot_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
+import 'package:borg/src/impact/impact_based_on_pubspec_yaml.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:plain_optional/plain_optional.dart';
@@ -120,11 +121,19 @@ class BootCommand extends Command<void> {
 
     final packagesToBoot = context.iif(
       some: (ctx) {
-        final packagesChangedSinceLastSuccessfulBoot = gitDiffFiles(gitref: ctx.gitref)
+        final packageDiff = gitDiffFiles(gitref: ctx.gitref)
             .where(_isPubspecFile)
             .map(path.dirname)
             .map(path.canonicalize)
-            .map(path.relative);
+            .map(path.relative)
+            .toSet();
+
+        final packagesChangedSinceLastSuccessfulBoot = packages.where((p) => packageDiff.contains(p.path));
+
+        final packagesUnderImpactSinceLastSuccessfulBoot = impactBasedOnPubspecYaml(
+          packages: packagesChangedSinceLastSuccessfulBoot,
+          allPackages: packages,
+        );
 
         if (getVerboseFlag(argResults)) {
           if (packagesChangedSinceLastSuccessfulBoot.isEmpty) {
@@ -138,7 +147,7 @@ class BootCommand extends Command<void> {
           print('');
         }
 
-        return packages.where((p) => packagesChangedSinceLastSuccessfulBoot.contains(p.path));
+        return packagesUnderImpactSinceLastSuccessfulBoot;
       },
       none: () {
         print('\nNo information on the last successful bootstrapping is found.');

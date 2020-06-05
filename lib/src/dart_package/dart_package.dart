@@ -50,4 +50,7 @@ class DartPackage {
   bool get isFlutterPackage => pubspecYaml.dependencies.any((d) => d.package() == 'flutter');
 
   final LazyData<PubspecYaml> _pubspecYaml;
+
+  @override
+  String toString() => 'DartPackage(path: $path)';
 }
