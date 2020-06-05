@@ -128,24 +128,32 @@ class BootCommand extends Command<void> {
             .map(path.relative)
             .toSet();
 
-        final packagesChangedSinceLastSuccessfulBoot = packages.where((p) => packageDiff.contains(p.path));
+        final changedPackagesWithinScope = packages.where((p) => packageDiff.contains(p.path));
+        final changedPackagesOutsideOfScope =
+            packageDiff.where((d) => !packages.any((p) => d.contains(p.path))).map((d) => DartPackage(path: d));
 
-        final packagesUnderImpactSinceLastSuccessfulBoot = impactBasedOnPubspecYaml(
-          packages: packagesChangedSinceLastSuccessfulBoot,
-          allPackages: packages,
-        );
+        final changedPackages = {
+          ...changedPackagesWithinScope,
+          ...changedPackagesOutsideOfScope,
+        };
 
         if (getVerboseFlag(argResults)) {
-          if (packagesChangedSinceLastSuccessfulBoot.isEmpty) {
+          if (changedPackages.isEmpty) {
             print('No changes to pubspec files detected in the change set');
           } else {
             print('Changes of pubspec files are detected for the following packages:');
-            for (final package in packagesChangedSinceLastSuccessfulBoot) {
-              print('\t$package');
+            for (final package in changedPackages) {
+              print('\t${package.path}');
             }
           }
           print('');
         }
+
+        print('Analyzing package dependencies...');
+        final packagesUnderImpactSinceLastSuccessfulBoot = impactBasedOnPubspecYaml(
+          packages: changedPackages,
+          allPackages: {...packages, ...changedPackagesOutsideOfScope},
+        ).where((p) => !changedPackagesOutsideOfScope.any((pp) => pp.path == p.path));
 
         return packagesUnderImpactSinceLastSuccessfulBoot;
       },

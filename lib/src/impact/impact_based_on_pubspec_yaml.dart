@@ -39,7 +39,10 @@ extension _Package on DartPackage {
             path: (pathDep) =>
                 _samePath(package.path, path.join(this.path, pathDep.path)) ||
                 allPackages
-                    .firstWhere((p) => _samePath(p.path, path.join(this.path, pathDep.path)))
+                    .firstWhere(
+                      (p) => _samePath(p.path, path.join(this.path, pathDep.path)),
+                      orElse: () => DartPackage(path: path.join(this.path, pathDep.path)),
+                    )
                     .dependsOn(package, allPackages),
             otherwise: () => false,
           )) ||
