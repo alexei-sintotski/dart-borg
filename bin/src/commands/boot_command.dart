@@ -145,13 +145,11 @@ class BootCommand extends Command<void> {
           return <DartPackage>[];
         }
 
-        if (getVerboseFlag(argResults)) {
-          print('Changes of pubspec files are detected for the following packages:');
-          for (final package in changedPackages) {
-            print('\t${renderPackageName(package.path)}');
-          }
-          print('');
+        print('Configuration changes detected for the following packages:');
+        for (final package in changedPackages) {
+          print('\t${renderPackageName(package.path)}');
         }
+        print('');
 
         print('Analyzing package dependencies...');
         final packagesUnderImpactSinceLastSuccessfulBoot = impactBasedOnPubspecYaml(
