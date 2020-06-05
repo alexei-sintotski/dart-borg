@@ -135,14 +135,14 @@ class BootCommand extends Command<void> {
           ...changedPackagesOutsideOfScope,
         };
 
+        if (changedPackages.isEmpty) {
+          return <DartPackage>[];
+        }
+
         if (getVerboseFlag(argResults)) {
-          if (changedPackages.isEmpty) {
-            print('No changes to pubspec files detected in the change set');
-          } else {
-            print('Changes of pubspec files are detected for the following packages:');
-            for (final package in changedPackages) {
-              print('\t${renderPackageName(package.path)}');
-            }
+          print('Changes of pubspec files are detected for the following packages:');
+          for (final package in changedPackages) {
+            print('\t${renderPackageName(package.path)}');
           }
           print('');
         }
