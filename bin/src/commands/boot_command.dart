@@ -23,6 +23,8 @@
  *
  */
 
+import 'dart:io';
+
 import 'package:args/command_runner.dart';
 import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/configuration/factory.dart';
@@ -122,8 +124,12 @@ class BootCommand extends Command<void> {
 
     final packagesToBoot = context.iif(
       some: (ctx) {
-        final packageDiff =
-            gitDiffFiles(gitref: ctx.gitref).where(_isPubspecFile).map(path.dirname).map(path.canonicalize).toSet();
+        final packageDiff = gitDiffFiles(gitref: ctx.gitref)
+            .where(_isPubspecFile)
+            .map(path.dirname)
+            .map(path.canonicalize)
+            .where((d) => Directory(d).existsSync())
+            .toSet();
 
         final changedPackagesWithinScope = packages.where((p) => packageDiff.contains(p.path));
         final changedPackagesOutsideOfScope = packageDiff

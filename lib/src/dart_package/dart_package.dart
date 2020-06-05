@@ -41,7 +41,7 @@ class DartPackage {
   }) : _pubspecYaml = LazyData(
             populate: () => tryToReadFileSync(join(path, 'pubspec.yaml')).iif(
                   some: (content) => content.toPubspecYaml(),
-                  none: () => null,
+                  none: () => throw AssertionError('${join(path, 'pubspec.yaml')} does not exist!'),
                 ));
 
   final String path;
