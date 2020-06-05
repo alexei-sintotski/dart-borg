@@ -27,6 +27,7 @@
 
 import 'package:borg/src/dart_package/dart_package.dart';
 import 'package:borg/src/impact/impact_based_on_pubspec_yaml.dart';
+import 'package:path/path.dart';
 import 'package:plain_optional/plain_optional.dart';
 import 'package:test/test.dart';
 
@@ -84,15 +85,15 @@ void main() {
   });
 }
 
-final _packageA = DartPackage(path: 'a', tryToReadFileSync: (_) => const Optional('''
+final _packageA = DartPackage(path: canonicalize('a'), tryToReadFileSync: (_) => const Optional('''
 name: a
 '''));
 
-final _packageB = DartPackage(path: 'b', tryToReadFileSync: (_) => const Optional('''
+final _packageB = DartPackage(path: canonicalize('b'), tryToReadFileSync: (_) => const Optional('''
 name: b
 '''));
 
-final _packageC = DartPackage(path: 'c', tryToReadFileSync: (_) => const Optional('''
+final _packageC = DartPackage(path: canonicalize('c'), tryToReadFileSync: (_) => const Optional('''
 name: c
 dependencies:
   a:
@@ -101,21 +102,21 @@ dependencies:
     path: ../b
 '''));
 
-final _packageD = DartPackage(path: 'd', tryToReadFileSync: (_) => const Optional('''
+final _packageD = DartPackage(path: canonicalize('d'), tryToReadFileSync: (_) => const Optional('''
 name: d
 dependencies:
   c:
     path: ../c
 '''));
 
-final _packageE = DartPackage(path: 'e', tryToReadFileSync: (_) => const Optional('''
+final _packageE = DartPackage(path: canonicalize('e'), tryToReadFileSync: (_) => const Optional('''
 name: e
 dev_dependencies:
   a:
     path: ../a
 '''));
 
-final _packageF = DartPackage(path: 'f', tryToReadFileSync: (_) => const Optional('''
+final _packageF = DartPackage(path: canonicalize('f'), tryToReadFileSync: (_) => const Optional('''
 name: f
 dev_dependencies:
   e:

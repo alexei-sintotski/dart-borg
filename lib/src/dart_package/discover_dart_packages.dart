@@ -41,10 +41,6 @@ Iterable<String> _locationsToScan(BorgConfiguration config) {
   const fileFinder = FileFinder(filename: 'pubspec.yaml', ignored: ['/.symlinks/']);
   final includedLocations = fileFinder.findFiles(config.pathsToScan);
   final excludedLocations = fileFinder.findFiles(config.excludedPaths);
-  final packages = includedLocations
-      .where((location) => !excludedLocations.contains(location))
-      .map(path.relative)
-      .map(path.dirname)
-      .map((d) => d == '.' ? path.canonicalize(d) : d);
+  final packages = includedLocations.where((location) => !excludedLocations.contains(location)).map(path.dirname);
   return packages.toList()..sort();
 }

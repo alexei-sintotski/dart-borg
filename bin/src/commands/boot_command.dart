@@ -40,6 +40,7 @@ import '../resolve_dependencies.dart';
 import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
 import '../utils/git.dart';
+import '../utils/render_package_name.dart';
 
 // ignore_for_file: avoid_print
 
@@ -121,16 +122,13 @@ class BootCommand extends Command<void> {
 
     final packagesToBoot = context.iif(
       some: (ctx) {
-        final packageDiff = gitDiffFiles(gitref: ctx.gitref)
-            .where(_isPubspecFile)
-            .map(path.dirname)
-            .map(path.canonicalize)
-            .map(path.relative)
-            .toSet();
+        final packageDiff =
+            gitDiffFiles(gitref: ctx.gitref).where(_isPubspecFile).map(path.dirname).map(path.canonicalize).toSet();
 
         final changedPackagesWithinScope = packages.where((p) => packageDiff.contains(p.path));
-        final changedPackagesOutsideOfScope =
-            packageDiff.where((d) => !packages.any((p) => d.contains(p.path))).map((d) => DartPackage(path: d));
+        final changedPackagesOutsideOfScope = packageDiff
+            .where((d) => !changedPackagesWithinScope.any((p) => p.path == d))
+            .map((d) => DartPackage(path: d));
 
         final changedPackages = {
           ...changedPackagesWithinScope,
@@ -143,7 +141,7 @@ class BootCommand extends Command<void> {
           } else {
             print('Changes of pubspec files are detected for the following packages:');
             for (final package in changedPackages) {
-              print('\t${package.path}');
+              print('\t${renderPackageName(package.path)}');
             }
           }
           print('');
@@ -154,6 +152,7 @@ class BootCommand extends Command<void> {
           packages: changedPackages,
           allPackages: {...packages, ...changedPackagesOutsideOfScope},
         ).where((p) => !changedPackagesOutsideOfScope.any((pp) => pp.path == p.path));
+        print('');
 
         return packagesUnderImpactSinceLastSuccessfulBoot;
       },
@@ -187,7 +186,7 @@ class BootCommand extends Command<void> {
     var i = 1;
     for (final package in packages) {
       final counter = '[${i++}/${packages.length}]';
-      print('$counter ${package.isFlutterPackage ? 'Flutter' : 'Dart'} package ${package.path}...');
+      print('$counter ${package.isFlutterPackage ? 'Flutter' : 'Dart'} package ${renderPackageName(package.path)}...');
 
       resolveDependencies(
         package: package,

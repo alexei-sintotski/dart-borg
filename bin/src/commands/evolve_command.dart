@@ -41,6 +41,7 @@ import '../options/verbose.dart';
 import '../resolve_dependencies.dart';
 import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
+import '../utils/render_package_name.dart';
 import '../utils/with_temp_location.dart';
 
 // ignore_for_file: avoid_print
@@ -94,9 +95,9 @@ class EvolveCommand extends Command<void> {
     for (final package in packages) {
       final counter = '[${i++}/${packages.length}]';
       if (getDryRunFlag(argResults)) {
-        stdout.write('$counter ${package.path}');
+        stdout.write('$counter ${renderPackageName(package.path)}');
       } else {
-        stdout.write('$counter Evolving ${package.path} ...');
+        stdout.write('$counter Evolving ${renderPackageName(package.path)} ...');
       }
       _evolvePackage(package, references);
     }
@@ -132,7 +133,7 @@ class EvolveCommand extends Command<void> {
       name: name,
       dependencies: depSpecs,
     ).toYamlString());
-    return DartPackage(path: location);
+    return DartPackage(path: path.canonicalize(location));
   }
 
   void _evolvePackage(

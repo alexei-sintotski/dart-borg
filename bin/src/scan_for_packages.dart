@@ -35,6 +35,7 @@ import 'package:meta/meta.dart';
 
 import 'options/verbose.dart';
 import 'utils/borg_exception.dart';
+import 'utils/render_package_name.dart';
 
 Iterable<DartPackage> scanForPackages({
   @required BorgConfiguration configuration,
@@ -52,7 +53,7 @@ Iterable<DartPackage> scanForPackages({
 
   if (getVerboseFlag(argResults)) {
     for (final package in packages) {
-      print('\t${package.path}');
+      print('\t${renderPackageName(package.path)}');
     }
   }
 
