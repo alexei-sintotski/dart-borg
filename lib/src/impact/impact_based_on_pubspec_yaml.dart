@@ -31,23 +31,28 @@ import 'package:path/path.dart' as path;
 import '../dart_package/dart_package.dart';
 
 extension _Package on DartPackage {
-  bool dependsOn(
+  bool productionCodeDependsOn(
     DartPackage package,
     Iterable<DartPackage> allPackages,
   ) =>
       pubspecYaml.dependencies.any((dep) => dep.iswitcho(
             path: (pathDep) =>
-                _samePath(package.path, path.join(this.path, pathDep.path)) ||
+                package.path == path.canonicalize(path.join(this.path, pathDep.path)) ||
                 allPackages
                     .firstWhere(
-                      (p) => _samePath(p.path, path.join(this.path, pathDep.path)),
-                      orElse: () => DartPackage(path: path.join(this.path, pathDep.path)),
+                      (p) => p.path == path.canonicalize(path.join(this.path, pathDep.path)),
+                      orElse: () => DartPackage(path: path.canonicalize(path.join(this.path, pathDep.path))),
                     )
-                    .dependsOn(package, allPackages),
+                    .productionCodeDependsOn(package, allPackages),
             otherwise: () => false,
-          )) ||
+          ));
+
+  bool devCodeDependsOn(
+    DartPackage package,
+    Iterable<DartPackage> allPackages,
+  ) =>
       pubspecYaml.devDependencies.any((dep) => dep.iswitcho(
-            path: (pathDep) => _samePath(package.path, path.join(this.path, pathDep.path)),
+            path: (pathDep) => package.path == path.canonicalize(path.join(this.path, pathDep.path)),
             otherwise: () => false,
           ));
 }
@@ -59,10 +64,6 @@ Iterable<DartPackage> impactBasedOnPubspecYaml({
     packages
         .expand((package) => allPackages.where((p) =>
             p.path == package.path ||
-            p.dependsOn(
-              package,
-              allPackages,
-            )))
+            p.productionCodeDependsOn(package, allPackages) ||
+            p.devCodeDependsOn(package, allPackages)))
         .toSet();
-
-bool _samePath(String path1, String path2) => path.canonicalize(path1) == path.canonicalize(path2);

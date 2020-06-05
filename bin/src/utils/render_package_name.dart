@@ -23,32 +23,9 @@
  *
  */
 
-import 'package:borg/borg.dart';
-import 'package:borg/src/dart_package/dart_package.dart';
-import 'package:pubspec_yaml/pubspec_yaml.dart';
+import 'package:path/path.dart' as path;
 
-import 'utils/borg_exception.dart';
-import 'utils/print_dependency_usage_report.dart';
-import 'utils/render_package_name.dart';
-
-// ignore_for_file: avoid_print
-
-void assertPubspecYamlConsistency(Iterable<DartPackage> packages) {
-  final inconsistentSpecList = findInconsistentDependencySpecs(
-      Map.fromEntries(packages.map((p) => MapEntry(renderPackageName(p.path), p.pubspecYaml))));
-
-  if (inconsistentSpecList.isNotEmpty) {
-    printDependencyUsageReport(
-      report: inconsistentSpecList,
-      formatDependency: _formatDependencySpec,
-    );
-
-    throw const BorgException('FAILURE: Inconsistent package dependency specifications detected!');
-  }
+String renderPackageName(String pathToPackage) {
+  final relativePath = path.relative(pathToPackage);
+  return relativePath == '.' ? path.basename(pathToPackage) : relativePath;
 }
-
-String _formatDependencySpec(PackageDependencySpec dependency) => dependency.iswitch(
-    git: (dep) => '${dep.url}${dep.ref.iif(some: (v) => ": $v", none: () => "")}',
-    path: (dep) => '${dep.path}',
-    hosted: (dep) => '${dep.version.valueOr(() => "unspecified")}',
-    sdk: (dep) => '${dep.version.valueOr(() => "unspecified")}');
