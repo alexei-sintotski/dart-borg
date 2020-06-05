@@ -15,8 +15,7 @@ Feature roadmap:
 
 | version | Major feature                                                                                                            |
 |---------|--------------------------------------------------------------------------------------------------------------------------|
-| 1.4.1   | Incremental bootstrapping takes Dart and Flutter versions into account                                                   |
-| 1.4.2   | Production quality incremental bootstrapping with usability improvements                                                 |
+| 1.4.x   | Productization of incremental bootstrapping                                                                              |
 | 1.5     | Ability to define commands in the configuration file                                                                     |
 | 1.6     | List outdated packages (requires Dart 2.8)                                                                               |
 | 1.7     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
@@ -178,7 +177,7 @@ changed pubspec files.
 Every time `borg boot` is finished successfully, it records git commit at the end of its execution and stores to
 file `.dart_tool/borg/context.yaml`. When developer executes the command in incremental boostrapping mode
 (`borg boot --mode=incremental`), the tool compares the repository changes since the last successful boot and
-executes `pub get` / `flutter packages get` only for packages with changed configuration.
+executes `pub get` / `flutter packages get` only for packages with changed configuration and packages depending on them.
 
 As incremental bootstrapping is still under development, it should not be used in critical use cases, for example,
 in continuous integration pipelines.

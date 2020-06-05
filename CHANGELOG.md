@@ -1,3 +1,6 @@
+## [1.4.1] - 2020-06-04
+* Incremental bootstrapping takes dependencies between packages in the mono repository into account
+
 ## [1.4.0] - 2020-06-04
 * Experimental support for incremental bootstrapping
 
