@@ -129,7 +129,10 @@ class BootCommand extends Command<void> {
 
     final packagesToBoot = context.iif(
       some: (ctx) {
-        final packageDiff = _getPackageDiff(gitref: ctx.gitref).where((d) => Directory(d).existsSync());
+        final packageDiff = {
+          ..._getPackageDiff(gitref: ctx.gitref),
+          ...ctx.modifiedPackages.map(path.canonicalize),
+        }.where((d) => Directory(d).existsSync());
 
         final changedPackagesWithinScope = packages.where((p) => packageDiff.contains(p.path));
         final changedPackagesOutsideOfScope = packageDiff
