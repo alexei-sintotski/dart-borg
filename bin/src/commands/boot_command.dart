@@ -94,7 +94,12 @@ class BootCommand extends Command<void> {
     }
 
     contextFactory.save(
-      context: context.copyWith(bootContext: Optional(BorgBootContext(gitref: gitHead()))),
+      context: context.copyWith(
+        bootContext: Optional(BorgBootContext(
+          gitref: gitHead(),
+          modifiedPackages: _getPackageDiff(gitref: 'HEAD').map(path.relative),
+        )),
+      ),
     );
   }
 
@@ -124,12 +129,7 @@ class BootCommand extends Command<void> {
 
     final packagesToBoot = context.iif(
       some: (ctx) {
-        final packageDiff = gitDiffFiles(gitref: ctx.gitref)
-            .where(_isPubspecFile)
-            .map(path.dirname)
-            .map(path.canonicalize)
-            .where((d) => Directory(d).existsSync())
-            .toSet();
+        final packageDiff = _getPackageDiff(gitref: ctx.gitref).where((d) => Directory(d).existsSync());
 
         final changedPackagesWithinScope = packages.where((p) => packageDiff.contains(p.path));
         final changedPackagesOutsideOfScope = packageDiff
@@ -202,5 +202,10 @@ class BootCommand extends Command<void> {
     print('\nSUCCESS: ${packages.length} packages have been bootstrapped');
   }
 }
+
+Set<String> _getPackageDiff({
+  @required String gitref,
+}) =>
+    gitDiffFiles(gitref: gitref).where(_isPubspecFile).map(path.dirname).map(path.canonicalize).toSet();
 
 bool _isPubspecFile(String pathToFile) => path.basenameWithoutExtension(pathToFile) == 'pubspec';
