@@ -27,22 +27,31 @@
 
 import 'package:meta/meta.dart';
 
-// ignore_for_file: sort_constructors_first
+// ignore_for_file: sort_constructors_first, avoid_as
 
 @immutable
 class BorgBootContext {
-  const BorgBootContext({@required this.gitref});
+  const BorgBootContext({
+    @required this.gitref,
+    this.modifiedPackages = const [],
+  });
 
   final String gitref;
+  final Iterable<String> modifiedPackages;
 
-  // ignore: avoid_as
-  factory BorgBootContext.fromJson(Map<String, dynamic> json) =>
-      // ignore: avoid_as
-      BorgBootContext(gitref: json[_gitrefKey] as String);
+  factory BorgBootContext.fromJson(Map<String, dynamic> json) => BorgBootContext(
+        gitref: json[_gitrefKey] as String,
+        modifiedPackages: json.containsKey(_modifiedPackagesKey)
+            // ignore: avoid_annotating_with_dynamic
+            ? (json[_modifiedPackagesKey] as List).map((dynamic p) => p as String)
+            : [],
+      );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         _gitrefKey: '\'$gitref\'',
+        if (modifiedPackages.isNotEmpty) _modifiedPackagesKey: modifiedPackages.toList(),
       };
 }
 
 const _gitrefKey = 'gitref';
+const _modifiedPackagesKey = 'modified_packages';
