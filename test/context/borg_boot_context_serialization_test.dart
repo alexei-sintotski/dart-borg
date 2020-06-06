@@ -32,26 +32,15 @@ import 'package:plain_optional/plain_optional.dart';
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
 
+// ignore_for_file: avoid_as
+
 void main() {
   group('$BorgContextFactory', () {
-    group('if context file does not exist', () {
+    group('given context file does not exist', () {
       final factory = BorgContextFactory(tryToReadFileSync: (_) => const Optional.none());
       final context = factory.createBorgContext();
       test('it provides context without boot context', () {
         expect(context.bootContext.hasValue, false);
-      });
-    });
-
-    group('if context file exists with boot context filled in', () {
-      final factory = BorgContextFactory(tryToReadFileSync: (_) => const Optional(contextWithBootContext));
-      final context = factory.createBorgContext();
-
-      test('it provides boot context object', () {
-        expect(context.bootContext.hasValue, true);
-      });
-
-      test('it provides correct gitref', () {
-        expect(context.bootContext.unsafe.gitref, gitref);
       });
     });
 
@@ -89,49 +78,124 @@ void main() {
       });
     });
 
-    group('given context object with boot context', () {
-      const context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitref)));
+    group('handling of gitref', () {
+      group('given context file with boot context containing gitref', () {
+        final factory = BorgContextFactory(
+          tryToReadFileSync: (_) => const Optional(contextWithBootContextWithGitrefOnly),
+        );
+        final context = factory.createBorgContext();
 
-      test('it provides content to save', () {
-        BorgContextFactory(saveStringToFileSync: (_, content) {
-          expect(content, isNotEmpty);
-        }).save(context: context);
+        test('it provides boot context object', () {
+          expect(context.bootContext.hasValue, true);
+        });
+
+        test('it provides correct gitref', () {
+          expect(context.bootContext.unsafe.gitref, gitref);
+        });
+
+        test('it provides an empty list of modified packages', () {
+          expect(context.bootContext.unsafe.modifiedPackages, isEmpty);
+        });
       });
 
-      test('it provides content with boot context', () {
-        BorgContextFactory(saveStringToFileSync: (_, content) {
-          // ignore: avoid_as
-          final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
-          expect(BorgContext.fromJson(jsonContent).bootContext.hasValue, isTrue);
-        }).save(context: context);
+      group('given context object with boot context', () {
+        const context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitref)));
+
+        test('it provides content to save', () {
+          BorgContextFactory(saveStringToFileSync: (_, content) {
+            expect(content, isNotEmpty);
+          }).save(context: context);
+        });
+
+        test('it provides content with boot context', () {
+          BorgContextFactory(saveStringToFileSync: (_, content) {
+            final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
+            expect(BorgContext.fromJson(jsonContent).bootContext.hasValue, isTrue);
+          }).save(context: context);
+        });
+
+        test('it provides boot context with correct gitref value', () {
+          BorgContextFactory(saveStringToFileSync: (_, content) {
+            final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
+            expect(BorgContext.fromJson(jsonContent).bootContext.unsafe.gitref, gitref);
+          }).save(context: context);
+        });
       });
 
-      test('it provides boot context with correct gitref value', () {
-        BorgContextFactory(saveStringToFileSync: (_, content) {
-          // ignore: avoid_as
-          final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
-          expect(BorgContext.fromJson(jsonContent).bootContext.unsafe.gitref, gitref);
-        }).save(context: context);
+      group('given last successful boot gitref covertible to a number in YAML', () {
+        const context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitrefThatLooksLikeANumber)));
+        String contextString;
+        BorgContextFactory(saveStringToFileSync: (_, content) => contextString = content).save(context: context);
+
+        test('it does not crash while loading context containing this gitref', () {
+          expect(contextString, isNotNull);
+          BorgContextFactory(tryToReadFileSync: (_) => Optional(contextString)).createBorgContext();
+        });
       });
     });
 
-    group('given last successful boot gitref covertible to a number in YAML', () {
-      const context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitrefThatLooksLikeANumber)));
-      String contextString;
-      BorgContextFactory(saveStringToFileSync: (_, content) => contextString = content).save(context: context);
+    group('handling of modified packages', () {
+      group('given context file with boot context not containing list of modified packages', () {
+        final factory = BorgContextFactory(
+          tryToReadFileSync: (_) => const Optional(contextWithBootContextWithGitrefOnly),
+        );
+        final context = factory.createBorgContext();
 
-      test('it does not crash while loading context containing this gitref', () {
-        expect(contextString, isNotNull);
-        BorgContextFactory(tryToReadFileSync: (_) => Optional(contextString)).createBorgContext();
+        test('it provides an empty list of modified packages', () {
+          expect(context.bootContext.unsafe.modifiedPackages, isEmpty);
+        });
+      });
+
+      group('given context file with boot context containing list of modified packages', () {
+        final factory = BorgContextFactory(
+          tryToReadFileSync: (_) => const Optional(contextWithBootContextWithModifiedPackages),
+        );
+        final context = factory.createBorgContext();
+
+        test('it provides correct list of modified packages', () {
+          expect(context.bootContext.unsafe.modifiedPackages, ['a', 'b', 'c']);
+        });
+      });
+
+      group('given context object with empty list of modified packages', () {
+        const context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitref)));
+        test('it produces context file with empty list of modified_packages', () {
+          BorgContextFactory(saveStringToFileSync: (_, content) {
+            final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
+            expect(BorgContext.fromJson(jsonContent).bootContext.unsafe.modifiedPackages, isEmpty);
+          }).save(context: context);
+        });
+      });
+
+      group('given context object with non-empty list of modified packages', () {
+        const modifiedPackages = ['a', 'b', 'c'];
+        const context = BorgContext(
+          bootContext: Optional(BorgBootContext(
+            gitref: gitref,
+            modifiedPackages: modifiedPackages,
+          )),
+        );
+        test('it produces context file with empty list of modified_packages', () {
+          BorgContextFactory(saveStringToFileSync: (_, content) {
+            final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
+            expect(BorgContext.fromJson(jsonContent).bootContext.unsafe.modifiedPackages, modifiedPackages);
+          }).save(context: context);
+        });
       });
     });
   });
 }
 
 const gitref = 'some_gitref';
-const contextWithBootContext = '''
+const contextWithBootContextWithGitrefOnly = '''
 last_successful_bootstrap:
   gitref: $gitref
 ''';
 
 const gitrefThatLooksLikeANumber = '07014e169';
+
+const contextWithBootContextWithModifiedPackages = '''
+last_successful_bootstrap:
+  gitref: $gitref
+  modified_packages: [a, b, c]
+''';
