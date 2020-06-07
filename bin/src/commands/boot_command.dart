@@ -97,10 +97,13 @@ class BootCommand extends Command<void> {
     contextFactory.save(
       context: context.copyWith(
         bootContext: Optional(BorgBootContext(
-          dartSdkVersion: dartSdkVersion,
-          gitref: gitHead(),
-          modifiedPackages: _getPackageDiff(gitref: 'HEAD').map(path.relative),
-        )),
+            dartSdkVersion: dartSdkVersion,
+            gitref: gitHead(),
+            modifiedPackages: _getPackageDiff(gitref: 'HEAD').map(path.relative),
+            flutterSdkVersion: configuration.flutterSdkPath.iif(
+              some: (flutterPath) => Optional(flutterSdkVersion(flutterPath)),
+              none: () => const Optional.none(),
+            ))),
       ),
     );
   }
@@ -131,6 +134,10 @@ class BootCommand extends Command<void> {
 
     final packagesToBoot = context.iif(
       some: (ctx) {
+        if (_isFlutterVersionChanged(context: ctx, configuration: configuration)) {
+          return packages;
+        }
+
         if (ctx.dartSdkVersion != dartSdkVersion && ctx.dartSdkVersion.isNotEmpty) {
           print('Dart version change detected:\n'
               '\twas: ${ctx.dartSdkVersion}\n'
@@ -194,6 +201,38 @@ class BootCommand extends Command<void> {
       );
     }
   }
+
+  bool _isFlutterVersionChanged({
+    @required BorgBootContext context,
+    @required BorgConfiguration configuration,
+  }) =>
+      context.flutterSdkVersion.iif(
+        some: (ctxVersion) => configuration.flutterSdkPath.iif(
+          some: (pathToFlutterSdk) {
+            final actualVersion = flutterSdkVersion(pathToFlutterSdk);
+            if (actualVersion != ctxVersion) {
+              print('Flutter version change detected:\n'
+                  'was: $ctxVersion\n'
+                  'now: $actualVersion\n'
+                  'Bootstrapping of all packages required\n');
+            }
+            return ctxVersion != actualVersion;
+          },
+          none: () {
+            print('Path to Flutter SDK has become undefined\n'
+                'Bootstrapping of all packages required\n');
+            return true;
+          },
+        ),
+        none: () => configuration.flutterSdkPath.iif(
+          some: (p) {
+            print('Path to Flutter SDK has become defined\n'
+                'Bootstrapping of all packages required\n');
+            return true;
+          },
+          none: () => false,
+        ),
+      );
 
   void _bootstrapPackages({
     @required Iterable<DartPackage> packages,
