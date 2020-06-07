@@ -27,19 +27,24 @@
 
 import 'package:meta/meta.dart';
 
+import '../utils/platform_version.dart' as platform;
+
 // ignore_for_file: sort_constructors_first, avoid_as
 
 @immutable
 class BorgBootContext {
-  const BorgBootContext({
+  BorgBootContext({
     @required this.gitref,
+    String dartSdkVersion,
     this.modifiedPackages = const [],
-  });
+  }) : dartSdkVersion = dartSdkVersion ?? platform.dartSdkVersion;
 
+  final String dartSdkVersion;
   final String gitref;
   final Iterable<String> modifiedPackages;
 
   factory BorgBootContext.fromJson(Map<String, dynamic> json) => BorgBootContext(
+        dartSdkVersion: json.containsKey(_dartSdkVersionKey) ? json[_dartSdkVersionKey] as String : '',
         gitref: json[_gitrefKey] as String,
         modifiedPackages: json.containsKey(_modifiedPackagesKey)
             // ignore: avoid_annotating_with_dynamic
@@ -48,10 +53,12 @@ class BorgBootContext {
       );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        _gitrefKey: '\'$gitref\'',
+        _dartSdkVersionKey: dartSdkVersion,
+        _gitrefKey: '"$gitref"',
         if (modifiedPackages.isNotEmpty) _modifiedPackagesKey: modifiedPackages.toList(),
       };
 }
 
 const _gitrefKey = 'gitref';
 const _modifiedPackagesKey = 'modified_packages';
+const _dartSdkVersionKey = 'dart_sdk_version';
