@@ -27,14 +27,15 @@
 
 import 'dart:io';
 
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 
 import 'run_system_command.dart';
 
 String dartSdkVersion = _yamlParseable(Platform.version);
 
-String flutterSdkVersion(String pathToFlutterSdk) => _yamlParseable((runSystemCommand(
-      command: '${path.join(pathToFlutterSdk, 'flutter')} --version',
+String flutterSdkVersion({@required String flutterSdkPath}) => _yamlParseable((runSystemCommand(
+      command: '${path.joinAll([flutterSdkPath, 'bin', 'flutter'])} --version',
       workingDirectory: Directory.current,
       // ignore: avoid_as
     ).stdout as String)

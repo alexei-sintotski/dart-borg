@@ -101,7 +101,7 @@ class BootCommand extends Command<void> {
             gitref: gitHead(),
             modifiedPackages: _getPackageDiff(gitref: 'HEAD').map(path.relative),
             flutterSdkVersion: configuration.flutterSdkPath.iif(
-              some: (flutterPath) => Optional(flutterSdkVersion(flutterPath)),
+              some: (flutterSdkPath) => Optional(flutterSdkVersion(flutterSdkPath: flutterSdkPath)),
               none: () => const Optional.none(),
             ))),
       ),
@@ -208,8 +208,8 @@ class BootCommand extends Command<void> {
   }) =>
       context.flutterSdkVersion.iif(
         some: (ctxVersion) => configuration.flutterSdkPath.iif(
-          some: (pathToFlutterSdk) {
-            final actualVersion = flutterSdkVersion(pathToFlutterSdk);
+          some: (flutterSdkPath) {
+            final actualVersion = flutterSdkVersion(flutterSdkPath: flutterSdkPath);
             if (actualVersion != ctxVersion) {
               print('Flutter version change detected:\n'
                   'was: $ctxVersion\n'
