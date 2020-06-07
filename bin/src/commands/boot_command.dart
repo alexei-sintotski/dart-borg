@@ -139,10 +139,9 @@ class BootCommand extends Command<void> {
         }
 
         if (ctx.dartSdkVersion != dartSdkVersion && ctx.dartSdkVersion.isNotEmpty) {
-          print('Dart version change detected:\n'
-              '\twas: ${ctx.dartSdkVersion}\n'
-              '\tnow: $dartSdkVersion\n'
-              'Bootstrapping of all packages required\n');
+          print('Dart version change detected, bootstrapping of all packages required\n'
+              '\tprevious version: ${ctx.dartSdkVersion}\n'
+              '\tcurrent version:  $dartSdkVersion\n');
           return packages;
         }
 
@@ -211,10 +210,10 @@ class BootCommand extends Command<void> {
           some: (flutterSdkPath) {
             final actualVersion = flutterSdkVersion(flutterSdkPath: flutterSdkPath);
             if (actualVersion != ctxVersion) {
-              print('Flutter version change detected:\n'
-                  'was: $ctxVersion\n'
-                  'now: $actualVersion\n'
-                  'Bootstrapping of all packages required\n');
+              print('Flutter version change detected, bootstrapping of all packages required\n'
+                  '$ctxVersion\n'
+                  '=>\n'
+                  '$actualVersion\n');
             }
             return ctxVersion != actualVersion;
           },
