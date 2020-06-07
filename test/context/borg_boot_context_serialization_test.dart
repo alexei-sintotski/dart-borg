@@ -85,7 +85,7 @@ void main() {
         );
         final context = factory.createBorgContext();
 
-        test('it provides Dart SDK version UNKNOWN', () {
+        test('it provides empty string for Dart SDK version', () {
           expect(context.bootContext.unsafe.dartSdkVersion, isEmpty);
         });
       });
@@ -96,8 +96,21 @@ void main() {
         );
         final context = factory.createBorgContext();
 
-        test('it provides empty string for Dart SDK version', () {
+        test('it provides correct Dart SDK version', () {
           expect(context.bootContext.unsafe.dartSdkVersion, dartSdkVersion);
+        });
+      });
+
+      group('given context object with boot context', () {
+        const context = BorgContext(
+          bootContext: Optional(BorgBootContext(dartSdkVersion: dartSdkVersion, gitref: gitref)),
+        );
+
+        test('it creates context file with correct Dart SDK version', () {
+          BorgContextFactory(saveStringToFileSync: (_, content) {
+            final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
+            expect(BorgContext.fromJson(jsonContent).bootContext.unsafe.dartSdkVersion, dartSdkVersion);
+          }).save(context: context);
         });
       });
     });
@@ -214,6 +227,60 @@ void main() {
         });
       });
     });
+
+    group('handling of Flutter SDK version', () {
+      group('given context file without specified Flutter SDK version', () {
+        final factory = BorgContextFactory(
+          tryToReadFileSync: (_) => const Optional(contextWithBootContextWithGitrefOnly),
+        );
+        final context = factory.createBorgContext();
+
+        test('it provides context object without Flutter SDK version', () {
+          expect(context.bootContext.unsafe.flutterSdkVersion.hasValue, isFalse);
+        });
+      });
+
+      group('given context file with boot context containing Flutter SDK version', () {
+        final factory = BorgContextFactory(
+          tryToReadFileSync: (_) => const Optional(contextWithFlutterSdkVersion),
+        );
+        final context = factory.createBorgContext();
+
+        test('it provides correct Flutter SDK version', () {
+          expect(context.bootContext.unsafe.flutterSdkVersion.unsafe, flutterSdkVersion);
+        });
+      });
+
+      group('given context object with boot context without Flutter SDK version', () {
+        const context = BorgContext(
+          bootContext: Optional(BorgBootContext(dartSdkVersion: dartSdkVersion, gitref: gitref)),
+        );
+
+        test('it creates context file without Flutter SDK version', () {
+          BorgContextFactory(saveStringToFileSync: (_, content) {
+            final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
+            expect(BorgContext.fromJson(jsonContent).bootContext.unsafe.flutterSdkVersion.hasValue, isFalse);
+          }).save(context: context);
+        });
+      });
+
+      group('given context object with boot context with Flutter SDK version', () {
+        const context = BorgContext(
+          bootContext: Optional(BorgBootContext(
+            dartSdkVersion: dartSdkVersion,
+            gitref: gitref,
+            flutterSdkVersion: Optional(flutterSdkVersion),
+          )),
+        );
+
+        test('it creates context file with correct Flutter SDK version', () {
+          BorgContextFactory(saveStringToFileSync: (_, content) {
+            final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
+            expect(BorgContext.fromJson(jsonContent).bootContext.unsafe.flutterSdkVersion.unsafe, flutterSdkVersion);
+          }).save(context: context);
+        });
+      });
+    });
   });
 }
 
@@ -237,3 +304,20 @@ last_successful_bootstrap:
   gitref: $gitref
   dart_sdk_version: $dartSdkVersion
 ''';
+
+const flutterSdkVersion = '''
+Flutter 1.17.2 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 5f21edf8b6 (10 days ago) • 2020-05-28 12:44:12 -0700
+Engine • revision b851c71829
+Tools • Dart 2.8.3
+''';
+const contextWithFlutterSdkVersion = '''
+last_successful_bootstrap:
+  dart_sdk_version: $dartSdkVersion
+  gitref: $gitref
+  flutter_sdk_version: |
+    Flutter 1.17.2 • channel stable • https://github.com/flutter/flutter.git
+    Framework • revision 5f21edf8b6 (10 days ago) • 2020-05-28 12:44:12 -0700
+    Engine • revision b851c71829
+    Tools • Dart 2.8.3
+ ''';
