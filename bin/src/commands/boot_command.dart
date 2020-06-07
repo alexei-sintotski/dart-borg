@@ -32,7 +32,6 @@ import 'package:borg/src/context/borg_boot_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
 import 'package:borg/src/impact/impact_based_on_pubspec_yaml.dart';
-import 'package:borg/src/utils/platform_version.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:plain_optional/plain_optional.dart';
@@ -43,6 +42,7 @@ import '../resolve_dependencies.dart';
 import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
 import '../utils/git.dart';
+import '../utils/platform_version.dart';
 import '../utils/render_package_name.dart';
 
 // ignore_for_file: avoid_print

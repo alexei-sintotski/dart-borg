@@ -27,17 +27,15 @@
 
 import 'package:meta/meta.dart';
 
-import '../utils/platform_version.dart' as platform;
-
 // ignore_for_file: sort_constructors_first, avoid_as
 
 @immutable
 class BorgBootContext {
-  BorgBootContext({
+  const BorgBootContext({
+    @required this.dartSdkVersion,
     @required this.gitref,
-    String dartSdkVersion,
     this.modifiedPackages = const [],
-  }) : dartSdkVersion = dartSdkVersion ?? platform.dartSdkVersion;
+  });
 
   final String dartSdkVersion;
   final String gitref;
