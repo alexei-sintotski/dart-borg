@@ -225,11 +225,7 @@ class BootCommand extends Command<void> {
           },
         ),
         none: () => configuration.flutterSdkPath.iif(
-          some: (p) {
-            print('Path to Flutter SDK has become defined\n'
-                'Bootstrapping of all packages required\n');
-            return true;
-          },
+          some: (p) => false,
           none: () => false,
         ),
       );
