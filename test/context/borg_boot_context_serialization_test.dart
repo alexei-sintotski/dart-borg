@@ -28,6 +28,7 @@ import 'dart:convert';
 import 'package:borg/src/context/borg_boot_context.dart';
 import 'package:borg/src/context/borg_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
+import 'package:borg/src/utils/platform_version.dart' as platform;
 import 'package:plain_optional/plain_optional.dart';
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
@@ -78,6 +79,38 @@ void main() {
       });
     });
 
+    group('handling of Dart SDK version', () {
+      group('given no Dart SDK version specified at the creation of boot ', () {
+        final context = BorgBootContext(gitref: gitref);
+
+        test('it provides current Dart SDK version', () {
+          expect(context.dartSdkVersion, platform.dartSdkVersion);
+        });
+      });
+
+      group('given context file without boot context containing Dart SDK version', () {
+        final factory = BorgContextFactory(
+          tryToReadFileSync: (_) => const Optional(contextWithBootContextWithGitrefOnly),
+        );
+        final context = factory.createBorgContext();
+
+        test('it provides Dart SDK version UNKNOWN', () {
+          expect(context.bootContext.unsafe.dartSdkVersion, isEmpty);
+        });
+      });
+
+      group('given context file with boot context containing Dart SDK version', () {
+        final factory = BorgContextFactory(
+          tryToReadFileSync: (_) => const Optional(contextWithDartSdkVersion),
+        );
+        final context = factory.createBorgContext();
+
+        test('it provides empty string for Dart SDK version', () {
+          expect(context.bootContext.unsafe.dartSdkVersion, dartSdkVersion);
+        });
+      });
+    });
+
     group('handling of gitref', () {
       group('given context file with boot context containing gitref', () {
         final factory = BorgContextFactory(
@@ -99,7 +132,7 @@ void main() {
       });
 
       group('given context object with boot context', () {
-        const context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitref)));
+        final context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitref)));
 
         test('it provides content to save', () {
           BorgContextFactory(saveStringToFileSync: (_, content) {
@@ -123,7 +156,7 @@ void main() {
       });
 
       group('given last successful boot gitref covertible to a number in YAML', () {
-        const context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitrefThatLooksLikeANumber)));
+        final context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitrefThatLooksLikeANumber)));
         String contextString;
         BorgContextFactory(saveStringToFileSync: (_, content) => contextString = content).save(context: context);
 
@@ -158,7 +191,7 @@ void main() {
       });
 
       group('given context object with empty list of modified packages', () {
-        const context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitref)));
+        final context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitref)));
         test('it produces context file with empty list of modified_packages', () {
           BorgContextFactory(saveStringToFileSync: (_, content) {
             final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
@@ -169,7 +202,7 @@ void main() {
 
       group('given context object with non-empty list of modified packages', () {
         const modifiedPackages = ['a', 'b', 'c'];
-        const context = BorgContext(
+        final context = BorgContext(
           bootContext: Optional(BorgBootContext(
             gitref: gitref,
             modifiedPackages: modifiedPackages,
@@ -198,4 +231,11 @@ const contextWithBootContextWithModifiedPackages = '''
 last_successful_bootstrap:
   gitref: $gitref
   modified_packages: [a, b, c]
+''';
+
+const dartSdkVersion = '1.0.0 (stable) (Tue May 26 18:39:38 2020 +0200) on macos_x64';
+const contextWithDartSdkVersion = '''
+last_successful_bootstrap:
+  gitref: $gitref
+  dart_sdk_version: $dartSdkVersion
 ''';

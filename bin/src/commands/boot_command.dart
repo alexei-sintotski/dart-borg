@@ -32,6 +32,7 @@ import 'package:borg/src/context/borg_boot_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
 import 'package:borg/src/impact/impact_based_on_pubspec_yaml.dart';
+import 'package:borg/src/utils/platform_version.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:plain_optional/plain_optional.dart';
@@ -96,6 +97,7 @@ class BootCommand extends Command<void> {
     contextFactory.save(
       context: context.copyWith(
         bootContext: Optional(BorgBootContext(
+          dartSdkVersion: dartSdkVersion,
           gitref: gitHead(),
           modifiedPackages: _getPackageDiff(gitref: 'HEAD').map(path.relative),
         )),
@@ -129,6 +131,14 @@ class BootCommand extends Command<void> {
 
     final packagesToBoot = context.iif(
       some: (ctx) {
+        if (ctx.dartSdkVersion != dartSdkVersion && ctx.dartSdkVersion.isNotEmpty) {
+          print('Dart version change detected:\n'
+              '\twas: ${ctx.dartSdkVersion}\n'
+              '\tnow: $dartSdkVersion\n'
+              'Bootstrapping of all packages required\n');
+          return packages;
+        }
+
         final packageDiff = {
           ..._getPackageDiff(gitref: ctx.gitref),
           ...ctx.modifiedPackages.map(path.canonicalize),
