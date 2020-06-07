@@ -28,7 +28,6 @@ import 'dart:convert';
 import 'package:borg/src/context/borg_boot_context.dart';
 import 'package:borg/src/context/borg_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
-import 'package:borg/src/utils/platform_version.dart' as platform;
 import 'package:plain_optional/plain_optional.dart';
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
@@ -80,14 +79,6 @@ void main() {
     });
 
     group('handling of Dart SDK version', () {
-      group('given no Dart SDK version specified at the creation of boot ', () {
-        final context = BorgBootContext(gitref: gitref);
-
-        test('it provides current Dart SDK version', () {
-          expect(context.dartSdkVersion, platform.dartSdkVersion);
-        });
-      });
-
       group('given context file without boot context containing Dart SDK version', () {
         final factory = BorgContextFactory(
           tryToReadFileSync: (_) => const Optional(contextWithBootContextWithGitrefOnly),
@@ -132,7 +123,9 @@ void main() {
       });
 
       group('given context object with boot context', () {
-        final context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitref)));
+        const context = BorgContext(
+          bootContext: Optional(BorgBootContext(dartSdkVersion: dartSdkVersion, gitref: gitref)),
+        );
 
         test('it provides content to save', () {
           BorgContextFactory(saveStringToFileSync: (_, content) {
@@ -156,7 +149,9 @@ void main() {
       });
 
       group('given last successful boot gitref covertible to a number in YAML', () {
-        final context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitrefThatLooksLikeANumber)));
+        const context = BorgContext(
+          bootContext: Optional(BorgBootContext(dartSdkVersion: dartSdkVersion, gitref: gitrefThatLooksLikeANumber)),
+        );
         String contextString;
         BorgContextFactory(saveStringToFileSync: (_, content) => contextString = content).save(context: context);
 
@@ -191,7 +186,9 @@ void main() {
       });
 
       group('given context object with empty list of modified packages', () {
-        final context = BorgContext(bootContext: Optional(BorgBootContext(gitref: gitref)));
+        const context = BorgContext(
+          bootContext: Optional(BorgBootContext(dartSdkVersion: dartSdkVersion, gitref: gitref)),
+        );
         test('it produces context file with empty list of modified_packages', () {
           BorgContextFactory(saveStringToFileSync: (_, content) {
             final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
@@ -202,8 +199,9 @@ void main() {
 
       group('given context object with non-empty list of modified packages', () {
         const modifiedPackages = ['a', 'b', 'c'];
-        final context = BorgContext(
+        const context = BorgContext(
           bootContext: Optional(BorgBootContext(
+            dartSdkVersion: dartSdkVersion,
             gitref: gitref,
             modifiedPackages: modifiedPackages,
           )),
