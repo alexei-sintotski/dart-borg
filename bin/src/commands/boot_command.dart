@@ -109,7 +109,7 @@ class BootCommand extends Command<void> {
           bootContext: Optional(BorgBootContext(
               dartSdkVersion: dartSdkVersion,
               gitref: gitHead(),
-              bootMode: BootMode.basic,
+              bootMode: getBootModeOption(argResults),
               modifiedPackages: _getPackageDiff(gitref: 'HEAD').map(path.relative),
               flutterSdkVersion: configuration.flutterSdkPath.iif(
                 some: (flutterSdkPath) => Optional(flutterSdkVersion(flutterSdkPath: flutterSdkPath)),
