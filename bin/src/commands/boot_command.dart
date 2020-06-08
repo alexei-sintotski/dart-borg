@@ -26,6 +26,7 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:borg/src/boot_mode.dart';
 import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/configuration/factory.dart';
 import 'package:borg/src/context/borg_boot_context.dart';
@@ -108,6 +109,7 @@ class BootCommand extends Command<void> {
           bootContext: Optional(BorgBootContext(
               dartSdkVersion: dartSdkVersion,
               gitref: gitHead(),
+              bootMode: BootMode.basic,
               modifiedPackages: _getPackageDiff(gitref: 'HEAD').map(path.relative),
               flutterSdkVersion: configuration.flutterSdkPath.iif(
                 some: (flutterSdkPath) => Optional(flutterSdkVersion(flutterSdkPath: flutterSdkPath)),

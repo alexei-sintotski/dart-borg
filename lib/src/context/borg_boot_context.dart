@@ -28,25 +28,30 @@
 import 'package:meta/meta.dart';
 import 'package:plain_optional/plain_optional.dart';
 
+import '../boot_mode.dart';
+
 // ignore_for_file: sort_constructors_first, avoid_as
 
 @immutable
 class BorgBootContext {
-  const BorgBootContext({
-    @required this.dartSdkVersion,
-    @required this.gitref,
-    this.modifiedPackages = const [],
-    this.flutterSdkVersion = const Optional.none(),
-  });
-
   final String dartSdkVersion;
   final String gitref;
   final Iterable<String> modifiedPackages;
   final Optional<String> flutterSdkVersion;
+  final BootMode bootMode;
+
+  const BorgBootContext({
+    @required this.dartSdkVersion,
+    @required this.gitref,
+    @required this.bootMode,
+    this.modifiedPackages = const [],
+    this.flutterSdkVersion = const Optional.none(),
+  });
 
   factory BorgBootContext.fromJson(Map<String, dynamic> json) => BorgBootContext(
         dartSdkVersion: json.containsKey(_dartSdkVersionKey) ? json[_dartSdkVersionKey] as String : '',
         gitref: json[_gitrefKey] as String,
+        bootMode: json.containsKey(_bootModeKey) ? _parseBootMode(json[_bootModeKey] as String) : BootMode.basic,
         modifiedPackages: json.containsKey(_modifiedPackagesKey)
             // ignore: avoid_annotating_with_dynamic
             ? (json[_modifiedPackagesKey] as List).map((dynamic p) => p as String)
@@ -59,6 +64,7 @@ class BorgBootContext {
   Map<String, dynamic> toJson() => <String, dynamic>{
         _dartSdkVersionKey: dartSdkVersion,
         _gitrefKey: '"$gitref"',
+        if (bootMode == BootMode.incremental) _bootModeKey: _incrementalValue,
         if (modifiedPackages.isNotEmpty) _modifiedPackagesKey: modifiedPackages.toList(),
         if (flutterSdkVersion.hasValue)
           _flutterSdkVersionKey: flutterSdkVersion.iif(
@@ -68,7 +74,11 @@ class BorgBootContext {
       };
 }
 
+BootMode _parseBootMode(String s) => s == _incrementalValue ? BootMode.incremental : BootMode.basic;
+
 const _gitrefKey = 'gitref';
 const _modifiedPackagesKey = 'modified_packages';
 const _dartSdkVersionKey = 'dart_sdk_version';
 const _flutterSdkVersionKey = 'flutter_sdk_version';
+const _bootModeKey = 'boot_mode';
+const _incrementalValue = 'incremental';

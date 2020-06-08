@@ -25,6 +25,7 @@
 
 import 'dart:convert';
 
+import 'package:borg/src/boot_mode.dart';
 import 'package:borg/src/context/borg_boot_context.dart';
 import 'package:borg/src/context/borg_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
@@ -103,7 +104,11 @@ void main() {
 
       group('given context object with boot context', () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(dartSdkVersion: dartSdkVersion, gitref: gitref)),
+          bootContext: Optional(BorgBootContext(
+            dartSdkVersion: dartSdkVersion,
+            gitref: gitref,
+            bootMode: BootMode.basic,
+          )),
         );
 
         test('it creates context file with correct Dart SDK version', () {
@@ -137,7 +142,11 @@ void main() {
 
       group('given context object with boot context', () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(dartSdkVersion: dartSdkVersion, gitref: gitref)),
+          bootContext: Optional(BorgBootContext(
+            dartSdkVersion: dartSdkVersion,
+            gitref: gitref,
+            bootMode: BootMode.basic,
+          )),
         );
 
         test('it provides content to save', () {
@@ -163,7 +172,11 @@ void main() {
 
       group('given last successful boot gitref covertible to a number in YAML', () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(dartSdkVersion: dartSdkVersion, gitref: gitrefThatLooksLikeANumber)),
+          bootContext: Optional(BorgBootContext(
+            dartSdkVersion: dartSdkVersion,
+            gitref: gitrefThatLooksLikeANumber,
+            bootMode: BootMode.basic,
+          )),
         );
         String contextString;
         BorgContextFactory(saveStringToFileSync: (_, content) => contextString = content).save(context: context);
@@ -171,6 +184,75 @@ void main() {
         test('it does not crash while loading context containing this gitref', () {
           expect(contextString, isNotNull);
           BorgContextFactory(tryToReadFileSync: (_) => Optional(contextString)).createBorgContext();
+        });
+      });
+    });
+
+    group('handling of boot mode', () {
+      group('given context file without boot mode specified', () {
+        final factory = BorgContextFactory(
+          tryToReadFileSync: (_) => const Optional(contextWithBootContextWithGitrefOnly),
+        );
+        final context = factory.createBorgContext();
+
+        test('it produces context with boot mode basic', () {
+          expect(context.bootContext.unsafe.bootMode, BootMode.basic);
+        });
+      });
+
+      group('given context file with boot mode basic specified', () {
+        final factory = BorgContextFactory(
+          tryToReadFileSync: (_) => const Optional(contextWithBootModeBasic),
+        );
+        final context = factory.createBorgContext();
+
+        test('it produces context with boot mode basic', () {
+          expect(context.bootContext.unsafe.bootMode, BootMode.basic);
+        });
+      });
+
+      group('given context file with boot mode incremental specified', () {
+        final factory = BorgContextFactory(
+          tryToReadFileSync: (_) => const Optional(contextWithBootModeIncremental),
+        );
+        final context = factory.createBorgContext();
+
+        test('it produces context with boot mode incremental', () {
+          expect(context.bootContext.unsafe.bootMode, BootMode.incremental);
+        });
+      });
+
+      group('given context object with boot mode basic', () {
+        const context = BorgContext(
+          bootContext: Optional(BorgBootContext(
+            dartSdkVersion: dartSdkVersion,
+            gitref: gitref,
+            bootMode: BootMode.basic,
+          )),
+        );
+
+        test('it save boot context with boot mode basic', () {
+          BorgContextFactory(saveStringToFileSync: (_, content) {
+            final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
+            expect(BorgContext.fromJson(jsonContent).bootContext.unsafe.bootMode, BootMode.basic);
+          }).save(context: context);
+        });
+      });
+
+      group('given context object with boot mode incremental', () {
+        const context = BorgContext(
+          bootContext: Optional(BorgBootContext(
+            dartSdkVersion: dartSdkVersion,
+            gitref: gitref,
+            bootMode: BootMode.incremental,
+          )),
+        );
+
+        test('it save boot context with boot mode incremental', () {
+          BorgContextFactory(saveStringToFileSync: (_, content) {
+            final jsonContent = json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>;
+            expect(BorgContext.fromJson(jsonContent).bootContext.unsafe.bootMode, BootMode.incremental);
+          }).save(context: context);
         });
       });
     });
@@ -200,7 +282,11 @@ void main() {
 
       group('given context object with empty list of modified packages', () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(dartSdkVersion: dartSdkVersion, gitref: gitref)),
+          bootContext: Optional(BorgBootContext(
+            dartSdkVersion: dartSdkVersion,
+            gitref: gitref,
+            bootMode: BootMode.basic,
+          )),
         );
         test('it produces context file with empty list of modified_packages', () {
           BorgContextFactory(saveStringToFileSync: (_, content) {
@@ -216,6 +302,7 @@ void main() {
           bootContext: Optional(BorgBootContext(
             dartSdkVersion: dartSdkVersion,
             gitref: gitref,
+            bootMode: BootMode.basic,
             modifiedPackages: modifiedPackages,
           )),
         );
@@ -253,7 +340,11 @@ void main() {
 
       group('given context object with boot context without Flutter SDK version', () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(dartSdkVersion: dartSdkVersion, gitref: gitref)),
+          bootContext: Optional(BorgBootContext(
+            dartSdkVersion: dartSdkVersion,
+            gitref: gitref,
+            bootMode: BootMode.basic,
+          )),
         );
 
         test('it creates context file without Flutter SDK version', () {
@@ -269,6 +360,7 @@ void main() {
           bootContext: Optional(BorgBootContext(
             dartSdkVersion: dartSdkVersion,
             gitref: gitref,
+            bootMode: BootMode.basic,
             flutterSdkVersion: Optional(flutterSdkVersion),
           )),
         );
@@ -321,3 +413,17 @@ last_successful_bootstrap:
     Engine • revision b851c71829
     Tools • Dart 2.8.3
  ''';
+
+const contextWithBootModeBasic = '''
+last_successful_bootstrap:
+  gitref: $gitref
+  dart_sdk_version: $dartSdkVersion
+  boot_mode: basic
+''';
+
+const contextWithBootModeIncremental = '''
+last_successful_bootstrap:
+  gitref: $gitref
+  dart_sdk_version: $dartSdkVersion
+  boot_mode: incremental
+''';
