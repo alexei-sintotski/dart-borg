@@ -23,33 +23,9 @@
  *
  */
 
-import 'package:args/args.dart';
-import 'package:borg/src/boot_mode.dart';
+// ignore_for_file: public_member_api_docs
 
-void addBootModeOption(ArgParser argParser) => argParser.addOption(
-      _name,
-      abbr: 'm',
-      help: 'Sets bootstrapping mode',
-      allowed: [
-        _basicValue,
-        _incrementalValue,
-      ],
-      allowedHelp: {
-        _basicValue: 'Bootstrap all packages found during package scan or specified in the command line',
-        _incrementalValue:
-            'Bootstrap only packages with dependencies updated since the last successful bootstrapping (EXPERIMENTAL)',
-      },
-      defaultsTo: _basicValue,
-    );
-
-// ignore: avoid_as
-BootMode getBootModeOption(ArgResults argResults) => _optionString2Enum[argResults[_name] as String];
-
-const _name = 'mode';
-const _basicValue = 'basic';
-const _incrementalValue = 'incremental';
-
-const _optionString2Enum = {
-  _basicValue: BootMode.basic,
-  _incrementalValue: BootMode.incremental,
-};
+enum BootMode {
+  basic,
+  incremental,
+}
