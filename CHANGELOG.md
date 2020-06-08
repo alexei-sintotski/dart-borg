@@ -5,6 +5,7 @@ Maturing of incremental bootstrapping implementation:
 * Incremental bootstrapping is ignored when Flutter SDK version is changed between runs of borg boot
 * Incremental bootstrapping is ignored when command line specifies packages to bootstrap
 * Incremental bootstrapping ignores previous bootstrapping of specific (not all) packages
+* Boot mode switch is persistent
 
 ## [1.4.1] - 2020-06-04
 * Incremental bootstrapping takes dependencies between packages in the mono repository into account
