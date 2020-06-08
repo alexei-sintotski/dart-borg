@@ -87,34 +87,38 @@ class BootCommand extends Command<void> {
         );
         break;
       case BootMode.incremental:
-        if (argResults.rest.isEmpty) {
-          _executeIncrementalBootstrapping(
-            packages: packages,
-            configuration: configuration,
-            context: context.bootContext,
-          );
-        } else {
+        if (_isPartialBootstrappingRequested()) {
           print('Bootstrapping of specific packages is requested, using basic bootstrapping\n');
           _executeBasicBootstrapping(
             packages: packages,
             configuration: configuration,
           );
+        } else {
+          _executeIncrementalBootstrapping(
+            packages: packages,
+            configuration: configuration,
+            context: context.bootContext,
+          );
         }
     }
 
-    contextFactory.save(
-      context: context.copyWith(
-        bootContext: Optional(BorgBootContext(
-            dartSdkVersion: dartSdkVersion,
-            gitref: gitHead(),
-            modifiedPackages: _getPackageDiff(gitref: 'HEAD').map(path.relative),
-            flutterSdkVersion: configuration.flutterSdkPath.iif(
-              some: (flutterSdkPath) => Optional(flutterSdkVersion(flutterSdkPath: flutterSdkPath)),
-              none: () => const Optional.none(),
-            ))),
-      ),
-    );
+    if (!_isPartialBootstrappingRequested()) {
+      contextFactory.save(
+        context: context.copyWith(
+          bootContext: Optional(BorgBootContext(
+              dartSdkVersion: dartSdkVersion,
+              gitref: gitHead(),
+              modifiedPackages: _getPackageDiff(gitref: 'HEAD').map(path.relative),
+              flutterSdkVersion: configuration.flutterSdkPath.iif(
+                some: (flutterSdkPath) => Optional(flutterSdkVersion(flutterSdkPath: flutterSdkPath)),
+                none: () => const Optional.none(),
+              ))),
+        ),
+      );
+    }
   }
+
+  bool _isPartialBootstrappingRequested() => argResults.rest.isNotEmpty;
 
   void _executeBasicBootstrapping({
     @required Iterable<DartPackage> packages,
@@ -133,7 +137,9 @@ class BootCommand extends Command<void> {
   }
 
   Iterable<DartPackage> _selectPackagesSpecifiedInCommandLine(Iterable<DartPackage> packages) =>
-      argResults.rest.isEmpty ? packages : packages.where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)));
+      _isPartialBootstrappingRequested()
+          ? packages.where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)))
+          : packages;
 
   void _executeIncrementalBootstrapping({
     @required Iterable<DartPackage> packages,
