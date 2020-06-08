@@ -170,14 +170,24 @@ than its Flutter counterpart.
 ## Experimental: Incremental bootstrapping
 
 Execution of `pub get` / `flutter packages get` can take several minutes for large repositories of tens and hundreds of
-packages. On the other hand, developer's workspace is updated typically in small steps, only several packages at the
+packages. On the other hand, developer's workspace is updated typically in small steps, only several packages at a
 time. Therefore, there should be no need to bootstrap the entire repository all the time, only the packages with
-changed pubspec files.
+changed pubspec files and packages depending on them.
 
 Every time `borg boot` is finished successfully, it records git commit at the end of its execution and stores to
 file `.dart_tool/borg/context.yaml`. When developer executes the command in incremental boostrapping mode
 (`borg boot --mode=incremental`), the tool compares the repository changes since the last successful boot and
 executes `pub get` / `flutter packages get` only for packages with changed configuration and packages depending on them.
+
+In some cases incremental bootstrapping is not available and basic bootstrapping is enforced:
+
+* Developer uses command line to bootstrap specific packages
+* `borg boot` detects Dart version update since the last successful bootstrapping
+* `borg boot` detects Flutter SDK update since the last successful bootstrapping
+
+Please note that `borg boot --mode=incremental` switches `borg boot` to incremental mode for subsequent runs. This means
+that you do not need to specify boot mode every time you run `borg boot`. `boot borg --mode=basic` switches back to the
+basic bootstrapping mode executing `pub get` / `flutter packages get` for all found packages.
 
 As incremental bootstrapping is still under development, it should not be used in critical use cases, for example,
 in continuous integration pipelines.

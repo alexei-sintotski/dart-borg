@@ -1,3 +1,11 @@
+## [1.4.2] - 2020-06-08
+Maturing of incremental bootstrapping implementation:
+* Correct handling of rolled back changes of pubspec files
+* Incremental bootstrapping is ignored when Dart version is changed between runs of borg boot
+* Incremental bootstrapping is ignored when Flutter SDK version is changed between runs of borg boot
+* Incremental bootstrapping is ignored when command line specifies packages to bootstrap
+* Incremental bootstrapping ignores previous bootstrapping of specific (not all) packages
+
 ## [1.4.1] - 2020-06-04
 * Incremental bootstrapping takes dependencies between packages in the mono repository into account
 
