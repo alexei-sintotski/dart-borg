@@ -25,21 +25,25 @@
 
 import 'package:args/args.dart';
 import 'package:borg/src/boot_mode.dart';
+import 'package:meta/meta.dart';
 
-void addBootModeOption(ArgParser argParser) => argParser.addOption(
+void addBootModeOption(ArgParser argParser, {@required BootMode defaultsTo}) => argParser.addOption(
       _name,
       abbr: 'm',
-      help: 'Sets bootstrapping mode',
+      help: 'Switches borg to the specified bootstrapping mode -- all subsequent borg runs will use the specified mode '
+          'until another mode is selected in command line',
       allowed: [
         _basicValue,
         _incrementalValue,
       ],
       allowedHelp: {
-        _basicValue: 'Bootstrap all packages found during package scan or specified in the command line',
+        _basicValue:
+            'Switches borg to bootstrap all packages found during package scan or specified in the command line',
         _incrementalValue:
-            'Bootstrap only packages with dependencies updated since the last successful bootstrapping (EXPERIMENTAL)',
+            'Switches borg to bootstrapping only packages with dependencies updated since the last successful '
+                'bootstrapping (EXPERIMENTAL)',
       },
-      defaultsTo: _basicValue,
+      defaultsTo: _optionEnum2String[defaultsTo],
     );
 
 // ignore: avoid_as
@@ -52,4 +56,9 @@ const _incrementalValue = 'incremental';
 const _optionString2Enum = {
   _basicValue: BootMode.basic,
   _incrementalValue: BootMode.incremental,
+};
+
+const _optionEnum2String = {
+  BootMode.basic: _basicValue,
+  BootMode.incremental: _incrementalValue,
 };

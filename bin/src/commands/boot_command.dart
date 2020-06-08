@@ -30,6 +30,7 @@ import 'package:borg/src/boot_mode.dart';
 import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/configuration/factory.dart';
 import 'package:borg/src/context/borg_boot_context.dart';
+import 'package:borg/src/context/borg_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
 import 'package:borg/src/impact/impact_based_on_pubspec_yaml.dart';
@@ -49,9 +50,13 @@ import '../utils/render_package_name.dart';
 // ignore_for_file: avoid_print
 
 class BootCommand extends Command<void> {
-  BootCommand() {
+  BootCommand() : context = contextFactory.createBorgContext() {
     configurationFactory.populateConfigurationArgs(argParser);
-    addBootModeOption(argParser);
+    addBootModeOption(argParser,
+        defaultsTo: context.bootContext.iif(
+          some: (ctx) => ctx.bootMode,
+          none: () => BootMode.basic,
+        ));
     addVerboseFlag(argParser);
   }
 
@@ -59,7 +64,7 @@ class BootCommand extends Command<void> {
   String get description => 'Executes "pub get" for multiple packages in repository\n\n'
       'Packages to bootstrap can be specified as arguments. '
       'If no arguments are supplied, the command bootstraps all scanned packages.\n'
-      'If path to Flutter SDK is defined, "flutter packages get" is used to resolve dependencies.';
+      '"flutter packages get" is used to resolve dependencies for Flutter packages.';
 
   @override
   String get name => 'boot';
@@ -67,12 +72,13 @@ class BootCommand extends Command<void> {
   @override
   void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
 
-  final BorgConfigurationFactory configurationFactory = BorgConfigurationFactory();
+  static final BorgConfigurationFactory configurationFactory = BorgConfigurationFactory();
+  // ignore: prefer_const_constructors
+  static final BorgContextFactory contextFactory = BorgContextFactory();
+  final BorgContext context;
 
   void _run() {
     final configuration = configurationFactory.createConfiguration(argResults: argResults);
-    // ignore: prefer_const_constructors
-    final contextFactory = BorgContextFactory();
     final context = contextFactory.createBorgContext();
 
     final packages = scanForPackages(
@@ -148,7 +154,7 @@ class BootCommand extends Command<void> {
     @required BorgConfiguration configuration,
     @required Optional<BorgBootContext> context,
   }) {
-    print('WARNING: Incremental bootstrapping selected, this feature is still EXPERIMENTAL!\n');
+    print('WARNING: Using incremental bootstrapping, this feature is still EXPERIMENTAL!\n');
 
     final packagesToBoot = context.iif(
       some: (ctx) {
