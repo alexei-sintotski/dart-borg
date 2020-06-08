@@ -87,11 +87,19 @@ class BootCommand extends Command<void> {
         );
         break;
       case BootMode.incremental:
-        _executeIncrementalBootstrapping(
-          packages: packages,
-          configuration: configuration,
-          context: context.bootContext,
-        );
+        if (argResults.rest.isEmpty) {
+          _executeIncrementalBootstrapping(
+            packages: packages,
+            configuration: configuration,
+            context: context.bootContext,
+          );
+        } else {
+          print('Bootstrapping of specific packages is requested, using basic bootstrapping\n');
+          _executeBasicBootstrapping(
+            packages: packages,
+            configuration: configuration,
+          );
+        }
     }
 
     contextFactory.save(
@@ -112,8 +120,7 @@ class BootCommand extends Command<void> {
     @required Iterable<DartPackage> packages,
     @required BorgConfiguration configuration,
   }) {
-    final packagesToBoot =
-        argResults.rest.isEmpty ? packages : packages.where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)));
+    final packagesToBoot = _selectPackagesSpecifiedInCommandLine(packages);
 
     if (packagesToBoot.isEmpty) {
       throw const BorgException('\nFATAL: Nothing to do, please check command line');
@@ -124,6 +131,9 @@ class BootCommand extends Command<void> {
       configuration: configuration,
     );
   }
+
+  Iterable<DartPackage> _selectPackagesSpecifiedInCommandLine(Iterable<DartPackage> packages) =>
+      argResults.rest.isEmpty ? packages : packages.where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)));
 
   void _executeIncrementalBootstrapping({
     @required Iterable<DartPackage> packages,
