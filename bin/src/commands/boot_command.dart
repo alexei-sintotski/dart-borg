@@ -198,7 +198,7 @@ class BootCommand extends Command<void> {
         final packagesUnderImpactSinceLastSuccessfulBoot = impactBasedOnPubspecYaml(
           packages: changedPackages,
           allPackages: {...packages, ...changedPackagesOutsideOfScope},
-        ).where((p) => !changedPackagesOutsideOfScope.any((pp) => pp.path == p.path));
+        ).where((p) => !changedPackagesOutsideOfScope.any((pp) => pp.path == p.path)).toSet();
         print('');
 
         return packagesUnderImpactSinceLastSuccessfulBoot;
