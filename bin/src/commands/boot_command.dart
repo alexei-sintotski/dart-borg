@@ -198,7 +198,7 @@ class BootCommand extends Command<void> {
           changedPackages: changedPackages,
           allPackages: packages,
         )) {
-          print('Massive configuration change detected, bootstrapping all packages...');
+          print('Massive configuration change detected, bootstrapping all packages...\n');
           return packages;
         }
 
