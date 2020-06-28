@@ -1,3 +1,6 @@
+## [1.4.3] - 2020-06-28
+* Improved performance of incremental bootstrapping for massive changes of packages configuration
+
 ## [1.4.2] - 2020-06-08
 Maturing of incremental bootstrapping implementation:
 * Correct handling of rolled back changes of pubspec files
