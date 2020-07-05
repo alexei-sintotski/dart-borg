@@ -66,11 +66,7 @@ class BorgBootContext {
         _gitrefKey: '"$gitref"',
         if (bootMode == BootMode.incremental) _bootModeKey: _incrementalValue,
         if (modifiedPackages.isNotEmpty) _modifiedPackagesKey: modifiedPackages.toList(),
-        if (flutterSdkVersion.hasValue)
-          _flutterSdkVersionKey: flutterSdkVersion.iif(
-            some: (v) => v,
-            none: () => null,
-          ),
+        if (flutterSdkVersion.hasValue) _flutterSdkVersionKey: flutterSdkVersion.valueOr(() => null),
       };
 }
 
