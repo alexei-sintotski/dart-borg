@@ -15,7 +15,6 @@ Feature roadmap:
 
 | version | Major feature                                                                                                            |
 |---------|--------------------------------------------------------------------------------------------------------------------------|
-| 1.4.x   | Productization of incremental bootstrapping                                                                              |
 | 1.5     | Ability to define commands in the configuration file                                                                     |
 | 1.6     | List outdated packages (requires Dart 2.8)                                                                               |
 | 1.7     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
@@ -167,7 +166,7 @@ results in fatal errors with message to the user.
 * Dart packages are always bootstrapped with `pub get`. The reason for this is that pub get has much higher performance
 than its Flutter counterpart.
 
-## Experimental: Incremental bootstrapping
+## Incremental bootstrapping
 
 Execution of `pub get` / `flutter packages get` can take several minutes for large repositories of tens and hundreds of
 packages. On the other hand, developer's workspace is updated typically in small steps, only several packages at a
@@ -188,9 +187,6 @@ In some cases incremental bootstrapping is not available and basic bootstrapping
 Please note that `borg boot --mode=incremental` switches `borg boot` to incremental mode for subsequent runs. This means
 that you do not need to specify boot mode every time you run `borg boot`. `boot borg --mode=basic` switches back to the
 basic bootstrapping mode executing `pub get` / `flutter packages get` for all found packages.
-
-As incremental bootstrapping is still under development, it should not be used in critical use cases, for example,
-in continuous integration pipelines.
 
 # Configuration file: borg.yaml
 

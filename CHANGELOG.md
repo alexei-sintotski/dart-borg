@@ -1,3 +1,8 @@
+## [1.4.4] - 2020-07-05
+* Production-grade incremental bootstrapping
+* Bootstrapping dependency analysis takes dependency overrides into account
+* Unit test coverage improvements
+
 ## [1.4.3] - 2020-06-28
 * Improved performance of incremental bootstrapping for massive changes of packages configuration
 
