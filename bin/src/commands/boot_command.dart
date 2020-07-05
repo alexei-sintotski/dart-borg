@@ -154,6 +154,8 @@ class BootCommand extends Command<void> {
     @required BorgConfiguration configuration,
     @required Optional<BorgBootContext> context,
   }) {
+    print('Analyzing workspace changes for incremental bootstrapping...\n');
+
     final packagesToBoot = context.iif(
       some: (ctx) {
         if (_isFlutterVersionChanged(context: ctx, configuration: configuration)) {
@@ -200,7 +202,7 @@ class BootCommand extends Command<void> {
           return packages;
         }
 
-        print('Analyzing package dependencies for incremental bootstrapping...');
+        print('Analyzing package dependencies...');
         final packagesUnderImpactSinceLastSuccessfulBoot = impactBasedOnPubspecYaml(
           packages: changedPackages,
           allPackagesInScope: {...packages, ...changedPackagesOutsideOfScope},
