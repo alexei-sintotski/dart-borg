@@ -41,7 +41,7 @@ void addBootModeOption(ArgParser argParser, {@required BootMode defaultsTo}) => 
             'Switches borg to bootstrap all packages found during package scan or specified in the command line',
         _incrementalValue:
             'Switches borg to bootstrapping only packages with dependencies updated since the last successful '
-                'bootstrapping (EXPERIMENTAL)',
+                'bootstrapping',
       },
       defaultsTo: _optionEnum2String[defaultsTo],
     );
