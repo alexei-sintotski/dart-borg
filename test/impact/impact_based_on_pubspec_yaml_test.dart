@@ -113,6 +113,16 @@ void main() {
         expect(packagesUnderImpact, {_packageA});
       });
     });
+
+    group('given input without dependencies between packages', () {
+      final packagesUnderImpact = impactBasedOnPubspecYaml(
+        packages: [_packageA],
+        allPackagesInScope: [_packageA, _packageB],
+      );
+      test('it returns the list of packages without modification', () {
+        expect(packagesUnderImpact, [_packageA]);
+      });
+    });
   });
 }
 
@@ -122,6 +132,10 @@ name: a
 
 final _packageB = DartPackage(path: canonicalize('b'), tryToReadFileSync: (_) => const Optional('''
 name: b
+dependencies:
+  y:
+dev_dependencies:
+  z:
 '''));
 
 final _packageC = DartPackage(path: canonicalize('c'), tryToReadFileSync: (_) => const Optional('''
@@ -173,7 +187,7 @@ dependency_overrides:
 '''));
 
 final _packageI = DartPackage(path: canonicalize('i'), tryToReadFileSync: (_) => const Optional('''
-name: h
+name: i
 dependencies:
   z:
     path: ../z
