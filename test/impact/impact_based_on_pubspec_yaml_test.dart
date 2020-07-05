@@ -82,6 +82,26 @@ void main() {
         expect(packagesUnderImpact, {_packageA, _packageE});
       });
     });
+
+    group('given input with packages, one directly depends on another via dependency override', () {
+      final packagesUnderImpact = impactBasedOnPubspecYaml(
+        packages: [_packageA],
+        allPackages: [_packageA, _packageG],
+      );
+      test('it returns the list containing both packages', () {
+        expect(packagesUnderImpact, {_packageA, _packageG});
+      });
+    });
+
+    group('given input with packages, one directly dev depends on another via dependency override', () {
+      final packagesUnderImpact = impactBasedOnPubspecYaml(
+        packages: [_packageA],
+        allPackages: [_packageA, _packageH],
+      );
+      test('it returns the list containing both packages', () {
+        expect(packagesUnderImpact, {_packageA, _packageH});
+      });
+    });
   });
 }
 
@@ -121,4 +141,22 @@ name: f
 dev_dependencies:
   e:
     path: ../e
+'''));
+
+final _packageG = DartPackage(path: canonicalize('g'), tryToReadFileSync: (_) => const Optional('''
+name: g
+dependencies:
+  a:
+dependency_overrides:
+  a:
+    path: ../a
+'''));
+
+final _packageH = DartPackage(path: canonicalize('h'), tryToReadFileSync: (_) => const Optional('''
+name: h
+dev_dependencies:
+  a:
+dependency_overrides:
+  a:
+    path: ../a
 '''));
