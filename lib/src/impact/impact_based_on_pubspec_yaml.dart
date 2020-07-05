@@ -27,6 +27,7 @@
 
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
+import 'package:pubspec_yaml/pubspec_yaml.dart';
 
 import '../dart_package/dart_package.dart';
 
@@ -35,27 +36,40 @@ extension _Package on DartPackage {
     DartPackage package,
     Iterable<DartPackage> allPackages,
   ) =>
-      pubspecYaml.dependencies.any((dep) => dep.iswitcho(
-            path: (pathDep) =>
-                package.path == path.canonicalize(path.join(this.path, pathDep.path)) ||
-                allPackages
-                    .firstWhere(
-                      (p) => p.path == path.canonicalize(path.join(this.path, pathDep.path)),
-                      orElse: () => DartPackage(path: path.canonicalize(path.join(this.path, pathDep.path))),
-                    )
-                    .productionCodeDependsOn(package, allPackages),
-            otherwise: () => false,
-          ));
+      pubspecYaml.dependencies
+          .map((d) => _overrideDependency(d, pubspecYaml.dependencyOverrides))
+          .any((dep) => dep.iswitcho(
+                path: (pathDep) =>
+                    package.path == path.canonicalize(path.join(this.path, pathDep.path)) ||
+                    allPackages
+                        .firstWhere(
+                          (p) => p.path == path.canonicalize(path.join(this.path, pathDep.path)),
+                          orElse: () => DartPackage(path: path.canonicalize(path.join(this.path, pathDep.path))),
+                        )
+                        .productionCodeDependsOn(package, allPackages),
+                otherwise: () => false,
+              ));
 
   bool devCodeDependsOn(
     DartPackage package,
     Iterable<DartPackage> allPackages,
   ) =>
-      pubspecYaml.devDependencies.any((dep) => dep.iswitcho(
-            path: (pathDep) => package.path == path.canonicalize(path.join(this.path, pathDep.path)),
-            otherwise: () => false,
-          ));
+      pubspecYaml.devDependencies
+          .map((d) => _overrideDependency(d, pubspecYaml.dependencyOverrides))
+          .any((dep) => dep.iswitcho(
+                path: (pathDep) => package.path == path.canonicalize(path.join(this.path, pathDep.path)),
+                otherwise: () => false,
+              ));
 }
+
+PackageDependencySpec _overrideDependency(
+  PackageDependencySpec d,
+  Iterable<PackageDependencySpec> dependencyOverrides,
+) =>
+    dependencyOverrides.firstWhere(
+      (override) => d.package() == override.package(),
+      orElse: () => d,
+    );
 
 Iterable<DartPackage> impactBasedOnPubspecYaml({
   @required Iterable<DartPackage> packages,
