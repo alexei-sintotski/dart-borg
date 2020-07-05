@@ -27,26 +27,32 @@
 
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
+import 'package:plain_optional/plain_optional.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
 import '../dart_package/dart_package.dart';
+import '../utils/file_io.dart';
 
 extension _Package on DartPackage {
   bool productionCodeDependsOn(
     DartPackage package,
-    Iterable<DartPackage> allPackages,
+    Iterable<DartPackage> allPackagesInScope,
+    Optional<String> Function(String) tryToReadFileSync,
   ) =>
       pubspecYaml.dependencies
           .map((d) => _overrideDependency(d, pubspecYaml.dependencyOverrides))
           .any((dep) => dep.iswitcho(
                 path: (pathDep) =>
                     package.path == path.canonicalize(path.join(this.path, pathDep.path)) ||
-                    allPackages
+                    allPackagesInScope
                         .firstWhere(
                           (p) => p.path == path.canonicalize(path.join(this.path, pathDep.path)),
-                          orElse: () => DartPackage(path: path.canonicalize(path.join(this.path, pathDep.path))),
+                          orElse: () => DartPackage(
+                            path: path.canonicalize(path.join(this.path, pathDep.path)),
+                            tryToReadFileSync: tryToReadFileSync,
+                          ),
                         )
-                        .productionCodeDependsOn(package, allPackages),
+                        .productionCodeDependsOn(package, allPackagesInScope, tryToReadFileSync),
                 otherwise: () => false,
               ));
 
@@ -73,11 +79,12 @@ PackageDependencySpec _overrideDependency(
 
 Iterable<DartPackage> impactBasedOnPubspecYaml({
   @required Iterable<DartPackage> packages,
-  @required Iterable<DartPackage> allPackages,
+  @required Iterable<DartPackage> allPackagesInScope,
+  Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
 }) =>
     packages
-        .expand((package) => allPackages.where((p) =>
+        .expand((package) => allPackagesInScope.where((p) =>
             p.path == package.path ||
-            p.productionCodeDependsOn(package, allPackages) ||
-            p.devCodeDependsOn(package, allPackages)))
+            p.productionCodeDependsOn(package, allPackagesInScope, tryToReadFileSync) ||
+            p.devCodeDependsOn(package, allPackagesInScope)))
         .toSet();

@@ -36,7 +36,7 @@ void main() {
     group('given input without dependencies between packages', () {
       final packagesUnderImpact = impactBasedOnPubspecYaml(
         packages: [_packageA],
-        allPackages: [_packageA, _packageB],
+        allPackagesInScope: [_packageA, _packageB],
       );
       test('it returns the list of packages without modification', () {
         expect(packagesUnderImpact, [_packageA]);
@@ -46,7 +46,7 @@ void main() {
     group('given input with packages, one directly depends on another', () {
       final packagesUnderImpact = impactBasedOnPubspecYaml(
         packages: [_packageA],
-        allPackages: [_packageA, _packageB, _packageC],
+        allPackagesInScope: [_packageA, _packageB, _packageC],
       );
       test('it returns the list containing both packages', () {
         expect(packagesUnderImpact, {_packageA, _packageC});
@@ -56,7 +56,7 @@ void main() {
     group('given input with packages, one indirectly depends on another', () {
       final packagesUnderImpact = impactBasedOnPubspecYaml(
         packages: [_packageA],
-        allPackages: [_packageA, _packageB, _packageC, _packageD],
+        allPackagesInScope: [_packageA, _packageB, _packageC, _packageD],
       );
       test('it returns the list containing all dependent packages', () {
         expect(packagesUnderImpact, {_packageA, _packageC, _packageD});
@@ -66,7 +66,7 @@ void main() {
     group('given input with packages, one directly dev depends on another', () {
       final packagesUnderImpact = impactBasedOnPubspecYaml(
         packages: [_packageA],
-        allPackages: [_packageA, _packageE],
+        allPackagesInScope: [_packageA, _packageE],
       );
       test('it returns the list containing both packages', () {
         expect(packagesUnderImpact, {_packageA, _packageE});
@@ -76,7 +76,7 @@ void main() {
     group('given input with packages, first directly dev depends on the second, third depends on the second', () {
       final packagesUnderImpact = impactBasedOnPubspecYaml(
         packages: [_packageA],
-        allPackages: [_packageA, _packageE, _packageF],
+        allPackagesInScope: [_packageA, _packageE, _packageF],
       );
       test('it returns the list containing only the first and the second packages', () {
         expect(packagesUnderImpact, {_packageA, _packageE});
@@ -86,7 +86,7 @@ void main() {
     group('given input with packages, one directly depends on another via dependency override', () {
       final packagesUnderImpact = impactBasedOnPubspecYaml(
         packages: [_packageA],
-        allPackages: [_packageA, _packageG],
+        allPackagesInScope: [_packageA, _packageG],
       );
       test('it returns the list containing both packages', () {
         expect(packagesUnderImpact, {_packageA, _packageG});
@@ -96,10 +96,21 @@ void main() {
     group('given input with packages, one directly dev depends on another via dependency override', () {
       final packagesUnderImpact = impactBasedOnPubspecYaml(
         packages: [_packageA],
-        allPackages: [_packageA, _packageH],
+        allPackagesInScope: [_packageA, _packageH],
       );
       test('it returns the list containing both packages', () {
         expect(packagesUnderImpact, {_packageA, _packageH});
+      });
+    });
+
+    group('given input with a package dependent on a package out of scope', () {
+      final packagesUnderImpact = impactBasedOnPubspecYaml(
+        packages: [_packageA],
+        allPackagesInScope: [_packageA, _packageI],
+        tryToReadFileSync: (_) => const Optional('name: z'),
+      );
+      test('it returns the containing only the changed dependency', () {
+        expect(packagesUnderImpact, {_packageA});
       });
     });
   });
@@ -159,4 +170,11 @@ dev_dependencies:
 dependency_overrides:
   a:
     path: ../a
+'''));
+
+final _packageI = DartPackage(path: canonicalize('i'), tryToReadFileSync: (_) => const Optional('''
+name: h
+dependencies:
+  z:
+    path: ../z
 '''));
