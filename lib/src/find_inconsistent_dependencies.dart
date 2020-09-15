@@ -93,5 +93,6 @@ List<String> _referencesToDependency(
   Map<String, PubspecLock> pubspecLocks,
 ) =>
     [
-      for (final pubspecLock in pubspecLocks.entries) if (pubspecLock.value.packages.contains(d)) ...[pubspecLock.key]
+      for (final pubspecLock in pubspecLocks.entries)
+        if (pubspecLock.value.packages.contains(d)) ...[pubspecLock.key]
     ];
