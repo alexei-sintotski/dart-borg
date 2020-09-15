@@ -98,5 +98,6 @@ List<String> _referencesToDependency(
   Map<String, Iterable<PackageDependencySpec>> specsPerPubspecYaml,
 ) =>
     [
-      for (final entry in specsPerPubspecYaml.entries) if (entry.value.contains(depSpec)) ...[entry.key]
+      for (final entry in specsPerPubspecYaml.entries)
+        if (entry.value.contains(depSpec)) ...[entry.key]
     ];
