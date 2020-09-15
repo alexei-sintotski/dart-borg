@@ -172,7 +172,7 @@ class BootCommand extends Command<void> {
         final packageDiff = {
           ..._getPackageDiff(gitref: ctx.gitref),
           ...ctx.modifiedPackages.map(path.canonicalize),
-        }.where((d) => Directory(d).existsSync());
+        }.where((d) => Directory(d).existsSync()).where((d) => File(path.join(d, 'pubspec.yaml')).existsSync());
 
         final changedPackagesWithinScope = packages.where((p) => packageDiff.contains(p.path));
         final changedPackagesOutsideOfScope = packageDiff
