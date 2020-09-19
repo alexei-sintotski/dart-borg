@@ -53,4 +53,16 @@ class DartPackage {
 
   @override
   String toString() => 'DartPackage(path: $path)';
+
+  @override
+  // ignore: avoid_annotating_with_dynamic
+  bool operator ==(dynamic other) => other.runtimeType == runtimeType && path == other.path;
+
+  @override
+  int get hashCode {
+    var result = 17;
+    // ignore: join_return_with_assignment
+    result = 37 * result + path.hashCode;
+    return result;
+  }
 }
