@@ -55,7 +55,7 @@ class BootCommand extends Command<void> {
     addBootModeOption(argParser,
         defaultsTo: context.bootContext.iif(
           some: (ctx) => ctx.bootMode,
-          none: () => BootMode.basic,
+          none: () => BootMode.incremental,
         ));
     addVerboseFlag(argParser);
   }
@@ -199,12 +199,11 @@ class BootCommand extends Command<void> {
           packages: changedPackages,
           allPackagesInScope: {...packages, ...changedPackagesOutsideOfScope},
         ).where((p) => !changedPackagesOutsideOfScope.any((pp) => pp.path == p.path)).toSet();
-        print('');
 
         return packagesUnderImpactSinceLastSuccessfulBoot;
       },
       none: () {
-        print('\nNo information on the last successful bootstrapping is found.');
+        print('No information on the last successful bootstrapping is found.');
         print('Bootstrapping all found packages...\n');
 
         if (packages.isEmpty) {
