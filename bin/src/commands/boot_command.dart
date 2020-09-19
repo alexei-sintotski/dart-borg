@@ -194,14 +194,6 @@ class BootCommand extends Command<void> {
         }
         print('');
 
-        if (_isMassiveConfigChange(
-          changedPackages: changedPackages,
-          allPackages: packages,
-        )) {
-          print('Massive configuration change detected, bootstrapping all packages...\n');
-          return packages;
-        }
-
         print('Analyzing package dependencies...');
         final packagesUnderImpactSinceLastSuccessfulBoot = impactBasedOnPubspecYaml(
           packages: changedPackages,
@@ -288,11 +280,3 @@ Set<String> _getPackageDiff({
     gitDiffFiles(gitref: gitref).where(_isPubspecFile).map(path.dirname).map(path.canonicalize).toSet();
 
 bool _isPubspecFile(String pathToFile) => path.basenameWithoutExtension(pathToFile) == 'pubspec';
-
-bool _isMassiveConfigChange({
-  @required Iterable<DartPackage> changedPackages,
-  @required Iterable<DartPackage> allPackages,
-}) =>
-    changedPackages.length >= allPackages.length * _incrementalBootstrappingThreshold;
-
-const _incrementalBootstrappingThreshold = 0.66;
