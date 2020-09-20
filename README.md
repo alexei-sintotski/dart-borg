@@ -184,9 +184,11 @@ In some cases incremental bootstrapping is not available and basic bootstrapping
 * `borg boot` detects Dart version update since the last successful bootstrapping
 * `borg boot` detects Flutter SDK update since the last successful bootstrapping
 
-Please note that `borg boot --mode=incremental` switches `borg boot` to incremental mode for subsequent runs. This means
-that you do not need to specify boot mode every time you run `borg boot`. `boot borg --mode=basic` switches back to the
-basic bootstrapping mode executing `pub get` / `flutter packages get` for all found packages.
+Incremental bootstrapping is the default bootstrapping mode since version 1.4.5.
+
+Please note that `borg boot --mode=basic` switches `borg boot` to basic mode for subsequent runs (The basic mode
+executes `pub get` / `flutter packages get` for all found packages). This means that you do not need to specify boot
+mode every time you run `borg boot`. `boot borg --mode=incremental` switches back to the incremental bootstrapping mode.
 
 # Configuration file: borg.yaml
 
