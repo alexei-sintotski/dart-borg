@@ -1,3 +1,8 @@
+## [1.4.5] - 2020-09-20
+* Feature: Incremental bootstrapping is the default bootstrapping mode
+* Optimization: Massive improvement of performance of dependency analysis during incremental bootstrapping
+* Bugfix: Incremental bootstrapping ignores deleted packages
+
 ## [1.4.4] - 2020-07-05
 * Production-grade incremental bootstrapping
 * Bootstrapping dependency analysis takes dependency overrides into account
