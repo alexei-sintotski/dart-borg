@@ -199,6 +199,7 @@ class BootCommand extends Command<void> {
           packages: changedPackages,
           allPackagesInScope: {...packages, ...changedPackagesOutsideOfScope},
         ).where((p) => !changedPackagesOutsideOfScope.any((pp) => pp.path == p.path)).toSet();
+        print('');
 
         return packagesUnderImpactSinceLastSuccessfulBoot;
       },
