@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,7 +32,8 @@ void addBootModeOption(ArgParser argParser, {@required BootMode defaultsTo}) =>
       _name,
       abbr: 'm',
       help:
-          'Switches borg to the specified bootstrapping mode -- all subsequent borg runs will use the specified mode '
+          'Switches borg to the specified bootstrapping mode -- all subsequent '
+          'borg runs will use the specified mode '
           'until another mode is selected in command line',
       allowed: [
         _basicValue,
@@ -40,10 +41,11 @@ void addBootModeOption(ArgParser argParser, {@required BootMode defaultsTo}) =>
       ],
       allowedHelp: {
         _basicValue:
-            'Switches borg to bootstrap all packages found during package scan or specified in the command line',
+            'Switches borg to bootstrap all packages found during package scan '
+                'or specified in the command line',
         _incrementalValue:
-            'Switches borg to bootstrap only packages with dependencies updated since the last successful '
-                'bootstrapping',
+            'Switches borg to bootstrap only packages with dependencies '
+                'updated since the last successful bootstrapping',
       },
       defaultsTo: _optionEnum2String[defaultsTo],
     );

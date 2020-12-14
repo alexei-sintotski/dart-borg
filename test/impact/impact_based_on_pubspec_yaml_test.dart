@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -74,42 +74,50 @@ void main() {
     });
 
     group(
-        'given input with packages, first directly dev depends on the second, third depends on the second',
-        () {
-      final packagesUnderImpact = impactBasedOnPubspecYaml(
-        packages: [_packageA],
-        allPackagesInScope: [_packageA, _packageE, _packageF],
-      );
-      test(
-          'it returns the list containing only the first and the second packages',
+      'given input with packages, first directly dev depends on the second, '
+      'third depends on the second',
+      () {
+        final packagesUnderImpact = impactBasedOnPubspecYaml(
+          packages: [_packageA],
+          allPackagesInScope: [_packageA, _packageE, _packageF],
+        );
+        test(
+          'it returns the list containing only '
+          'the first and the second packages',
           () {
-        expect(packagesUnderImpact, {_packageA, _packageE});
-      });
-    });
+            expect(packagesUnderImpact, {_packageA, _packageE});
+          },
+        );
+      },
+    );
 
     group(
-        'given input with packages, one directly depends on another via dependency override',
-        () {
-      final packagesUnderImpact = impactBasedOnPubspecYaml(
-        packages: [_packageA],
-        allPackagesInScope: [_packageA, _packageG],
-      );
-      test('it returns the list containing both packages', () {
-        expect(packagesUnderImpact, {_packageA, _packageG});
-      });
-    });
+      'given input with packages, '
+      'one directly depends on another via dependency override',
+      () {
+        final packagesUnderImpact = impactBasedOnPubspecYaml(
+          packages: [_packageA],
+          allPackagesInScope: [_packageA, _packageG],
+        );
+        test('it returns the list containing both packages', () {
+          expect(packagesUnderImpact, {_packageA, _packageG});
+        });
+      },
+    );
 
     group(
-        'given input with packages, one directly dev depends on another via dependency override',
-        () {
-      final packagesUnderImpact = impactBasedOnPubspecYaml(
-        packages: [_packageA],
-        allPackagesInScope: [_packageA, _packageH],
-      );
-      test('it returns the list containing both packages', () {
-        expect(packagesUnderImpact, {_packageA, _packageH});
-      });
-    });
+      'given input with packages, '
+      'one directly dev depends on another via dependency override',
+      () {
+        final packagesUnderImpact = impactBasedOnPubspecYaml(
+          packages: [_packageA],
+          allPackagesInScope: [_packageA, _packageH],
+        );
+        test('it returns the list containing both packages', () {
+          expect(packagesUnderImpact, {_packageA, _packageH});
+        });
+      },
+    );
 
     group('given input with a package dependent on a package out of scope', () {
       final packagesUnderImpact = impactBasedOnPubspecYaml(

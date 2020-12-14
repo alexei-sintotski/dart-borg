@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -86,14 +86,20 @@ class EvolveCommand extends Command<void> {
     }
 
     print(
-        '\nResolving ${allExternalDepSpecs.length} direct external dependencies used by all found packages...');
+      '\nResolving ${allExternalDepSpecs.length} direct external dependencies '
+      'used by all found packages...',
+    );
     final references = _resolveConsistentDependencySet(allExternalDepSpecs);
     print(
-        '\tresolved ${references.length} direct and transitive external dependencies');
+      '\tresolved ${references.length} direct and transitive external '
+      'dependencies',
+    );
 
     if (getDryRunFlag(argResults)) {
       print(
-          '\nDRY RUN: Previewing evolution of ${packages.length} Dart packages...');
+        '\nDRY RUN: Previewing evolution of ${packages.length} Dart '
+        'packages...',
+      );
     } else {
       print('\nCommencing evolution of ${packages.length} Dart packages...');
     }
@@ -217,15 +223,17 @@ void _printDependencyCorrections({
       final orgDep = actualDependencies
           .firstWhere((d) => d.package() == correction.package());
       print(
-          '\t${correction.package()}: ${_formatDependencyDetail(orgDep)} => ${_formatDependencyDetail(correction)}');
+        '\t${correction.package()}: ${_formatDependencyDetail(orgDep)} => '
+        '${_formatDependencyDetail(correction)}',
+      );
     }
     stdout.write('\n');
   }
 }
 
 String _formatDependencyDetail(PackageDependency dep) => dep.iswitch(
-      sdk: (d) => '${d.version}',
-      hosted: (d) => '${d.version}',
+      sdk: (d) => d.version,
+      hosted: (d) => d.version,
       git: (d) => '${d.url}:${d.resolvedRef}',
-      path: (d) => '${d.path}',
+      path: (d) => d.path,
     );

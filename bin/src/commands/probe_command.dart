@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -88,7 +88,8 @@ class ProbeCommand extends Command<void> {
     }
     if (getPubspecYamlFlag(argResults) || getPubspecLockFlag(argResults)) {
       print(
-          '\nSUCCESS: All packages use consistent set of external dependencies');
+        '\nSUCCESS: All packages use consistent set of external dependencies',
+      );
     } else {
       throw const BorgException('FATAL: Nothing to do!');
     }
@@ -127,6 +128,6 @@ class ProbeCommand extends Command<void> {
 String _formatDependencyInfo(PackageDependency dependency) =>
     dependency.iswitcho(
       git: (dep) => '${dep.url}:${dep.resolvedRef}',
-      path: (dep) => '${dep.path}',
-      otherwise: () => '${dependency.version()}',
+      path: (dep) => dep.path,
+      otherwise: () => dependency.version(),
     );

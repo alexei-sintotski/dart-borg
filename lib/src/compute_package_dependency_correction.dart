@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,14 +25,17 @@
 
 import 'package:pubspec_lock/pubspec_lock.dart';
 
-/// Given the collection of actual package dependencies (deps) and the reference dependencies (references),
-/// this function determines delta between the two collections and returns package versions to be used as package
-/// dependencies instead of the ones used in deps to make it consistent with references.
+/// Given the collection of actual package dependencies (deps) and the
+/// reference dependencies (references), this function determines delta between
+/// the two collections and returns package versions to be used as package
+/// dependencies instead of the ones used in deps to make it consistent with
+/// references.
 ///
-/// This function is intended to calculate correction to a package configuration to make it consistent with other
-/// packages in a Dart mono repository.
+/// This function is intended to calculate correction to a package configuration
+/// to make it consistent with other packages in a Dart mono repository.
 ///
-/// In case deps is already consistent with references, the empty set is returned.
+/// In case deps is already consistent with references, the empty set is
+/// returned.
 ///
 Iterable<PackageDependency> computePackageDependencyCorrection(
   Iterable<PackageDependency> deps,

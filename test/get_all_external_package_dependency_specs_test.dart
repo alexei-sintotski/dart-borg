@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -86,19 +86,22 @@ void main() {
     });
 
     group(
-        'provided with pubspec.yaml with a single development hosted dependency',
-        () {
-      final pubspecYaml =
-          PubspecYaml.loadFromYamlString('dev_dependencies: {a: }');
-      final r = getAllExternalPackageDependencySpecs([pubspecYaml]);
+      'provided with pubspec.yaml with a single development hosted dependency',
+      () {
+        final pubspecYaml = PubspecYaml.loadFromYamlString(
+          'dev_dependencies: {a: }',
+        );
+        final r = getAllExternalPackageDependencySpecs([pubspecYaml]);
 
-      test('it produces the specified dependency', () {
-        expect(r, const [
-          PackageDependencySpec.hosted(
-              HostedPackageDependencySpec(package: 'a'))
-        ]);
-      });
-    });
+        test('it produces the specified dependency', () {
+          expect(r, const [
+            PackageDependencySpec.hosted(
+              HostedPackageDependencySpec(package: 'a'),
+            )
+          ]);
+        });
+      },
+    );
 
     group('provided with pubspec.yaml with a dependency override', () {
       const overridenVersion = '^2.0.0';
@@ -118,23 +121,31 @@ void main() {
     });
 
     group(
-        'given two pubspec.yaml files with hosted dependency with version specified and ommitted',
-        () {
-      final pubspecYamlNoVersion =
-          PubspecYaml.loadFromYamlString('dependencies: {a:}');
-      final pubspecYamlWithVersion =
-          PubspecYaml.loadFromYamlString('dependencies: {a: 1.0.0}');
-      final r = getAllExternalPackageDependencySpecs(
-          [pubspecYamlNoVersion, pubspecYamlWithVersion]);
+      'given two pubspec.yaml files with hosted dependency with '
+      'version specified and ommitted',
+      () {
+        final pubspecYamlNoVersion = PubspecYaml.loadFromYamlString(
+          'dependencies: {a:}',
+        );
+        final pubspecYamlWithVersion = PubspecYaml.loadFromYamlString(
+          'dependencies: {a: 1.0.0}',
+        );
+        final r = getAllExternalPackageDependencySpecs(
+          [pubspecYamlNoVersion, pubspecYamlWithVersion],
+        );
 
-      test('it produces dependency with detailed specification', () {
-        expect(r, const [
-          PackageDependencySpec.hosted(HostedPackageDependencySpec(
-            package: 'a',
-            version: Optional('1.0.0'),
-          ))
-        ]);
-      });
-    });
+        test('it produces dependency with detailed specification', () {
+          expect(
+            r,
+            const [
+              PackageDependencySpec.hosted(HostedPackageDependencySpec(
+                package: 'a',
+                version: Optional('1.0.0'),
+              ))
+            ],
+          );
+        });
+      },
+    );
   });
 }

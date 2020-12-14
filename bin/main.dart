@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,8 +32,8 @@ import 'src/commands/probe_command.dart';
 
 void main(List<String> args) => CommandRunner<void>(
       'borg',
-      'Dart borg is a command-line tool to support development teams working on '
-          'large scale Dart and Flutter mono repositories.',
+      'Dart borg is a command-line tool to support development teams working '
+          'on large scale Dart and Flutter mono repositories.',
     )
       ..addCommand(ProbeCommand())
       ..addCommand(EvolveCommand())
