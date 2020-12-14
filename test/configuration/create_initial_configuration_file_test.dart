@@ -33,28 +33,35 @@ import 'package:yaml/yaml.dart';
 
 void main() {
   group('$BorgConfigurationFactory', () {
-    final factory = BorgConfigurationFactory(tryToReadFileSync: (_) => const Optional.none());
+    final factory = BorgConfigurationFactory(
+        tryToReadFileSync: (_) => const Optional.none());
 
-    test('creates initial configuration file with include entry referring to current directory', () {
-      factory.createInitialConfigurationFile(saveStringToFileSync: (_, content) {
+    test(
+        'creates initial configuration file with include entry referring to current directory',
+        () {
+      factory.createInitialConfigurationFile(
+          saveStringToFileSync: (_, content) {
         final savedConfig = BorgConfiguration.fromJson(_toJson(content));
         expect(savedConfig.pathsToScan, contains('.'));
       });
     });
 
     test('creates initial configuration file with exclude entry', () {
-      factory.createInitialConfigurationFile(saveStringToFileSync: (_, content) {
+      factory.createInitialConfigurationFile(
+          saveStringToFileSync: (_, content) {
         expect(_toJson(content).keys, contains('exclude'));
       });
     });
 
     test('creates initial configuration file with dartsdk entry', () {
-      factory.createInitialConfigurationFile(saveStringToFileSync: (_, content) {
+      factory.createInitialConfigurationFile(
+          saveStringToFileSync: (_, content) {
         expect(_toJson(content).keys, contains('dart_sdk'));
       });
     });
   });
 }
 
-// ignore: avoid_as
-Map<String, dynamic> _toJson(String yaml) => json.decode(json.encode(loadYaml(yaml))) as Map<String, dynamic>;
+Map<String, dynamic> _toJson(String yaml) =>
+    // ignore: avoid_as
+    json.decode(json.encode(loadYaml(yaml))) as Map<String, dynamic>;

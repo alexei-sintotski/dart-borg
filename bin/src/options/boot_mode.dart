@@ -27,10 +27,12 @@ import 'package:args/args.dart';
 import 'package:borg/src/boot_mode.dart';
 import 'package:meta/meta.dart';
 
-void addBootModeOption(ArgParser argParser, {@required BootMode defaultsTo}) => argParser.addOption(
+void addBootModeOption(ArgParser argParser, {@required BootMode defaultsTo}) =>
+    argParser.addOption(
       _name,
       abbr: 'm',
-      help: 'Switches borg to the specified bootstrapping mode -- all subsequent borg runs will use the specified mode '
+      help:
+          'Switches borg to the specified bootstrapping mode -- all subsequent borg runs will use the specified mode '
           'until another mode is selected in command line',
       allowed: [
         _basicValue,
@@ -46,8 +48,11 @@ void addBootModeOption(ArgParser argParser, {@required BootMode defaultsTo}) => 
       defaultsTo: _optionEnum2String[defaultsTo],
     );
 
+BootMode getBootModeOption(
+  ArgResults argResults,
+) =>
 // ignore: avoid_as
-BootMode getBootModeOption(ArgResults argResults) => _optionString2Enum[argResults[_name] as String];
+    _optionString2Enum[argResults[_name] as String];
 
 const _name = 'mode';
 const _basicValue = 'basic';

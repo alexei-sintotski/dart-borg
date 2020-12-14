@@ -49,7 +49,8 @@ class BorgConfiguration extends $BorgConfiguration {
     this.excludedPaths = const [],
   });
 
-  factory BorgConfiguration.fromJson(Map<String, dynamic> json) => BorgConfiguration(
+  factory BorgConfiguration.fromJson(Map<String, dynamic> json) =>
+      BorgConfiguration(
         dartSdkPath: _getString(json, _dartSdkToken),
         flutterSdkPath: _getString(json, _flutterSdkToken),
         pathsToScan: _getStringIterable(json, _includeToken),

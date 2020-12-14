@@ -37,7 +37,8 @@ void _addDartSdkOption({
       defaultsTo: defaultsTo,
     );
 
-// ignore: avoid_as
-String _getDartSdkOption(ArgResults argResults) => argResults[_nameDartSdkOption] as String;
+String _getDartSdkOption(ArgResults argResults) =>
+    // ignore: avoid_as
+    argResults[_nameDartSdkOption] as String;
 
 const _nameDartSdkOption = 'dartsdk';

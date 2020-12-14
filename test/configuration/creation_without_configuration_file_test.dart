@@ -53,57 +53,70 @@ void main() {
       });
 
       group('given command-line with undefined paths', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--paths=']));
+        final config = factory.createConfiguration(
+            argResults: argParser.parse(['--paths=']));
         test('it creates configuration object with empty list of paths', () {
           expect(config.pathsToScan, isEmpty);
         });
       });
 
       group('given command-line with undefined excluded paths', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--exclude=']));
-        test('it creates configuration object with empty list of excluded paths', () {
+        final config = factory.createConfiguration(
+            argResults: argParser.parse(['--exclude=']));
+        test(
+            'it creates configuration object with empty list of excluded paths',
+            () {
           expect(config.excludedPaths, isEmpty);
         });
       });
 
       group('given command-line with undefined Dart SDK path', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--dartsdk=']));
-        test('it creates configuration object with undefined Dart SDK path', () {
+        final config = factory.createConfiguration(
+            argResults: argParser.parse(['--dartsdk=']));
+        test('it creates configuration object with undefined Dart SDK path',
+            () {
           expect(config.dartSdkPath.hasValue, isFalse);
         });
       });
 
       group('given command-line with undefined Flutter SDK path', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--fluttersdk=']));
-        test('it creates configuration object with undefined Flutter SDK path', () {
+        final config = factory.createConfiguration(
+            argResults: argParser.parse(['--fluttersdk=']));
+        test('it creates configuration object with undefined Flutter SDK path',
+            () {
           expect(config.flutterSdkPath.hasValue, isFalse);
         });
       });
 
       group('given command-line with defined paths', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--paths=$_pathsValue']));
+        final config = factory.createConfiguration(
+            argResults: argParser.parse(['--paths=$_pathsValue']));
         test('it creates configuration object with correct paths value', () {
           expect(config.pathsToScan, [_pathsValue]);
         });
       });
 
       group('given command-line with defined excluded paths', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--exclude=$_excludeValue']));
+        final config = factory.createConfiguration(
+            argResults: argParser.parse(['--exclude=$_excludeValue']));
         test('it creates configuration object with correct exclude value', () {
           expect(config.excludedPaths, [_excludeValue]);
         });
       });
 
       group('given command-line with defined path to Dart SDK', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--dartsdk=$_dartsdkValue']));
+        final config = factory.createConfiguration(
+            argResults: argParser.parse(['--dartsdk=$_dartsdkValue']));
         test('it creates configuration object with correct dartsdk value', () {
           expect(config.dartSdkPath, const Optional(_dartsdkValue));
         });
       });
 
       group('given command-line with defined path to Flutter SDK', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--fluttersdk=$_fluttersdkValue']));
-        test('it creates configuration object with correct fluttersdk value', () {
+        final config = factory.createConfiguration(
+            argResults: argParser.parse(['--fluttersdk=$_fluttersdkValue']));
+        test('it creates configuration object with correct fluttersdk value',
+            () {
           expect(config.flutterSdkPath, const Optional(_fluttersdkValue));
         });
       });

@@ -41,13 +41,15 @@ class DartPackage {
   }) : _pubspecYaml = LazyData(
             populate: () => tryToReadFileSync(join(path, 'pubspec.yaml')).iif(
                   some: (content) => content.toPubspecYaml(),
-                  none: () => throw AssertionError('${join(path, 'pubspec.yaml')} does not exist!'),
+                  none: () => throw AssertionError(
+                      '${join(path, 'pubspec.yaml')} does not exist!'),
                 ));
 
   final String path;
   PubspecYaml get pubspecYaml => _pubspecYaml.entry;
 
-  bool get isFlutterPackage => pubspecYaml.dependencies.any((d) => d.package() == 'flutter');
+  bool get isFlutterPackage =>
+      pubspecYaml.dependencies.any((d) => d.package() == 'flutter');
 
   final LazyData<PubspecYaml> _pubspecYaml;
 
@@ -56,7 +58,8 @@ class DartPackage {
 
   @override
   // ignore: avoid_annotating_with_dynamic
-  bool operator ==(dynamic other) => other.runtimeType == runtimeType && path == other.path;
+  bool operator ==(dynamic other) =>
+      other.runtimeType == runtimeType && path == other.path;
 
   @override
   int get hashCode {

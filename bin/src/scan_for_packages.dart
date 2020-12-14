@@ -48,7 +48,8 @@ Iterable<DartPackage> scanForPackages({
   print(' ${packages.length} packages found');
 
   if (packages.isEmpty) {
-    throw const BorgException('FATAL: No Dart packages found, check borg configuration and command-line!');
+    throw const BorgException(
+        'FATAL: No Dart packages found, check borg configuration and command-line!');
   }
 
   if (getVerboseFlag(argResults)) {

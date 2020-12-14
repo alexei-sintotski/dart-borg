@@ -52,7 +52,8 @@ class ProbeCommand extends Command<void> {
   }
 
   @override
-  String get description => 'Checks consistency of Dart dependendencies across multiple packages';
+  String get description =>
+      'Checks consistency of Dart dependendencies across multiple packages';
 
   @override
   String get name => 'probe';
@@ -60,12 +61,14 @@ class ProbeCommand extends Command<void> {
   @override
   void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
 
-  final BorgConfigurationFactory configurationFactory = BorgConfigurationFactory();
+  final BorgConfigurationFactory configurationFactory =
+      BorgConfigurationFactory();
   BorgConfiguration configuration;
   Iterable<DartPackage> packages;
 
   void _run() {
-    configuration = configurationFactory.createConfiguration(argResults: argResults);
+    configuration =
+        configurationFactory.createConfiguration(argResults: argResults);
 
     packages = scanForPackages(
       configuration: configuration,
@@ -84,7 +87,8 @@ class ProbeCommand extends Command<void> {
       print('Analysis of pubspec.lock files is skipped');
     }
     if (getPubspecYamlFlag(argResults) || getPubspecLockFlag(argResults)) {
-      print('\nSUCCESS: All packages use consistent set of external dependencies');
+      print(
+          '\nSUCCESS: All packages use consistent set of external dependencies');
     } else {
       throw const BorgException('FATAL: Nothing to do!');
     }
@@ -98,7 +102,9 @@ class ProbeCommand extends Command<void> {
   void _checkPubspecLockFiles() {
     final pubspecLocks = Map.fromEntries(packages
         .map((p) => File(path.join(p.path, 'pubspec.lock')))
-        .where((f) => f.existsSync() && [FileSystemEntityType.file].contains(f.statSync().type))
+        .where((f) =>
+            f.existsSync() &&
+            [FileSystemEntityType.file].contains(f.statSync().type))
         .map((f) => MapEntry(
               f.path,
               f.readAsStringSync().loadPubspecLockFromYaml(),
@@ -112,12 +118,14 @@ class ProbeCommand extends Command<void> {
         report: inconsistentUsageList,
         formatDependency: _formatDependencyInfo,
       );
-      throw const BorgException('FAILURE: Inconsistent use of external dependencies detected!');
+      throw const BorgException(
+          'FAILURE: Inconsistent use of external dependencies detected!');
     }
   }
 }
 
-String _formatDependencyInfo(PackageDependency dependency) => dependency.iswitcho(
+String _formatDependencyInfo(PackageDependency dependency) =>
+    dependency.iswitcho(
       git: (dep) => '${dep.url}:${dep.resolvedRef}',
       path: (dep) => '${dep.path}',
       otherwise: () => '${dependency.version()}',

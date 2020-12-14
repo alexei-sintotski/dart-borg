@@ -33,21 +33,27 @@ import 'generic_dependency_usage_report.dart';
 /// However, if a dependency is specified by a mix of path and other dependency types in different pubspec.yaml files,
 /// this case is reported as inconsistency.
 ///
-List<DependencyUsageReport<PackageDependencySpec>> findInconsistentDependencySpecs(
-    Map<String, PubspecYaml> pubspecYamls) {
+List<DependencyUsageReport<PackageDependencySpec>>
+    findInconsistentDependencySpecs(Map<String, PubspecYaml> pubspecYamls) {
   final specsPerPubspecYaml = _collectAllDepSpecsPerPubspecYaml(pubspecYamls);
 
   final allSpecs = _collectAllDepSpecs(specsPerPubspecYaml);
   final externalSpecs = _filterOutPathOnlySpecs(allSpecs).toSet();
-  final specsWithRelevantHostedSpecs = _filterOutRedundantHostedSpecs(externalSpecs).toSet();
-  final inconsistentSpecs = _filterOutSingularReferences(specsWithRelevantHostedSpecs).toSet();
+  final specsWithRelevantHostedSpecs =
+      _filterOutRedundantHostedSpecs(externalSpecs).toSet();
+  final inconsistentSpecs =
+      _filterOutSingularReferences(specsWithRelevantHostedSpecs).toSet();
   return _createReport(inconsistentSpecs, specsPerPubspecYaml);
 }
 
-Map<String, Set<PackageDependencySpec>> _collectAllDepSpecsPerPubspecYaml(Map<String, PubspecYaml> pubspecYamls) =>
-    Map.fromEntries(pubspecYamls.keys.map((k) => MapEntry(k, _getDependencySpecs(pubspecYamls[k]))));
+Map<String, Set<PackageDependencySpec>> _collectAllDepSpecsPerPubspecYaml(
+        Map<String, PubspecYaml> pubspecYamls) =>
+    Map.fromEntries(pubspecYamls.keys
+        .map((k) => MapEntry(k, _getDependencySpecs(pubspecYamls[k]))));
 
-Set<PackageDependencySpec> _collectAllDepSpecs(Map<String, Set<PackageDependencySpec>> specsPerPubspecYaml) => {
+Set<PackageDependencySpec> _collectAllDepSpecs(
+        Map<String, Set<PackageDependencySpec>> specsPerPubspecYaml) =>
+    {
       for (final k in specsPerPubspecYaml.keys) ...specsPerPubspecYaml[k],
     };
 
@@ -56,27 +62,34 @@ Set<PackageDependencySpec> _getDependencySpecs(PubspecYaml pubspecYaml) => {
       ...pubspecYaml.devDependencies
     }.map((dep) => _correctForOverride(dep, pubspecYaml)).toSet();
 
-PackageDependencySpec _correctForOverride(PackageDependencySpec dep, PubspecYaml pubspecYaml) =>
-    pubspecYaml.dependencyOverrides.firstWhere((d) => d.package() == dep.package(), orElse: () => dep);
+PackageDependencySpec _correctForOverride(
+        PackageDependencySpec dep, PubspecYaml pubspecYaml) =>
+    pubspecYaml.dependencyOverrides
+        .firstWhere((d) => d.package() == dep.package(), orElse: () => dep);
 
-Iterable<PackageDependencySpec> _filterOutPathOnlySpecs(Iterable<PackageDependencySpec> specs) =>
-    specs.where((spec) => specs
-        .where((s) => s.package() == spec.package())
-        .any((spec) => spec.iswitcho(path: (_) => false, otherwise: () => true)));
+Iterable<PackageDependencySpec> _filterOutPathOnlySpecs(
+        Iterable<PackageDependencySpec> specs) =>
+    specs.where((spec) => specs.where((s) => s.package() == spec.package()).any(
+        (spec) => spec.iswitcho(path: (_) => false, otherwise: () => true)));
 
-Iterable<PackageDependencySpec> _filterOutRedundantHostedSpecs(Iterable<PackageDependencySpec> specs) =>
+Iterable<PackageDependencySpec> _filterOutRedundantHostedSpecs(
+        Iterable<PackageDependencySpec> specs) =>
     specs.where((s) => s.iswitcho(
           hosted: (hs) =>
               hs.version.hasValue ||
-              specs.where((s) => s.package() == hs.package).every((s) => s.iswitcho(
-                    hosted: (h) => !h.version.hasValue,
-                    otherwise: () => true,
-                  )),
+              specs
+                  .where((s) => s.package() == hs.package)
+                  .every((s) => s.iswitcho(
+                        hosted: (h) => !h.version.hasValue,
+                        otherwise: () => true,
+                      )),
           otherwise: () => true,
         ));
 
-Iterable<PackageDependencySpec> _filterOutSingularReferences(Iterable<PackageDependencySpec> specs) =>
-    specs.where((s) => specs.where((ss) => s.package() == ss.package()).length > 1);
+Iterable<PackageDependencySpec> _filterOutSingularReferences(
+        Iterable<PackageDependencySpec> specs) =>
+    specs.where(
+        (s) => specs.where((ss) => s.package() == ss.package()).length > 1);
 
 List<DependencyUsageReport<PackageDependencySpec>> _createReport(
   Iterable<PackageDependencySpec> specs,
@@ -86,10 +99,11 @@ List<DependencyUsageReport<PackageDependencySpec>> _createReport(
   return names
       .map((name) => DependencyUsageReport(
           dependencyName: name,
-          references: Map.fromEntries(specs.where((d) => d.package() == name).map((d) => MapEntry(
-                d,
-                _referencesToDependency(d, specsPerPubspecYaml),
-              )))))
+          references: Map.fromEntries(
+              specs.where((d) => d.package() == name).map((d) => MapEntry(
+                    d,
+                    _referencesToDependency(d, specsPerPubspecYaml),
+                  )))))
       .toList();
 }
 

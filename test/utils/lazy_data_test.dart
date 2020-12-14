@@ -38,7 +38,8 @@ void main() {
         return value;
       });
 
-      test('it provides data entry according to the provided populate function', () {
+      test('it provides data entry according to the provided populate function',
+          () {
         expect(data.entry, value);
       });
 

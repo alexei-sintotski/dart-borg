@@ -48,13 +48,19 @@ class BorgBootContext {
     this.flutterSdkVersion = const Optional.none(),
   });
 
-  factory BorgBootContext.fromJson(Map<String, dynamic> json) => BorgBootContext(
-        dartSdkVersion: json.containsKey(_dartSdkVersionKey) ? json[_dartSdkVersionKey] as String : '',
+  factory BorgBootContext.fromJson(Map<String, dynamic> json) =>
+      BorgBootContext(
+        dartSdkVersion: json.containsKey(_dartSdkVersionKey)
+            ? json[_dartSdkVersionKey] as String
+            : '',
         gitref: json[_gitrefKey] as String,
-        bootMode: json.containsKey(_bootModeKey) ? _parseBootMode(json[_bootModeKey] as String) : BootMode.basic,
+        bootMode: json.containsKey(_bootModeKey)
+            ? _parseBootMode(json[_bootModeKey] as String)
+            : BootMode.basic,
         modifiedPackages: json.containsKey(_modifiedPackagesKey)
-            // ignore: avoid_annotating_with_dynamic
-            ? (json[_modifiedPackagesKey] as List).map((dynamic p) => p as String)
+            ? (json[_modifiedPackagesKey] as List)
+                // ignore: avoid_annotating_with_dynamic
+                .map((dynamic p) => p as String)
             : [],
         flutterSdkVersion: json.containsKey(_flutterSdkVersionKey)
             ? Optional(json[_flutterSdkVersionKey] as String)
@@ -65,12 +71,15 @@ class BorgBootContext {
         _dartSdkVersionKey: dartSdkVersion,
         _gitrefKey: '"$gitref"',
         if (bootMode == BootMode.incremental) _bootModeKey: _incrementalValue,
-        if (modifiedPackages.isNotEmpty) _modifiedPackagesKey: modifiedPackages.toList(),
-        if (flutterSdkVersion.hasValue) _flutterSdkVersionKey: flutterSdkVersion.valueOr(() => null),
+        if (modifiedPackages.isNotEmpty)
+          _modifiedPackagesKey: modifiedPackages.toList(),
+        if (flutterSdkVersion.hasValue)
+          _flutterSdkVersionKey: flutterSdkVersion.valueOr(() => null),
       };
 }
 
-BootMode _parseBootMode(String s) => s == _incrementalValue ? BootMode.incremental : BootMode.basic;
+BootMode _parseBootMode(String s) =>
+    s == _incrementalValue ? BootMode.incremental : BootMode.basic;
 
 const _gitrefKey = 'gitref';
 const _modifiedPackagesKey = 'modified_packages';

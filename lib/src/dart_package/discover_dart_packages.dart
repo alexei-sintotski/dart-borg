@@ -35,12 +35,16 @@ import 'dart_package.dart';
 Iterable<DartPackage> discoverDartPackages({
   @required BorgConfiguration configuration,
 }) =>
-    _locationsToScan(configuration).map((location) => DartPackage(path: location));
+    _locationsToScan(configuration)
+        .map((location) => DartPackage(path: location));
 
 Iterable<String> _locationsToScan(BorgConfiguration config) {
-  const fileFinder = FileFinder(filename: 'pubspec.yaml', ignored: ['/.symlinks/']);
+  const fileFinder =
+      FileFinder(filename: 'pubspec.yaml', ignored: ['/.symlinks/']);
   final includedLocations = fileFinder.findFiles(config.pathsToScan);
   final excludedLocations = fileFinder.findFiles(config.excludedPaths);
-  final packages = includedLocations.where((location) => !excludedLocations.contains(location)).map(path.dirname);
+  final packages = includedLocations
+      .where((location) => !excludedLocations.contains(location))
+      .map(path.dirname);
   return packages.toList()..sort();
 }

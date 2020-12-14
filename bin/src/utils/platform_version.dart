@@ -34,7 +34,8 @@ import 'run_system_command.dart';
 
 String dartSdkVersion = _yamlParseable(Platform.version);
 
-String flutterSdkVersion({@required String flutterSdkPath}) => _yamlParseable((runSystemCommand(
+String flutterSdkVersion({@required String flutterSdkPath}) =>
+    _yamlParseable((runSystemCommand(
       command: '${path.joinAll([flutterSdkPath, 'bin', 'flutter'])} --version',
       workingDirectory: Directory.current,
       // ignore: avoid_as

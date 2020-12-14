@@ -48,7 +48,10 @@ class BorgContextFactory {
 
   BorgContext createBorgContext() => _tryToReadFileSync(pathToContextFile).iif(
         // ignore: avoid_as
-        some: (content) => BorgContext.fromJson(json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>),
+        some: (content) => BorgContext.fromJson(
+          // ignore: avoid_as
+          json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>,
+        ),
         none: () => const BorgContext(bootContext: Optional.none()),
       );
 

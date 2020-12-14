@@ -38,6 +38,8 @@ void _addFlutterSdkOption({
     );
 
 // ignore: avoid_as
-String _getFlutterSdkOption(ArgResults argResults) => argResults[_nameFlutterSdkOption] as String;
+String _getFlutterSdkOption(ArgResults argResults) =>
+    // ignore: avoid_as
+    argResults[_nameFlutterSdkOption] as String;
 
 const _nameFlutterSdkOption = 'fluttersdk';

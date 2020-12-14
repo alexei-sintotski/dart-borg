@@ -49,13 +49,17 @@ abstract class $BorgConfiguration {
 
 class BorgConfiguration$ {
   static final dartSdkPath = Lens<BorgConfiguration, Optional<String>>(
-      (s_) => s_.dartSdkPath, (s_, dartSdkPath) => s_.copyWith(dartSdkPath: dartSdkPath));
+      (s_) => s_.dartSdkPath,
+      (s_, dartSdkPath) => s_.copyWith(dartSdkPath: dartSdkPath));
   static final flutterSdkPath = Lens<BorgConfiguration, Optional<String>>(
-      (s_) => s_.flutterSdkPath, (s_, flutterSdkPath) => s_.copyWith(flutterSdkPath: flutterSdkPath));
+      (s_) => s_.flutterSdkPath,
+      (s_, flutterSdkPath) => s_.copyWith(flutterSdkPath: flutterSdkPath));
   static final pathsToScan = Lens<BorgConfiguration, Iterable<String>>(
-      (s_) => s_.pathsToScan, (s_, pathsToScan) => s_.copyWith(pathsToScan: pathsToScan));
+      (s_) => s_.pathsToScan,
+      (s_, pathsToScan) => s_.copyWith(pathsToScan: pathsToScan));
   static final excludedPaths = Lens<BorgConfiguration, Iterable<String>>(
-      (s_) => s_.excludedPaths, (s_, excludedPaths) => s_.copyWith(excludedPaths: excludedPaths));
+      (s_) => s_.excludedPaths,
+      (s_, excludedPaths) => s_.copyWith(excludedPaths: excludedPaths));
 }
 
 // ignore_for_file: ARGUMENT_TYPE_NOT_ASSIGNABLE
