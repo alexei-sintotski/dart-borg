@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -42,20 +42,24 @@ void main() {
         final config =
             factory.createConfiguration(argResults: argParser.parse([]));
         test(
-            'it produces configuration with included paths according to the configuration file',
-            () {
-          expect(config.pathsToScan, [_includedLocation]);
-        });
+          'it produces configuration with included paths according to the '
+          'configuration file',
+          () {
+            expect(config.pathsToScan, [_includedLocation]);
+          },
+        );
       });
 
       group('given command line with included paths defined', () {
         final config = factory.createConfiguration(
             argResults: argParser.parse(['--paths=$_includedLocation2']));
         test(
-            'it produces configuration with included paths according to the command line',
-            () {
-          expect(config.pathsToScan, [_includedLocation2]);
-        });
+          'it produces configuration with included paths according to the '
+          'command line',
+          () {
+            expect(config.pathsToScan, [_includedLocation2]);
+          },
+        );
       });
     });
 
@@ -71,20 +75,24 @@ void main() {
         final config =
             factory.createConfiguration(argResults: argParser.parse([]));
         test(
-            'it produces configuration with excluded paths according to the configuration file',
-            () {
-          expect(config.excludedPaths, [_excludedLocation]);
-        });
+          'it produces configuration with excluded paths according to the '
+          'configuration file',
+          () {
+            expect(config.excludedPaths, [_excludedLocation]);
+          },
+        );
       });
 
       group('given command line with excluded paths defined', () {
         final config = factory.createConfiguration(
             argResults: argParser.parse(['--paths=$_excludedLocation2']));
         test(
-            'it produces configuration with excluded paths according to the command line',
-            () {
-          expect(config.pathsToScan, [_excludedLocation2]);
-        });
+          'it produces configuration with excluded paths according to '
+          'the command line',
+          () {
+            expect(config.pathsToScan, [_excludedLocation2]);
+          },
+        );
       });
     });
 
@@ -100,20 +108,24 @@ void main() {
         final config =
             factory.createConfiguration(argResults: argParser.parse([]));
         test(
-            'it produces configuration with Dart SDK path according to the configuration file',
-            () {
-          expect(config.dartSdkPath, const Optional(_dartSdkLocation));
-        });
+          'it produces configuration with Dart SDK path according to the '
+          'configuration file',
+          () {
+            expect(config.dartSdkPath, const Optional(_dartSdkLocation));
+          },
+        );
       });
 
       group('given command line with path to Dart SDK defined', () {
         final config = factory.createConfiguration(
             argResults: argParser.parse(['--dartsdk=$_dartSdkLocation2']));
         test(
-            'it produces configuration with Dart SDK path according to the command line',
-            () {
-          expect(config.dartSdkPath, const Optional(_dartSdkLocation2));
-        });
+          'it produces configuration with Dart SDK path according to '
+          'the command line',
+          () {
+            expect(config.dartSdkPath, const Optional(_dartSdkLocation2));
+          },
+        );
       });
     });
 
@@ -129,10 +141,12 @@ void main() {
         final config =
             factory.createConfiguration(argResults: argParser.parse([]));
         test(
-            'it produces configuration with Flutter SDK path according to the configuration file',
-            () {
-          expect(config.flutterSdkPath, const Optional(_flutterSdkLocation));
-        });
+          'it produces configuration with Flutter SDK path according to '
+          'the configuration file',
+          () {
+            expect(config.flutterSdkPath, const Optional(_flutterSdkLocation));
+          },
+        );
       });
 
       group('given command line with path to Flutter SDK defined', () {
@@ -140,10 +154,12 @@ void main() {
             argResults:
                 argParser.parse(['--fluttersdk=$_flutterSdkLocation2']));
         test(
-            'it produces configuration with Flutter SDK path according to the command line',
-            () {
-          expect(config.flutterSdkPath, const Optional(_flutterSdkLocation2));
-        });
+          'it produces configuration with Flutter SDK path according to '
+          'the command line',
+          () {
+            expect(config.flutterSdkPath, const Optional(_flutterSdkLocation2));
+          },
+        );
       });
     });
 

@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -65,7 +65,7 @@ void main() {
     });
 
     group('given context object without boot context', () {
-      const context = BorgContext(bootContext: Optional.none());
+      const context = BorgContext();
 
       test('it saves content to a file', () {
         var savedToFile = false;
@@ -290,32 +290,39 @@ void main() {
 
     group('handling of modified packages', () {
       group(
-          'given context file with boot context not containing list of modified packages',
-          () {
-        final factory = BorgContextFactory(
-          tryToReadFileSync: (_) =>
-              const Optional(contextWithBootContextWithGitrefOnly),
-        );
-        final context = factory.createBorgContext();
+        'given context file with boot context not containing list of '
+        'modified packages',
+        () {
+          final factory = BorgContextFactory(
+            tryToReadFileSync: (_) =>
+                const Optional(contextWithBootContextWithGitrefOnly),
+          );
+          final context = factory.createBorgContext();
 
-        test('it provides an empty list of modified packages', () {
-          expect(context.bootContext.unsafe.modifiedPackages, isEmpty);
-        });
-      });
+          test('it provides an empty list of modified packages', () {
+            expect(context.bootContext.unsafe.modifiedPackages, isEmpty);
+          });
+        },
+      );
 
       group(
-          'given context file with boot context containing list of modified packages',
-          () {
-        final factory = BorgContextFactory(
-          tryToReadFileSync: (_) =>
-              const Optional(contextWithBootContextWithModifiedPackages),
-        );
-        final context = factory.createBorgContext();
+        'given context file with boot context containing list of '
+        'modified packages',
+        () {
+          final factory = BorgContextFactory(
+            tryToReadFileSync: (_) =>
+                const Optional(contextWithBootContextWithModifiedPackages),
+          );
+          final context = factory.createBorgContext();
 
-        test('it provides correct list of modified packages', () {
-          expect(context.bootContext.unsafe.modifiedPackages, ['a', 'b', 'c']);
-        });
-      });
+          test('it provides correct list of modified packages', () {
+            expect(
+              context.bootContext.unsafe.modifiedPackages,
+              ['a', 'b', 'c'],
+            );
+          });
+        },
+      );
 
       group('given context object with empty list of modified packages', () {
         const context = BorgContext(

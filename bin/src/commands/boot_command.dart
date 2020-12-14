@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -63,9 +63,10 @@ class BootCommand extends Command<void> {
   @override
   String get description =>
       'Executes "pub get" for multiple packages in repository\n\n'
-      'Packages to bootstrap can be specified as arguments. '
-      'If no arguments are supplied, the command bootstraps all scanned packages.\n'
-      '"flutter packages get" is used to resolve dependencies for Flutter packages.';
+      'Packages to bootstrap can be specified as arguments. If no arguments '
+      'are supplied, the command bootstraps all scanned packages.\n'
+      '"flutter packages get" is used to resolve dependencies for Flutter '
+      'packages.';
 
   @override
   String get name => 'boot';
@@ -99,7 +100,9 @@ class BootCommand extends Command<void> {
       case BootMode.incremental:
         if (_isPartialBootstrappingRequested()) {
           print(
-              'Bootstrapping of specific packages is requested, using basic bootstrapping\n');
+            'Bootstrapping of specific packages is requested, '
+            'using basic bootstrapping\n',
+          );
           _executeBasicBootstrapping(
             packages: packages,
             configuration: configuration,
@@ -175,9 +178,11 @@ class BootCommand extends Command<void> {
         if (ctx.dartSdkVersion != dartSdkVersion &&
             ctx.dartSdkVersion.isNotEmpty) {
           print(
-              'Dart version change detected, bootstrapping of all packages required\n'
-              '\t${ctx.dartSdkVersion}\n'
-              '=> \t$dartSdkVersion\n');
+            'Dart version change detected, '
+            'bootstrapping of all packages required\n'
+            '\t${ctx.dartSdkVersion}\n'
+            '=> \t$dartSdkVersion\n',
+          );
           return packages;
         }
 
@@ -255,8 +260,8 @@ class BootCommand extends Command<void> {
             final actualVersion =
                 flutterSdkVersion(flutterSdkPath: flutterSdkPath);
             if (actualVersion != ctxVersion) {
-              print(
-                  'Flutter version change detected, bootstrapping of all packages required\n\n'
+              print('Flutter version change detected, '
+                  'bootstrapping of all packages required\n\n'
                   '$ctxVersion\n\n'
                   '=>\n\n'
                   '$actualVersion\n');
@@ -284,8 +289,9 @@ class BootCommand extends Command<void> {
     for (final package in packages) {
       final counter = '[${i++}/${packages.length}]';
       print(
-          '$counter ${package.isFlutterPackage ? 'Flutter' : 'Dart'} package ${renderPackageName(package.path)}...');
-
+        '$counter ${package.isFlutterPackage ? 'Flutter' : 'Dart'} '
+        'package ${renderPackageName(package.path)}...',
+      );
       resolveDependencies(
         package: package,
         configuration: configuration,

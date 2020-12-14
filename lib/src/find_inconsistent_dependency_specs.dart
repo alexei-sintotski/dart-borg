@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,11 +27,12 @@ import 'package:pubspec_yaml/pubspec_yaml.dart';
 
 import 'generic_dependency_usage_report.dart';
 
-/// Finds inconsistent set of external dependency specifications in the provided set of pubspec.yaml content and
-/// generates report on inconsistent references.
-/// As analysis focuses on consistency of external dependencies, consistency of path dependencies is ignored.
-/// However, if a dependency is specified by a mix of path and other dependency types in different pubspec.yaml files,
-/// this case is reported as inconsistency.
+/// Finds inconsistent set of external dependency specifications in the provided
+/// set of pubspec.yaml content and generates report on inconsistent references.
+/// As analysis focuses on consistency of external dependencies, consistency of
+/// path dependencies is ignored. However, if a dependency is specified by a mix
+/// of path and other dependency types in different pubspec.yaml files, this
+/// case is reported as inconsistency.
 ///
 List<DependencyUsageReport<PackageDependencySpec>>
     findInconsistentDependencySpecs(Map<String, PubspecYaml> pubspecYamls) {

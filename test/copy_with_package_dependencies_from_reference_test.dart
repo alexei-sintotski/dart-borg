@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -48,14 +48,17 @@ void main() {
     });
 
     group(
-        'provided with matching hosted reference with different dependency type',
-        () {
-      final r = copyWithPackageDependenciesFromReference(
-          [directHostedXv1], [transitiveHostedXv2]);
-      test('it corrects the reference without modifying dependency type', () {
-        expect(r, [directHostedXv2]);
-      });
-    });
+      'provided with matching hosted reference with different dependency type',
+      () {
+        final r = copyWithPackageDependenciesFromReference(
+          [directHostedXv1],
+          [transitiveHostedXv2],
+        );
+        test('it corrects the reference without modifying dependency type', () {
+          expect(r, [directHostedXv2]);
+        });
+      },
+    );
 
     group('provided with matching sdk reference with different dependency type',
         () {
