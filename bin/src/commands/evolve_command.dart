@@ -54,7 +54,8 @@ class EvolveCommand extends Command<void> {
   }
 
   @override
-  String get description => 'Upgrade Dart dependencies consistently across multiple packages';
+  String get description =>
+      'Upgrade Dart dependencies consistently across multiple packages';
 
   @override
   String get name => 'evolve';
@@ -62,12 +63,14 @@ class EvolveCommand extends Command<void> {
   @override
   void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
 
-  final BorgConfigurationFactory configurationFactory = BorgConfigurationFactory();
+  final BorgConfigurationFactory configurationFactory =
+      BorgConfigurationFactory();
   BorgConfiguration configuration;
   Iterable<DartPackage> packages;
 
   void _run() {
-    configuration = configurationFactory.createConfiguration(argResults: argResults);
+    configuration =
+        configurationFactory.createConfiguration(argResults: argResults);
 
     packages = scanForPackages(
       configuration: configuration,
@@ -76,17 +79,21 @@ class EvolveCommand extends Command<void> {
 
     assertPubspecYamlConsistency(packages);
 
-    final allExternalDepSpecs = getAllExternalPackageDependencySpecs(packages.map((p) => p.pubspecYaml));
+    final allExternalDepSpecs = getAllExternalPackageDependencySpecs(
+        packages.map((p) => p.pubspecYaml));
     if (getVerboseFlag(argResults)) {
       _printDependencySpecs(allExternalDepSpecs);
     }
 
-    print('\nResolving ${allExternalDepSpecs.length} direct external dependencies used by all found packages...');
+    print(
+        '\nResolving ${allExternalDepSpecs.length} direct external dependencies used by all found packages...');
     final references = _resolveConsistentDependencySet(allExternalDepSpecs);
-    print('\tresolved ${references.length} direct and transitive external dependencies');
+    print(
+        '\tresolved ${references.length} direct and transitive external dependencies');
 
     if (getDryRunFlag(argResults)) {
-      print('\nDRY RUN: Previewing evolution of ${packages.length} Dart packages...');
+      print(
+          '\nDRY RUN: Previewing evolution of ${packages.length} Dart packages...');
     } else {
       print('\nCommencing evolution of ${packages.length} Dart packages...');
     }
@@ -97,7 +104,8 @@ class EvolveCommand extends Command<void> {
       if (getDryRunFlag(argResults)) {
         stdout.write('$counter ${renderPackageName(package.path)}');
       } else {
-        stdout.write('$counter Evolving ${renderPackageName(package.path)} ...');
+        stdout
+            .write('$counter Evolving ${renderPackageName(package.path)} ...');
       }
       _evolvePackage(package, references);
     }
@@ -105,7 +113,8 @@ class EvolveCommand extends Command<void> {
     print('\nSUCCESS: ${packages.length} packages have been processed');
   }
 
-  Iterable<PackageDependency> _resolveConsistentDependencySet(Iterable<PackageDependencySpec> directDepSpecs) =>
+  Iterable<PackageDependency> _resolveConsistentDependencySet(
+          Iterable<PackageDependencySpec> directDepSpecs) =>
       withTempLocation(action: (location) {
         final package = _createPackage(
           name: 'borg_evolve_temp',
@@ -148,11 +157,14 @@ class EvolveCommand extends Command<void> {
         configuration: configuration,
       );
     }
-    final pubspecLock = pubspecLockFile.readAsStringSync().loadPubspecLockFromYaml();
-    final depsCorrectionSet = computePackageDependencyCorrection(pubspecLock.packages, references);
+    final pubspecLock =
+        pubspecLockFile.readAsStringSync().loadPubspecLockFromYaml();
+    final depsCorrectionSet =
+        computePackageDependencyCorrection(pubspecLock.packages, references);
     if (depsCorrectionSet.isNotEmpty && !getDryRunFlag(argResults)) {
       final correctedPubspecLock = pubspecLock.copyWith(
-        packages: copyWithPackageDependenciesFromReference(pubspecLock.packages, references),
+        packages: copyWithPackageDependenciesFromReference(
+            pubspecLock.packages, references),
       );
       pubspecLockFile.writeAsStringSync(correctedPubspecLock.toYamlString());
       resolveDependencies(
@@ -161,13 +173,16 @@ class EvolveCommand extends Command<void> {
       );
     }
 
-    _printDependencyCorrections(actualDependencies: pubspecLock.packages, correctionSet: depsCorrectionSet);
+    _printDependencyCorrections(
+        actualDependencies: pubspecLock.packages,
+        correctionSet: depsCorrectionSet);
   }
 }
 
 void _printDependencySpecs(Iterable<PackageDependencySpec> deps) {
   print('Total amount of direct external dependencies: ${deps.length} ');
-  for (final dep in deps.toList()..sort((a, b) => a.package().compareTo(b.package()))) {
+  for (final dep in deps.toList()
+    ..sort((a, b) => a.package().compareTo(b.package()))) {
     print('\t${dep.package()}${_printDependencySpecDetail(dep)}');
   }
 }
@@ -182,8 +197,12 @@ String _printDependencySpecDetail(PackageDependencySpec dep) => dep.iswitch(
       path: (_) => '',
     );
 
-Iterable<PackageDependency> _getResolvedDependencies({@required Directory location}) =>
-    File(path.join(location.path, 'pubspec.lock')).readAsStringSync().loadPubspecLockFromYaml().packages;
+Iterable<PackageDependency> _getResolvedDependencies(
+        {@required Directory location}) =>
+    File(path.join(location.path, 'pubspec.lock'))
+        .readAsStringSync()
+        .loadPubspecLockFromYaml()
+        .packages;
 
 void _printDependencyCorrections({
   @required Iterable<PackageDependency> actualDependencies,
@@ -193,9 +212,12 @@ void _printDependencyCorrections({
     print(' => up-to-date');
   } else {
     stdout.write('\n');
-    for (final correction in correctionSet.toList()..sort((a, b) => a.package().compareTo(b.package()))) {
-      final orgDep = actualDependencies.firstWhere((d) => d.package() == correction.package());
-      print('\t${correction.package()}: ${_formatDependencyDetail(orgDep)} => ${_formatDependencyDetail(correction)}');
+    for (final correction in correctionSet.toList()
+      ..sort((a, b) => a.package().compareTo(b.package()))) {
+      final orgDep = actualDependencies
+          .firstWhere((d) => d.package() == correction.package());
+      print(
+          '\t${correction.package()}: ${_formatDependencyDetail(orgDep)} => ${_formatDependencyDetail(correction)}');
     }
     stdout.write('\n');
   }

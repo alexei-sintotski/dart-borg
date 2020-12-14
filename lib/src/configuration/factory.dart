@@ -70,11 +70,15 @@ class BorgConfigurationFactory {
     );
     _addPathsMultiOption(
       argParser: argParser,
-      defaultsTo: _configFromFile.pathsToScan.isNotEmpty ? _configFromFile.pathsToScan : [Directory.current.path],
+      defaultsTo: _configFromFile.pathsToScan.isNotEmpty
+          ? _configFromFile.pathsToScan
+          : [Directory.current.path],
     );
     _addExcludeMultiOption(
       argParser: argParser,
-      defaultsTo: _configFromFile.excludedPaths.isNotEmpty ? _configFromFile.excludedPaths : [],
+      defaultsTo: _configFromFile.excludedPaths.isNotEmpty
+          ? _configFromFile.excludedPaths
+          : [],
     );
   }
 
@@ -82,14 +86,24 @@ class BorgConfigurationFactory {
     final dartSdkOption = _getDartSdkOption(argResults);
     final flutterSdkOption = _getFlutterSdkOption(argResults);
     return BorgConfiguration(
-      pathsToScan: _getPathsMultiOption(argResults).map((e) => e.trim()).where((e) => e.isNotEmpty),
-      excludedPaths: _getExcludesMultiOption(argResults).map((e) => e.trim()).where((e) => e.isNotEmpty),
-      dartSdkPath: dartSdkOption.isEmpty ? const Optional.none() : Optional(dartSdkOption),
-      flutterSdkPath: flutterSdkOption.isEmpty ? const Optional.none() : Optional(flutterSdkOption),
+      pathsToScan: _getPathsMultiOption(argResults)
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty),
+      excludedPaths: _getExcludesMultiOption(argResults)
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty),
+      dartSdkPath: dartSdkOption.isEmpty
+          ? const Optional.none()
+          : Optional(dartSdkOption),
+      flutterSdkPath: flutterSdkOption.isEmpty
+          ? const Optional.none()
+          : Optional(flutterSdkOption),
     );
   }
 
-  void createInitialConfigurationFile({void Function(String, String) saveStringToFileSync = saveStringToFileSync}) {
+  void createInitialConfigurationFile(
+      {void Function(String, String) saveStringToFileSync =
+          saveStringToFileSync}) {
     saveStringToFileSync(
       _configurationFileName,
       _initialConfigurationFileContent,
@@ -102,8 +116,9 @@ BorgConfiguration _constructConfigFromFile({
   @required String Function(String) toAbsolutePath,
 }) {
   final configFromFile = tryToReadFileSync(_configurationFileName).iif(
-    some: (s) =>
-        BorgConfiguration.fromJson(json.decode(json.encode(loadYaml(s))) as Map<String, dynamic>), // ignore: avoid_as
+    some: (s) => BorgConfiguration.fromJson(
+        json.decode(json.encode(loadYaml(s)))
+            as Map<String, dynamic>), // ignore: avoid_as
     none: () => const BorgConfiguration(),
   );
   return configFromFile.copyWith(

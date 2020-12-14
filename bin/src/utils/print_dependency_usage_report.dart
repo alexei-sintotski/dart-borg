@@ -32,8 +32,10 @@ void printDependencyUsageReport<DependencyType>({
   @required List<DependencyUsageReport<DependencyType>> report,
   @required String Function(DependencyType dependency) formatDependency,
 }) {
-  for (final use in report..sort((a, b) => a.dependencyName.compareTo(b.dependencyName))) {
-    print('\n${use.dependencyName}: inconsistent dependency specifications detected');
+  for (final use in report
+    ..sort((a, b) => a.dependencyName.compareTo(b.dependencyName))) {
+    print(
+        '\n${use.dependencyName}: inconsistent dependency specifications detected');
     for (final dependency in use.references.keys) {
       print('\tVersion ${formatDependency(dependency)} is used by:');
       for (final user in use.references[dependency]) {

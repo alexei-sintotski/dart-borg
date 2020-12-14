@@ -73,17 +73,23 @@ void main() {
       });
     });
 
-    group('given input with packages, first directly dev depends on the second, third depends on the second', () {
+    group(
+        'given input with packages, first directly dev depends on the second, third depends on the second',
+        () {
       final packagesUnderImpact = impactBasedOnPubspecYaml(
         packages: [_packageA],
         allPackagesInScope: [_packageA, _packageE, _packageF],
       );
-      test('it returns the list containing only the first and the second packages', () {
+      test(
+          'it returns the list containing only the first and the second packages',
+          () {
         expect(packagesUnderImpact, {_packageA, _packageE});
       });
     });
 
-    group('given input with packages, one directly depends on another via dependency override', () {
+    group(
+        'given input with packages, one directly depends on another via dependency override',
+        () {
       final packagesUnderImpact = impactBasedOnPubspecYaml(
         packages: [_packageA],
         allPackagesInScope: [_packageA, _packageG],
@@ -93,7 +99,9 @@ void main() {
       });
     });
 
-    group('given input with packages, one directly dev depends on another via dependency override', () {
+    group(
+        'given input with packages, one directly dev depends on another via dependency override',
+        () {
       final packagesUnderImpact = impactBasedOnPubspecYaml(
         packages: [_packageA],
         allPackagesInScope: [_packageA, _packageH],
@@ -126,11 +134,13 @@ void main() {
   });
 }
 
-final _packageA = DartPackage(path: canonicalize('a'), tryToReadFileSync: (_) => const Optional('''
+final _packageA = DartPackage(
+    path: canonicalize('a'), tryToReadFileSync: (_) => const Optional('''
 name: a
 '''));
 
-final _packageB = DartPackage(path: canonicalize('b'), tryToReadFileSync: (_) => const Optional('''
+final _packageB = DartPackage(
+    path: canonicalize('b'), tryToReadFileSync: (_) => const Optional('''
 name: b
 dependencies:
   y:
@@ -138,7 +148,8 @@ dev_dependencies:
   z:
 '''));
 
-final _packageC = DartPackage(path: canonicalize('c'), tryToReadFileSync: (_) => const Optional('''
+final _packageC = DartPackage(
+    path: canonicalize('c'), tryToReadFileSync: (_) => const Optional('''
 name: c
 dependencies:
   a:
@@ -147,28 +158,32 @@ dependencies:
     path: ../b
 '''));
 
-final _packageD = DartPackage(path: canonicalize('d'), tryToReadFileSync: (_) => const Optional('''
+final _packageD = DartPackage(
+    path: canonicalize('d'), tryToReadFileSync: (_) => const Optional('''
 name: d
 dependencies:
   c:
     path: ../c
 '''));
 
-final _packageE = DartPackage(path: canonicalize('e'), tryToReadFileSync: (_) => const Optional('''
+final _packageE = DartPackage(
+    path: canonicalize('e'), tryToReadFileSync: (_) => const Optional('''
 name: e
 dev_dependencies:
   a:
     path: ../a
 '''));
 
-final _packageF = DartPackage(path: canonicalize('f'), tryToReadFileSync: (_) => const Optional('''
+final _packageF = DartPackage(
+    path: canonicalize('f'), tryToReadFileSync: (_) => const Optional('''
 name: f
 dev_dependencies:
   e:
     path: ../e
 '''));
 
-final _packageG = DartPackage(path: canonicalize('g'), tryToReadFileSync: (_) => const Optional('''
+final _packageG = DartPackage(
+    path: canonicalize('g'), tryToReadFileSync: (_) => const Optional('''
 name: g
 dependencies:
   a:
@@ -177,7 +192,8 @@ dependency_overrides:
     path: ../a
 '''));
 
-final _packageH = DartPackage(path: canonicalize('h'), tryToReadFileSync: (_) => const Optional('''
+final _packageH = DartPackage(
+    path: canonicalize('h'), tryToReadFileSync: (_) => const Optional('''
 name: h
 dev_dependencies:
   a:
@@ -186,7 +202,8 @@ dependency_overrides:
     path: ../a
 '''));
 
-final _packageI = DartPackage(path: canonicalize('i'), tryToReadFileSync: (_) => const Optional('''
+final _packageI = DartPackage(
+    path: canonicalize('i'), tryToReadFileSync: (_) => const Optional('''
 name: i
 dependencies:
   z:

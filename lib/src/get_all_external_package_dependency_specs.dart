@@ -29,30 +29,38 @@ import 'package:pubspec_yaml/pubspec_yaml.dart';
 ///
 /// Package dependency overrides are taken into account.
 ///
-Iterable<PackageDependencySpec> getAllExternalPackageDependencySpecs(Iterable<PubspecYaml> pubspecYamls) =>
+Iterable<PackageDependencySpec> getAllExternalPackageDependencySpecs(
+        Iterable<PubspecYaml> pubspecYamls) =>
     _filterOutRedundantHostedSpecs(
       {
-        for (final pubspecYaml in pubspecYamls) ..._getDependencySpecs(pubspecYaml),
+        for (final pubspecYaml in pubspecYamls)
+          ..._getDependencySpecs(pubspecYaml),
       }.where(_isExternal),
     );
 
-bool _isExternal(PackageDependencySpec dep) => dep.iswitcho(path: (_) => false, otherwise: () => true);
+bool _isExternal(PackageDependencySpec dep) =>
+    dep.iswitcho(path: (_) => false, otherwise: () => true);
 
 Set<PackageDependencySpec> _getDependencySpecs(PubspecYaml pubspecYaml) => {
       ...pubspecYaml.dependencies,
       ...pubspecYaml.devDependencies,
     }.map((dep) => _correctForOverride(dep, pubspecYaml)).toSet();
 
-PackageDependencySpec _correctForOverride(PackageDependencySpec dep, PubspecYaml pubspecYaml) =>
-    pubspecYaml.dependencyOverrides.firstWhere((d) => d.package() == dep.package(), orElse: () => dep);
+PackageDependencySpec _correctForOverride(
+        PackageDependencySpec dep, PubspecYaml pubspecYaml) =>
+    pubspecYaml.dependencyOverrides
+        .firstWhere((d) => d.package() == dep.package(), orElse: () => dep);
 
-Iterable<PackageDependencySpec> _filterOutRedundantHostedSpecs(Iterable<PackageDependencySpec> specs) =>
+Iterable<PackageDependencySpec> _filterOutRedundantHostedSpecs(
+        Iterable<PackageDependencySpec> specs) =>
     specs.where((s) => s.iswitcho(
           hosted: (hs) =>
               hs.version.hasValue ||
-              specs.where((s) => s.package() == hs.package).every((s) => s.iswitcho(
-                    hosted: (h) => !h.version.hasValue,
-                    otherwise: () => true,
-                  )),
+              specs
+                  .where((s) => s.package() == hs.package)
+                  .every((s) => s.iswitcho(
+                        hosted: (h) => !h.version.hasValue,
+                        otherwise: () => true,
+                      )),
           otherwise: () => true,
         ));

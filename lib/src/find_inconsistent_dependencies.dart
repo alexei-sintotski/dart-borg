@@ -35,13 +35,18 @@ import 'generic_dependency_usage_report.dart';
 ///
 /// NB: To simplify implementation at this moment, version specifications are compared as strings, not semantically.
 ///
-List<DependencyUsageReport<PackageDependency>> findInconsistentDependencies(Map<String, PubspecLock> pubspecLocks) {
+List<DependencyUsageReport<PackageDependency>> findInconsistentDependencies(
+    Map<String, PubspecLock> pubspecLocks) {
   final dependencies = _collectAllDependencies(pubspecLocks).toSet();
-  final externalDependencies = _filterOutPathOnlyDependencies(dependencies).toSet();
-  final normalizedDependencyMap = _normalizeDependencyType(externalDependencies);
+  final externalDependencies =
+      _filterOutPathOnlyDependencies(dependencies).toSet();
+  final normalizedDependencyMap =
+      _normalizeDependencyType(externalDependencies);
   final normalizedDependencies = normalizedDependencyMap.keys.toSet();
-  final inconsistentDependencies = _filterOutConsistentDependencies(normalizedDependencies).toSet();
-  return _createReport(inconsistentDependencies, normalizedDependencyMap, pubspecLocks);
+  final inconsistentDependencies =
+      _filterOutConsistentDependencies(normalizedDependencies).toSet();
+  return _createReport(
+      inconsistentDependencies, normalizedDependencyMap, pubspecLocks);
 }
 
 Iterable<PackageDependency> _collectAllDependencies(
@@ -56,13 +61,18 @@ Iterable<PackageDependency> _filterOutPathOnlyDependencies(
         .where((dd) => dd.package() == d.package())
         .any((dd) => dd.iswitcho(path: (_) => false, otherwise: () => true)));
 
-Map<PackageDependency, PackageDependency> _normalizeDependencyType(Iterable<PackageDependency> dependencies) =>
+Map<PackageDependency, PackageDependency> _normalizeDependencyType(
+        Iterable<PackageDependency> dependencies) =>
     Map.fromEntries(dependencies.map((d) => MapEntry(
           d.iswitch(
-            sdk: (dd) => PackageDependency.sdk(dd.copyWith(type: DependencyType.direct)),
-            hosted: (dd) => PackageDependency.hosted(dd.copyWith(type: DependencyType.direct)),
-            git: (dd) => PackageDependency.git(dd.copyWith(type: DependencyType.direct)),
-            path: (dd) => PackageDependency.path(dd.copyWith(type: DependencyType.direct)),
+            sdk: (dd) =>
+                PackageDependency.sdk(dd.copyWith(type: DependencyType.direct)),
+            hosted: (dd) => PackageDependency.hosted(
+                dd.copyWith(type: DependencyType.direct)),
+            git: (dd) =>
+                PackageDependency.git(dd.copyWith(type: DependencyType.direct)),
+            path: (dd) => PackageDependency.path(
+                dd.copyWith(type: DependencyType.direct)),
           ),
           d,
         )));
@@ -70,7 +80,9 @@ Map<PackageDependency, PackageDependency> _normalizeDependencyType(Iterable<Pack
 Iterable<PackageDependency> _filterOutConsistentDependencies(
   Iterable<PackageDependency> externalDependencies,
 ) =>
-    externalDependencies.where((d) => externalDependencies.where((dd) => dd.package() == d.package()).length > 1);
+    externalDependencies.where((d) =>
+        externalDependencies.where((dd) => dd.package() == d.package()).length >
+        1);
 
 List<DependencyUsageReport<PackageDependency>> _createReport(
   Iterable<PackageDependency> dependencies,
@@ -81,10 +93,13 @@ List<DependencyUsageReport<PackageDependency>> _createReport(
   return names
       .map((name) => DependencyUsageReport(
           dependencyName: name,
-          references: Map.fromEntries(dependencies.where((d) => d.package() == name).map((d) => MapEntry(
-                normalizedDependencyMap[d],
-                _referencesToDependency(normalizedDependencyMap[d], pubspecLocks),
-              )))))
+          references: Map.fromEntries(dependencies
+              .where((d) => d.package() == name)
+              .map((d) => MapEntry(
+                    normalizedDependencyMap[d],
+                    _referencesToDependency(
+                        normalizedDependencyMap[d], pubspecLocks),
+                  )))))
       .toList();
 }
 

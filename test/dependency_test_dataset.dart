@@ -37,12 +37,15 @@ const directHostedXv1 = PackageDependency.hosted(rawDirectHostedXv1);
 final HostedPackageDependency rawDirectHostedXv2 = rawDirectHostedXv1.copyWith(
   version: '2.0.0',
 );
-final PackageDependency directHostedXv2 = PackageDependency.hosted(rawDirectHostedXv2);
+final PackageDependency directHostedXv2 =
+    PackageDependency.hosted(rawDirectHostedXv2);
 
-final HostedPackageDependency rawTransitiveHostedXv2 = rawDirectHostedXv2.copyWith(
+final HostedPackageDependency rawTransitiveHostedXv2 =
+    rawDirectHostedXv2.copyWith(
   type: DependencyType.transitive,
 );
-final PackageDependency transitiveHostedXv2 = PackageDependency.hosted(rawTransitiveHostedXv2);
+final PackageDependency transitiveHostedXv2 =
+    PackageDependency.hosted(rawTransitiveHostedXv2);
 
 const rawDirectSdkXv1 = SdkPackageDependency(
   package: 'x',
@@ -60,7 +63,8 @@ final PackageDependency directSdkXv2 = PackageDependency.sdk(rawDirectSdkXv2);
 final SdkPackageDependency rawTransitiveSdkXv2 = rawDirectSdkXv2.copyWith(
   type: DependencyType.transitive,
 );
-final PackageDependency transitiveSdkXv2 = PackageDependency.sdk(rawTransitiveSdkXv2);
+final PackageDependency transitiveSdkXv2 =
+    PackageDependency.sdk(rawTransitiveSdkXv2);
 
 const rawDirectGitXv1 = GitPackageDependency(
   package: 'x',
@@ -81,7 +85,8 @@ final PackageDependency directGitXv2 = PackageDependency.git(rawDirectGitXv2);
 final GitPackageDependency rawTransitiveGitXv2 = rawDirectGitXv2.copyWith(
   type: DependencyType.transitive,
 );
-final PackageDependency transitiveGitXv2 = PackageDependency.git(rawTransitiveGitXv2);
+final PackageDependency transitiveGitXv2 =
+    PackageDependency.git(rawTransitiveGitXv2);
 
 const rawDirectPathXv1 = PathPackageDependency(
   package: 'x',
@@ -95,9 +100,11 @@ const directPathXv1 = PackageDependency.path(rawDirectPathXv1);
 final PathPackageDependency rawDirectPathXv2 = rawDirectPathXv1.copyWith(
   version: '2.0.0',
 );
-final PackageDependency directPathXv2 = PackageDependency.path(rawDirectPathXv2);
+final PackageDependency directPathXv2 =
+    PackageDependency.path(rawDirectPathXv2);
 
 final PathPackageDependency rawTransitivePathXv2 = rawDirectPathXv2.copyWith(
   type: DependencyType.transitive,
 );
-final PackageDependency transitivePathXv2 = PackageDependency.path(rawTransitivePathXv2);
+final PackageDependency transitivePathXv2 =
+    PackageDependency.path(rawTransitivePathXv2);

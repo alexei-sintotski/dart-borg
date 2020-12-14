@@ -33,20 +33,27 @@ void main() {
     group('given configuration file with paths defined', () {
       final argParser = ArgParser();
       final factory = BorgConfigurationFactory(
-        tryToReadFileSync: (_) => const Optional(_configurationWithIncludedLocation),
+        tryToReadFileSync: (_) =>
+            const Optional(_configurationWithIncludedLocation),
         toAbsolutePath: (s) => s,
       )..populateConfigurationArgs(argParser);
 
       group('given no arguments in command line', () {
-        final config = factory.createConfiguration(argResults: argParser.parse([]));
-        test('it produces configuration with included paths according to the configuration file', () {
+        final config =
+            factory.createConfiguration(argResults: argParser.parse([]));
+        test(
+            'it produces configuration with included paths according to the configuration file',
+            () {
           expect(config.pathsToScan, [_includedLocation]);
         });
       });
 
       group('given command line with included paths defined', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--paths=$_includedLocation2']));
-        test('it produces configuration with included paths according to the command line', () {
+        final config = factory.createConfiguration(
+            argResults: argParser.parse(['--paths=$_includedLocation2']));
+        test(
+            'it produces configuration with included paths according to the command line',
+            () {
           expect(config.pathsToScan, [_includedLocation2]);
         });
       });
@@ -55,20 +62,27 @@ void main() {
     group('given configuration file with excluded paths defined', () {
       final argParser = ArgParser();
       final factory = BorgConfigurationFactory(
-        tryToReadFileSync: (_) => const Optional(_configurationWithExcludedLocation),
+        tryToReadFileSync: (_) =>
+            const Optional(_configurationWithExcludedLocation),
         toAbsolutePath: (s) => s,
       )..populateConfigurationArgs(argParser);
 
       group('given no arguments in command line', () {
-        final config = factory.createConfiguration(argResults: argParser.parse([]));
-        test('it produces configuration with excluded paths according to the configuration file', () {
+        final config =
+            factory.createConfiguration(argResults: argParser.parse([]));
+        test(
+            'it produces configuration with excluded paths according to the configuration file',
+            () {
           expect(config.excludedPaths, [_excludedLocation]);
         });
       });
 
       group('given command line with excluded paths defined', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--paths=$_excludedLocation2']));
-        test('it produces configuration with excluded paths according to the command line', () {
+        final config = factory.createConfiguration(
+            argResults: argParser.parse(['--paths=$_excludedLocation2']));
+        test(
+            'it produces configuration with excluded paths according to the command line',
+            () {
           expect(config.pathsToScan, [_excludedLocation2]);
         });
       });
@@ -77,20 +91,27 @@ void main() {
     group('given configuration file with path to Dart SDK defined', () {
       final argParser = ArgParser();
       final factory = BorgConfigurationFactory(
-        tryToReadFileSync: (_) => const Optional(_configurationWithDartSdkLocation),
+        tryToReadFileSync: (_) =>
+            const Optional(_configurationWithDartSdkLocation),
         toAbsolutePath: (s) => s,
       )..populateConfigurationArgs(argParser);
 
       group('given no arguments in command line', () {
-        final config = factory.createConfiguration(argResults: argParser.parse([]));
-        test('it produces configuration with Dart SDK path according to the configuration file', () {
+        final config =
+            factory.createConfiguration(argResults: argParser.parse([]));
+        test(
+            'it produces configuration with Dart SDK path according to the configuration file',
+            () {
           expect(config.dartSdkPath, const Optional(_dartSdkLocation));
         });
       });
 
       group('given command line with path to Dart SDK defined', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--dartsdk=$_dartSdkLocation2']));
-        test('it produces configuration with Dart SDK path according to the command line', () {
+        final config = factory.createConfiguration(
+            argResults: argParser.parse(['--dartsdk=$_dartSdkLocation2']));
+        test(
+            'it produces configuration with Dart SDK path according to the command line',
+            () {
           expect(config.dartSdkPath, const Optional(_dartSdkLocation2));
         });
       });
@@ -99,20 +120,28 @@ void main() {
     group('given configuration file with path to Flutter SDK defined', () {
       final argParser = ArgParser();
       final factory = BorgConfigurationFactory(
-        tryToReadFileSync: (_) => const Optional(_configurationWithFlutterSdkLocation),
+        tryToReadFileSync: (_) =>
+            const Optional(_configurationWithFlutterSdkLocation),
         toAbsolutePath: (s) => s,
       )..populateConfigurationArgs(argParser);
 
       group('given no arguments in command line', () {
-        final config = factory.createConfiguration(argResults: argParser.parse([]));
-        test('it produces configuration with Flutter SDK path according to the configuration file', () {
+        final config =
+            factory.createConfiguration(argResults: argParser.parse([]));
+        test(
+            'it produces configuration with Flutter SDK path according to the configuration file',
+            () {
           expect(config.flutterSdkPath, const Optional(_flutterSdkLocation));
         });
       });
 
       group('given command line with path to Flutter SDK defined', () {
-        final config = factory.createConfiguration(argResults: argParser.parse(['--fluttersdk=$_flutterSdkLocation2']));
-        test('it produces configuration with Flutter SDK path according to the command line', () {
+        final config = factory.createConfiguration(
+            argResults:
+                argParser.parse(['--fluttersdk=$_flutterSdkLocation2']));
+        test(
+            'it produces configuration with Flutter SDK path according to the command line',
+            () {
           expect(config.flutterSdkPath, const Optional(_flutterSdkLocation2));
         });
       });
@@ -122,7 +151,8 @@ void main() {
       test('it produces configuration without exceptions', () {
         final argParser = ArgParser();
         BorgConfigurationFactory(
-          tryToReadFileSync: (_) => const Optional(_configurationWithAllOptionsSpecified),
+          tryToReadFileSync: (_) =>
+              const Optional(_configurationWithAllOptionsSpecified),
           toAbsolutePath: (s) => s,
         )
           ..populateConfigurationArgs(argParser)

@@ -56,7 +56,8 @@ void main() {
       });
     });
 
-    group('when provided with two distinct versions of a hosted dependency', () {
+    group('when provided with two distinct versions of a hosted dependency',
+        () {
       final report = findInconsistentDependencies({
         'a1': const PubspecLock(packages: [_hostedDependencyAv1]),
         'a2': const PubspecLock(packages: [_hostedDependencyAv2]),
@@ -87,7 +88,9 @@ void main() {
     });
   });
 
-  group('when provided with two dependencies with difference in dependency type only', () {
+  group(
+      'when provided with two dependencies with difference in dependency type only',
+      () {
     final report = findInconsistentDependencies({
       'a1': const PubspecLock(packages: [_hostedDependencyAv1]),
       'a2': const PubspecLock(packages: [_hostedDependencyAv1Transitive]),
@@ -106,7 +109,8 @@ const _hostedDependencyAv1 = PackageDependency.hosted(HostedPackageDependency(
   type: DependencyType.direct,
 ));
 
-const _hostedDependencyAv1Transitive = PackageDependency.hosted(HostedPackageDependency(
+const _hostedDependencyAv1Transitive =
+    PackageDependency.hosted(HostedPackageDependency(
   package: 'a',
   version: '1.0.0',
   name: 'a',

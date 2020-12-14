@@ -40,35 +40,46 @@ void main() {
 
     group('provided with matching reference', () {
       final refs = [directHostedXv2];
-      final r = copyWithPackageDependenciesFromReference([directHostedXv1], refs);
+      final r =
+          copyWithPackageDependenciesFromReference([directHostedXv1], refs);
       test('it provides the reference dependency', () {
         expect(r, refs);
       });
     });
 
-    group('provided with matching hosted reference with different dependency type', () {
-      final r = copyWithPackageDependenciesFromReference([directHostedXv1], [transitiveHostedXv2]);
+    group(
+        'provided with matching hosted reference with different dependency type',
+        () {
+      final r = copyWithPackageDependenciesFromReference(
+          [directHostedXv1], [transitiveHostedXv2]);
       test('it corrects the reference without modifying dependency type', () {
         expect(r, [directHostedXv2]);
       });
     });
 
-    group('provided with matching sdk reference with different dependency type', () {
-      final r = copyWithPackageDependenciesFromReference([directSdkXv1], [transitiveSdkXv2]);
+    group('provided with matching sdk reference with different dependency type',
+        () {
+      final r = copyWithPackageDependenciesFromReference(
+          [directSdkXv1], [transitiveSdkXv2]);
       test('it corrects the reference without modifying dependency type', () {
         expect(r, [directSdkXv2]);
       });
     });
 
-    group('provided with matching git reference with different dependency type', () {
-      final r = copyWithPackageDependenciesFromReference([directGitXv1], [transitiveGitXv2]);
+    group('provided with matching git reference with different dependency type',
+        () {
+      final r = copyWithPackageDependenciesFromReference(
+          [directGitXv1], [transitiveGitXv2]);
       test('it corrects the reference without modifying dependency type', () {
         expect(r, [directGitXv2]);
       });
     });
 
-    group('provided with matching path reference with different dependency type', () {
-      final r = copyWithPackageDependenciesFromReference([directPathXv1], [transitivePathXv2]);
+    group(
+        'provided with matching path reference with different dependency type',
+        () {
+      final r = copyWithPackageDependenciesFromReference(
+          [directPathXv1], [transitivePathXv2]);
       test('it corrects the reference without modifying dependency type', () {
         expect(r, [directPathXv2]);
       });

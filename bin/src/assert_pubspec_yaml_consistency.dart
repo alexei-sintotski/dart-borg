@@ -35,7 +35,10 @@ import 'utils/render_package_name.dart';
 
 void assertPubspecYamlConsistency(Iterable<DartPackage> packages) {
   final inconsistentSpecList = findInconsistentDependencySpecs(
-      Map.fromEntries(packages.map((p) => MapEntry(renderPackageName(p.path), p.pubspecYaml))));
+      Map.fromEntries(packages.map((p) => MapEntry(
+            renderPackageName(p.path),
+            p.pubspecYaml,
+          ))));
 
   if (inconsistentSpecList.isNotEmpty) {
     printDependencyUsageReport(
@@ -43,12 +46,18 @@ void assertPubspecYamlConsistency(Iterable<DartPackage> packages) {
       formatDependency: _formatDependencySpec,
     );
 
-    throw const BorgException('FAILURE: Inconsistent package dependency specifications detected!');
+    throw const BorgException(
+        'FAILURE: Inconsistent package dependency specifications detected!');
   }
 }
 
-String _formatDependencySpec(PackageDependencySpec dependency) => dependency.iswitch(
-    git: (dep) => '${dep.url}${dep.ref.iif(some: (v) => ": $v", none: () => "")}',
-    path: (dep) => '${dep.path}',
-    hosted: (dep) => '${dep.version.valueOr(() => "unspecified")}',
-    sdk: (dep) => '${dep.version.valueOr(() => "unspecified")}');
+String _formatDependencySpec(PackageDependencySpec dependency) =>
+    dependency.iswitch(
+      git: (dep) => '${dep.url}${dep.ref.iif(
+        some: (v) => ": $v",
+        none: () => "",
+      )}',
+      path: (dep) => '${dep.path}',
+      hosted: (dep) => '${dep.version.valueOr(() => "unspecified")}',
+      sdk: (dep) => '${dep.version.valueOr(() => "unspecified")}',
+    );

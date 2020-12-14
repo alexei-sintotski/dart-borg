@@ -47,7 +47,10 @@ Iterable<DartPackage> impactBasedOnPubspecYaml({
     allPackagesInScope: allPackagesInScope,
     tryToReadFileSync: tryToReadFileSync,
   );
-  return packages.expand(productImpactResolver.impact).toSet().union(packages.expand(devImpactResolver.impact).toSet());
+  return packages
+      .expand(productImpactResolver.impact)
+      .toSet()
+      .union(packages.expand(devImpactResolver.impact).toSet());
 }
 
 class _ProductImpactResolver {
@@ -59,7 +62,8 @@ class _ProductImpactResolver {
           tryToReadFileSync: tryToReadFileSync,
         );
 
-  Set<DartPackage> impact(DartPackage package) => _impactMap.containsKey(package) ? _impactMap[package] : {};
+  Set<DartPackage> impact(DartPackage package) =>
+      _impactMap.containsKey(package) ? _impactMap[package] : {};
 
   final Map<DartPackage, Set<DartPackage>> _impactMap;
 
@@ -68,7 +72,8 @@ class _ProductImpactResolver {
     Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
   }) {
     final impactMap = _createInitialImpactMap(allPackagesInScope);
-    _inflateDirectDependencies(allPackagesInScope, (p) => p.pubspecYaml.dependencies, impactMap, tryToReadFileSync);
+    _inflateDirectDependencies(allPackagesInScope,
+        (p) => p.pubspecYaml.dependencies, impactMap, tryToReadFileSync);
     _growTransitiveDependencies(impactMap);
     return impactMap;
   }
@@ -83,7 +88,8 @@ class _DevImpactResolver {
           tryToReadFileSync: tryToReadFileSync,
         );
 
-  Set<DartPackage> impact(DartPackage package) => _impactMap.containsKey(package) ? _impactMap[package] : {};
+  Set<DartPackage> impact(DartPackage package) =>
+      _impactMap.containsKey(package) ? _impactMap[package] : {};
 
   final Map<DartPackage, Set<DartPackage>> _impactMap;
 
@@ -92,12 +98,14 @@ class _DevImpactResolver {
     Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
   }) {
     final impactMap = _createInitialImpactMap(allPackagesInScope);
-    _inflateDirectDependencies(allPackagesInScope, (p) => p.pubspecYaml.devDependencies, impactMap, tryToReadFileSync);
+    _inflateDirectDependencies(allPackagesInScope,
+        (p) => p.pubspecYaml.devDependencies, impactMap, tryToReadFileSync);
     return impactMap;
   }
 }
 
-Map<DartPackage, Set<DartPackage>> _createInitialImpactMap(Iterable<DartPackage> allPackagesInScope) =>
+Map<DartPackage, Set<DartPackage>> _createInitialImpactMap(
+        Iterable<DartPackage> allPackagesInScope) =>
     <DartPackage, Set<DartPackage>>{
       for (final p in allPackagesInScope) ...{
         p: {p}
@@ -127,22 +135,26 @@ void _populateDirectDependencies(
   Optional<String> Function(String) tryToReadFileSync,
 ) {
   for (final d in dependencies(package)
-      .map((p) => _overrideDependency(p, package.pubspecYaml.dependencyOverrides))
+      .map((p) =>
+          _overrideDependency(p, package.pubspecYaml.dependencyOverrides))
       .where(_isPathDependency)) {
     final dp = d.iswitcho(
-      path: (pathDep) =>
-          impactMap.keys.firstWhere((pp) => pp.path == path.canonicalize(path.join(package.path, pathDep.path)),
-              orElse: () => DartPackage(
-                    path: path.canonicalize(path.join(package.path, pathDep.path)),
-                    tryToReadFileSync: tryToReadFileSync,
-                  )),
+      path: (pathDep) => impactMap.keys.firstWhere(
+          (pp) =>
+              pp.path ==
+              path.canonicalize(path.join(package.path, pathDep.path)),
+          orElse: () => DartPackage(
+                path: path.canonicalize(path.join(package.path, pathDep.path)),
+                tryToReadFileSync: tryToReadFileSync,
+              )),
       otherwise: () => null,
     );
     if (impactMap.containsKey(dp)) {
       impactMap[dp].add(package);
     } else {
       impactMap[dp] = {dp};
-      _populateDirectDependencies(dp, dependencies, impactMap, tryToReadFileSync);
+      _populateDirectDependencies(
+          dp, dependencies, impactMap, tryToReadFileSync);
     }
   }
 }
@@ -152,17 +164,22 @@ void _growTransitiveDependencies(
 ) {
   var previousFingerprint = <DartPackage, int>{};
   var currentFingerprint = _fingerprint(impactMap);
-  while (!const DeepCollectionEquality.unordered().equals(previousFingerprint, currentFingerprint)) {
+  while (!const DeepCollectionEquality.unordered()
+      .equals(previousFingerprint, currentFingerprint)) {
     previousFingerprint = currentFingerprint;
     for (final package in impactMap.keys) {
-      final totalImpact = {for (final impactedPackage in impactMap[package]) ...impactMap[impactedPackage]};
+      final totalImpact = {
+        for (final impactedPackage in impactMap[package])
+          ...impactMap[impactedPackage]
+      };
       impactMap[package] = totalImpact;
     }
     currentFingerprint = _fingerprint(impactMap);
   }
 }
 
-Map<DartPackage, int> _fingerprint(Map<DartPackage, Set<DartPackage>> impactMap) =>
+Map<DartPackage, int> _fingerprint(
+        Map<DartPackage, Set<DartPackage>> impactMap) =>
     impactMap.map((p, d) => MapEntry(p, d.length));
 
 PackageDependencySpec _overrideDependency(
@@ -174,4 +191,5 @@ PackageDependencySpec _overrideDependency(
       orElse: () => d,
     );
 
-bool _isPathDependency(PackageDependencySpec d) => d.iswitcho(path: (_) => true, otherwise: () => false);
+bool _isPathDependency(PackageDependencySpec d) =>
+    d.iswitcho(path: (_) => true, otherwise: () => false);

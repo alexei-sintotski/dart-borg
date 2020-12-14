@@ -38,21 +38,28 @@ Iterable<PackageDependency> computePackageDependencyCorrection(
   Iterable<PackageDependency> deps,
   Iterable<PackageDependency> references,
 ) =>
-    references
-        .map((ref) => _correctDependencyType(ref, deps))
-        .where((ref) => deps.any((dep) => dep.package() == ref.package() && dep != ref));
+    references.map((ref) => _correctDependencyType(ref, deps)).where((ref) =>
+        deps.any((dep) => dep.package() == ref.package() && dep != ref));
 
 PackageDependency _correctDependencyType(
   PackageDependency ref,
   Iterable<PackageDependency> deps,
 ) =>
     ref.iswitch(
-      sdk: (r) => PackageDependency.sdk(
-          r.copyWith(type: deps.firstWhere((d) => d.package() == r.package, orElse: () => ref).type())),
-      hosted: (r) => PackageDependency.hosted(
-          r.copyWith(type: deps.firstWhere((d) => d.package() == r.package, orElse: () => ref).type())),
-      git: (r) => PackageDependency.git(
-          r.copyWith(type: deps.firstWhere((d) => d.package() == r.package, orElse: () => ref).type())),
-      path: (r) => PackageDependency.path(
-          r.copyWith(type: deps.firstWhere((d) => d.package() == r.package, orElse: () => ref).type())),
+      sdk: (r) => PackageDependency.sdk(r.copyWith(
+          type: deps
+              .firstWhere((d) => d.package() == r.package, orElse: () => ref)
+              .type())),
+      hosted: (r) => PackageDependency.hosted(r.copyWith(
+          type: deps
+              .firstWhere((d) => d.package() == r.package, orElse: () => ref)
+              .type())),
+      git: (r) => PackageDependency.git(r.copyWith(
+          type: deps
+              .firstWhere((d) => d.package() == r.package, orElse: () => ref)
+              .type())),
+      path: (r) => PackageDependency.path(r.copyWith(
+          type: deps
+              .firstWhere((d) => d.package() == r.package, orElse: () => ref)
+              .type())),
     );

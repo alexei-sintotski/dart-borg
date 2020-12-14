@@ -38,6 +38,8 @@ void _addPathsMultiOption({
     );
 
 // ignore: avoid_as
-Iterable<String> _getPathsMultiOption(ArgResults argResults) => argResults[_namePathsMultiOption] as Iterable<String>;
+Iterable<String> _getPathsMultiOption(ArgResults argResults) =>
+    // ignore: avoid_as
+    argResults[_namePathsMultiOption] as Iterable<String>;
 
 const _namePathsMultiOption = 'paths';

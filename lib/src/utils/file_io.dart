@@ -32,7 +32,8 @@ import 'package:plain_optional/plain_optional.dart';
 
 Optional<String> tryToReadFileSync(String filePath) {
   final file = File(filePath);
-  if (file.existsSync() && [FileSystemEntityType.file].contains(file.statSync().type)) {
+  if (file.existsSync() &&
+      [FileSystemEntityType.file].contains(file.statSync().type)) {
     return Optional(file.readAsStringSync());
   } else {
     return const Optional.none();
@@ -44,4 +45,5 @@ void saveStringToFileSync(String filePath, String content) {
   File(filePath).writeAsStringSync(content);
 }
 
-String absolutizePath(String location) => path.canonicalize(path.absolute(location));
+String absolutizePath(String location) =>
+    path.canonicalize(path.absolute(location));

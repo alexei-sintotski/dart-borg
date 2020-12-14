@@ -25,7 +25,8 @@
 
 import 'package:args/args.dart';
 
-void addVerboseFlag(ArgParser argParser) => argParser.addFlag(_name, abbr: 'v', help: 'Verbose output');
+void addVerboseFlag(ArgParser argParser) =>
+    argParser.addFlag(_name, abbr: 'v', help: 'Verbose output');
 
 // ignore: avoid_as
 bool getVerboseFlag(ArgResults argResults) => argResults[_name] as bool;

@@ -61,7 +61,8 @@ class BootCommand extends Command<void> {
   }
 
   @override
-  String get description => 'Executes "pub get" for multiple packages in repository\n\n'
+  String get description =>
+      'Executes "pub get" for multiple packages in repository\n\n'
       'Packages to bootstrap can be specified as arguments. '
       'If no arguments are supplied, the command bootstraps all scanned packages.\n'
       '"flutter packages get" is used to resolve dependencies for Flutter packages.';
@@ -72,13 +73,15 @@ class BootCommand extends Command<void> {
   @override
   void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
 
-  static final BorgConfigurationFactory configurationFactory = BorgConfigurationFactory();
+  static final BorgConfigurationFactory configurationFactory =
+      BorgConfigurationFactory();
   // ignore: prefer_const_constructors
   static final BorgContextFactory contextFactory = BorgContextFactory();
   final BorgContext context;
 
   void _run() {
-    final configuration = configurationFactory.createConfiguration(argResults: argResults);
+    final configuration =
+        configurationFactory.createConfiguration(argResults: argResults);
     final context = contextFactory.createBorgContext();
 
     final packages = scanForPackages(
@@ -95,7 +98,8 @@ class BootCommand extends Command<void> {
         break;
       case BootMode.incremental:
         if (_isPartialBootstrappingRequested()) {
-          print('Bootstrapping of specific packages is requested, using basic bootstrapping\n');
+          print(
+              'Bootstrapping of specific packages is requested, using basic bootstrapping\n');
           _executeBasicBootstrapping(
             packages: packages,
             configuration: configuration,
@@ -116,9 +120,11 @@ class BootCommand extends Command<void> {
               dartSdkVersion: dartSdkVersion,
               gitref: gitHead(),
               bootMode: getBootModeOption(argResults),
-              modifiedPackages: _getPackageDiff(gitref: 'HEAD').map(path.relative),
+              modifiedPackages:
+                  _getPackageDiff(gitref: 'HEAD').map(path.relative),
               flutterSdkVersion: configuration.flutterSdkPath.iif(
-                some: (flutterSdkPath) => Optional(flutterSdkVersion(flutterSdkPath: flutterSdkPath)),
+                some: (flutterSdkPath) =>
+                    Optional(flutterSdkVersion(flutterSdkPath: flutterSdkPath)),
                 none: () => const Optional.none(),
               ))),
         ),
@@ -135,7 +141,8 @@ class BootCommand extends Command<void> {
     final packagesToBoot = _selectPackagesSpecifiedInCommandLine(packages);
 
     if (packagesToBoot.isEmpty) {
-      throw const BorgException('\nFATAL: Nothing to do, please check command line');
+      throw const BorgException(
+          '\nFATAL: Nothing to do, please check command line');
     }
 
     _bootstrapPackages(
@@ -144,9 +151,11 @@ class BootCommand extends Command<void> {
     );
   }
 
-  Iterable<DartPackage> _selectPackagesSpecifiedInCommandLine(Iterable<DartPackage> packages) =>
+  Iterable<DartPackage> _selectPackagesSpecifiedInCommandLine(
+          Iterable<DartPackage> packages) =>
       _isPartialBootstrappingRequested()
-          ? packages.where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)))
+          ? packages
+              .where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)))
           : packages;
 
   void _executeIncrementalBootstrapping({
@@ -158,12 +167,15 @@ class BootCommand extends Command<void> {
 
     final packagesToBoot = context.iif(
       some: (ctx) {
-        if (_isFlutterVersionChanged(context: ctx, configuration: configuration)) {
+        if (_isFlutterVersionChanged(
+            context: ctx, configuration: configuration)) {
           return packages;
         }
 
-        if (ctx.dartSdkVersion != dartSdkVersion && ctx.dartSdkVersion.isNotEmpty) {
-          print('Dart version change detected, bootstrapping of all packages required\n'
+        if (ctx.dartSdkVersion != dartSdkVersion &&
+            ctx.dartSdkVersion.isNotEmpty) {
+          print(
+              'Dart version change detected, bootstrapping of all packages required\n'
               '\t${ctx.dartSdkVersion}\n'
               '=> \t$dartSdkVersion\n');
           return packages;
@@ -172,9 +184,12 @@ class BootCommand extends Command<void> {
         final packageDiff = {
           ..._getPackageDiff(gitref: ctx.gitref),
           ...ctx.modifiedPackages.map(path.canonicalize),
-        }.where((d) => Directory(d).existsSync()).where((d) => File(path.join(d, 'pubspec.yaml')).existsSync());
+        }
+            .where((d) => Directory(d).existsSync())
+            .where((d) => File(path.join(d, 'pubspec.yaml')).existsSync());
 
-        final changedPackagesWithinScope = packages.where((p) => packageDiff.contains(p.path));
+        final changedPackagesWithinScope =
+            packages.where((p) => packageDiff.contains(p.path));
         final changedPackagesOutsideOfScope = packageDiff
             .where((d) => !changedPackagesWithinScope.any((p) => p.path == d))
             .map((d) => DartPackage(path: d));
@@ -195,10 +210,14 @@ class BootCommand extends Command<void> {
         print('');
 
         print('Analyzing package dependencies...');
-        final packagesUnderImpactSinceLastSuccessfulBoot = impactBasedOnPubspecYaml(
+        final packagesUnderImpactSinceLastSuccessfulBoot =
+            impactBasedOnPubspecYaml(
           packages: changedPackages,
           allPackagesInScope: {...packages, ...changedPackagesOutsideOfScope},
-        ).where((p) => !changedPackagesOutsideOfScope.any((pp) => pp.path == p.path)).toSet();
+        )
+                .where((p) => !changedPackagesOutsideOfScope
+                    .any((pp) => pp.path == p.path))
+                .toSet();
         print('');
 
         return packagesUnderImpactSinceLastSuccessfulBoot;
@@ -208,7 +227,8 @@ class BootCommand extends Command<void> {
         print('Bootstrapping all found packages...\n');
 
         if (packages.isEmpty) {
-          throw const BorgException('\nFATAL: Nothing to do, please check command line');
+          throw const BorgException(
+              '\nFATAL: Nothing to do, please check command line');
         }
 
         return packages;
@@ -232,9 +252,11 @@ class BootCommand extends Command<void> {
       context.flutterSdkVersion.iif(
         some: (ctxVersion) => configuration.flutterSdkPath.iif(
           some: (flutterSdkPath) {
-            final actualVersion = flutterSdkVersion(flutterSdkPath: flutterSdkPath);
+            final actualVersion =
+                flutterSdkVersion(flutterSdkPath: flutterSdkPath);
             if (actualVersion != ctxVersion) {
-              print('Flutter version change detected, bootstrapping of all packages required\n\n'
+              print(
+                  'Flutter version change detected, bootstrapping of all packages required\n\n'
                   '$ctxVersion\n\n'
                   '=>\n\n'
                   '$actualVersion\n');
@@ -261,12 +283,15 @@ class BootCommand extends Command<void> {
     var i = 1;
     for (final package in packages) {
       final counter = '[${i++}/${packages.length}]';
-      print('$counter ${package.isFlutterPackage ? 'Flutter' : 'Dart'} package ${renderPackageName(package.path)}...');
+      print(
+          '$counter ${package.isFlutterPackage ? 'Flutter' : 'Dart'} package ${renderPackageName(package.path)}...');
 
       resolveDependencies(
         package: package,
         configuration: configuration,
-        verbosity: getVerboseFlag(argResults) ? VerbosityLevel.verbose : VerbosityLevel.short,
+        verbosity: getVerboseFlag(argResults)
+            ? VerbosityLevel.verbose
+            : VerbosityLevel.short,
       );
     }
 
@@ -277,6 +302,11 @@ class BootCommand extends Command<void> {
 Set<String> _getPackageDiff({
   @required String gitref,
 }) =>
-    gitDiffFiles(gitref: gitref).where(_isPubspecFile).map(path.dirname).map(path.canonicalize).toSet();
+    gitDiffFiles(gitref: gitref)
+        .where(_isPubspecFile)
+        .map(path.dirname)
+        .map(path.canonicalize)
+        .toSet();
 
-bool _isPubspecFile(String pathToFile) => path.basenameWithoutExtension(pathToFile) == 'pubspec';
+bool _isPubspecFile(String pathToFile) =>
+    path.basenameWithoutExtension(pathToFile) == 'pubspec';
