@@ -15,10 +15,10 @@ Feature roadmap:
 
 | version | Major feature                                                                                                            |
 |---------|--------------------------------------------------------------------------------------------------------------------------|
-| 1.5     | Ability to define commands in the configuration file                                                                     |
-| 1.6     | List outdated packages (requires Dart 2.8)                                                                               |
+| 1.5     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
+| 1.6     | List outdated packages                                                                                                   |
 | 1.7     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository |
-| 1.8     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
+| 1.8     | Ability to define commands in the configuration file                                                                     |
 
 # Installation
 
