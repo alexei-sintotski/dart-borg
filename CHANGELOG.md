@@ -1,3 +1,5 @@
+## [1.4.5+1] - Dart 2.10 and upgraded dependencies
+
 ## [1.4.5] - 2020-09-20
 * Feature: Incremental bootstrapping is the default bootstrapping mode
 * Optimization: Massive improvement of performance of dependency analysis during incremental bootstrapping
