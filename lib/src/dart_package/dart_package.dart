@@ -26,10 +26,10 @@
 import 'package:meta/meta.dart';
 import 'package:path/path.dart';
 import 'package:plain_optional/plain_optional.dart';
+import 'package:pubspec_lock/pubspec_lock.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
 
 import '../utils/file_io.dart';
-import '../utils/lazy_data.dart';
 
 // ignore_for_file: public_member_api_docs
 
@@ -38,20 +38,23 @@ class DartPackage {
   DartPackage({
     @required this.path,
     Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
-  }) : _pubspecYaml = LazyData(
-            populate: () => tryToReadFileSync(join(path, 'pubspec.yaml')).iif(
-                  some: (content) => content.toPubspecYaml(),
-                  none: () => throw AssertionError(
-                      '${join(path, 'pubspec.yaml')} does not exist!'),
-                ));
+  })  : pubspecYaml = tryToReadFileSync(join(path, 'pubspec.yaml')).iif(
+          some: (content) => content.toPubspecYaml(),
+          none: () => throw AssertionError(
+            '${join(path, 'pubspec.yaml')} does not exist!',
+          ),
+        ),
+        pubspecLock = tryToReadFileSync(join(path, 'pubspec.lock')).iif(
+          some: (content) => Optional(content.loadPubspecLockFromYaml()),
+          none: () => const Optional.none(),
+        );
 
   final String path;
-  PubspecYaml get pubspecYaml => _pubspecYaml.entry;
+  final PubspecYaml pubspecYaml;
+  final Optional<PubspecLock> pubspecLock;
 
   bool get isFlutterPackage =>
       pubspecYaml.dependencies.any((d) => d.package() == 'flutter');
-
-  final LazyData<PubspecYaml> _pubspecYaml;
 
   @override
   String toString() => 'DartPackage(path: $path)';
