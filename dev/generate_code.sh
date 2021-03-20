@@ -7,5 +7,4 @@ dev/format_dart_code.sh
 
 if [ -n "$(git status --porcelain -- **/*.g.dart)" ]; then
   git diff -- **/*.g.dart
-  exit 1
 fi
