@@ -89,6 +89,9 @@ class EvolveCommand extends Command<void> {
           if (p.pubspecLock.hasValue) p.pubspecLock.valueOr(() => null)
       ],
     );
+    final sdkSpec = packages.isNotEmpty
+        ? packages.first.pubspecYaml.environment
+        : {'sdk': '>=2.10.0 <3.0.0'};
     if (getVerboseFlag(argResults)) {
       _printDependencySpecs(allExternalDepSpecs);
     }
@@ -100,6 +103,7 @@ class EvolveCommand extends Command<void> {
     final references = _upgradeDependencies(
       allExternalDepSpecs,
       allExternalResolvedDeps,
+      sdkSpec,
     );
     print(
       '\tresolved ${references.length} direct and transitive external '
@@ -133,6 +137,7 @@ class EvolveCommand extends Command<void> {
   Iterable<PackageDependency> _upgradeDependencies(
     Iterable<PackageDependencySpec> directDepSpecs,
     Iterable<PackageDependency> directDeps,
+    Map<String, String> environment,
   ) =>
       withTempLocation(action: (location) {
         final package = _createPackage(
@@ -140,6 +145,7 @@ class EvolveCommand extends Command<void> {
           location: location.path,
           depSpecs: directDepSpecs,
           resolvedDeps: directDeps,
+          environment: environment,
         );
         upgradeDependencies(
           package: package,
@@ -155,6 +161,7 @@ class EvolveCommand extends Command<void> {
     @required String location,
     @required Iterable<PackageDependencySpec> depSpecs,
     @required Iterable<PackageDependency> resolvedDeps,
+    @required Map<String, String> environment,
   }) {
     if (getVerboseFlag(argResults)) {
       print('\tusing temporary package at $location...');
@@ -162,6 +169,7 @@ class EvolveCommand extends Command<void> {
     File(path.join(location, 'pubspec.yaml')).writeAsStringSync(PubspecYaml(
       name: name,
       dependencies: depSpecs,
+      environment: environment,
     ).toYamlString());
     File(path.join(location, 'pubspec.lock')).writeAsStringSync(PubspecLock(
       packages: resolvedDeps,
