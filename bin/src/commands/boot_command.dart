@@ -40,7 +40,7 @@ import 'package:plain_optional/plain_optional.dart';
 
 import '../options/boot_mode.dart';
 import '../options/verbose.dart';
-import '../resolve_dependencies.dart';
+import '../pub_operations.dart';
 import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
 import '../utils/git.dart';

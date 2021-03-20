@@ -43,21 +43,12 @@ void resolveDependencies({
   String arguments = '',
   VerbosityLevel verbosity = VerbosityLevel.short,
 }) {
-  String createPubCommandLine(DartPackage package) => package.isFlutterPackage
-      ? configuration.flutterSdkPath.iif(
-          some: (flutterSdkPath) => '${path.joinAll([
-            flutterSdkPath,
-            'bin',
-            'flutter'
-          ])} packages get',
-          none: () => throw BorgException(
-              'FATAL: Cannot bootstrap Flutter package ${package.path}, '
-              'path to Flutter SDK is not defined'),
-        )
-      : '${_pub(configuration)} get $arguments';
-
   final result = runSystemCommand(
-      command: createPubCommandLine(package),
+      command: _pubGetCommand(
+        package: package,
+        configuration: configuration,
+        arguments: arguments,
+      ),
       workingDirectory: Directory(package.path),
       environment: configuration.flutterSdkPath.iif(
         some: (flutterSdkPath) => {'FLUTTER_ROOT': flutterSdkPath},
@@ -73,6 +64,77 @@ void resolveDependencies({
     throw const BorgException('FAILURE: pub get failed');
   }
 }
+
+void upgradeDependencies({
+  @required DartPackage package,
+  @required BorgConfiguration configuration,
+  String arguments = '',
+  VerbosityLevel verbosity = VerbosityLevel.short,
+}) {
+  final result = runSystemCommand(
+      command: _upgradeDepsCommand(
+        package: package,
+        configuration: configuration,
+        arguments: arguments,
+      ),
+      workingDirectory: Directory(package.path),
+      environment: configuration.flutterSdkPath.iif(
+        some: (flutterSdkPath) => {'FLUTTER_ROOT': flutterSdkPath},
+        none: () => {},
+      ));
+
+  if (result.exitCode != 0 || verbosity == VerbosityLevel.verbose) {
+    stdout.write('\n');
+    print(result.stdout);
+    print(result.stderr);
+  }
+  if (result.exitCode != 0) {
+    throw const BorgException('FAILURE: Upgrade of dependencies failed');
+  }
+}
+
+String _pubGetCommand({
+  @required DartPackage package,
+  @required BorgConfiguration configuration,
+  @required String arguments,
+}) =>
+    _createPubCommandLine(
+      package: package,
+      configuration: configuration,
+      flutterArguments: 'packages get',
+      pubArguments: 'get $arguments',
+    );
+
+String _upgradeDepsCommand({
+  @required DartPackage package,
+  @required BorgConfiguration configuration,
+  @required String arguments,
+}) =>
+    _createPubCommandLine(
+      package: package,
+      configuration: configuration,
+      flutterArguments: 'packages upgrade',
+      pubArguments: 'upgrade $arguments',
+    );
+
+String _createPubCommandLine({
+  @required DartPackage package,
+  @required BorgConfiguration configuration,
+  @required String flutterArguments,
+  @required String pubArguments,
+}) =>
+    package.isFlutterPackage
+        ? configuration.flutterSdkPath.iif(
+            some: (flutterSdkPath) => '${path.joinAll([
+              flutterSdkPath,
+              'bin',
+              'flutter'
+            ])} $flutterArguments',
+            none: () => throw BorgException(
+                'FATAL: Cannot bootstrap Flutter package ${package.path}, '
+                'path to Flutter SDK is not defined'),
+          )
+        : '${_pub(configuration)} $pubArguments';
 
 String _pub(BorgConfiguration config) => config.dartSdkPath.iif(
       some: (location) => path.joinAll([location, 'bin', 'pub']),

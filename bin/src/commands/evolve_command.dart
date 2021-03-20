@@ -30,6 +30,7 @@ import 'package:borg/borg.dart';
 import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/configuration/factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
+import 'package:borg/src/get_all_external_package_dependencies.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:pubspec_lock/pubspec_lock.dart';
@@ -38,7 +39,7 @@ import 'package:pubspec_yaml/pubspec_yaml.dart';
 import '../assert_pubspec_yaml_consistency.dart';
 import '../options/dry_run.dart';
 import '../options/verbose.dart';
-import '../resolve_dependencies.dart';
+import '../pub_operations.dart';
 import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
 import '../utils/render_package_name.dart';
@@ -80,7 +81,14 @@ class EvolveCommand extends Command<void> {
     assertPubspecYamlConsistency(packages);
 
     final allExternalDepSpecs = getAllExternalPackageDependencySpecs(
-        packages.map((p) => p.pubspecYaml));
+      packages.map((p) => p.pubspecYaml),
+    );
+    final allExternalResolvedDeps = getAllExternalPackageDependencies(
+      [
+        for (final p in packages)
+          if (p.pubspecLock.hasValue) p.pubspecLock.valueOr(() => null)
+      ],
+    );
     if (getVerboseFlag(argResults)) {
       _printDependencySpecs(allExternalDepSpecs);
     }
@@ -89,7 +97,10 @@ class EvolveCommand extends Command<void> {
       '\nResolving ${allExternalDepSpecs.length} direct external dependencies '
       'used by all found packages...',
     );
-    final references = _resolveConsistentDependencySet(allExternalDepSpecs);
+    final references = _upgradeDependencies(
+      allExternalDepSpecs,
+      allExternalResolvedDeps,
+    );
     print(
       '\tresolved ${references.length} direct and transitive external '
       'dependencies',
@@ -119,15 +130,18 @@ class EvolveCommand extends Command<void> {
     print('\nSUCCESS: ${packages.length} packages have been processed');
   }
 
-  Iterable<PackageDependency> _resolveConsistentDependencySet(
-          Iterable<PackageDependencySpec> directDepSpecs) =>
+  Iterable<PackageDependency> _upgradeDependencies(
+    Iterable<PackageDependencySpec> directDepSpecs,
+    Iterable<PackageDependency> directDeps,
+  ) =>
       withTempLocation(action: (location) {
         final package = _createPackage(
           name: 'borg_evolve_temp',
           location: location.path,
           depSpecs: directDepSpecs,
+          resolvedDeps: directDeps,
         );
-        resolveDependencies(
+        upgradeDependencies(
           package: package,
           configuration: configuration,
           arguments: '--no-precompile',
@@ -140,6 +154,7 @@ class EvolveCommand extends Command<void> {
     @required String name,
     @required String location,
     @required Iterable<PackageDependencySpec> depSpecs,
+    @required Iterable<PackageDependency> resolvedDeps,
   }) {
     if (getVerboseFlag(argResults)) {
       print('\tusing temporary package at $location...');
@@ -147,6 +162,9 @@ class EvolveCommand extends Command<void> {
     File(path.join(location, 'pubspec.yaml')).writeAsStringSync(PubspecYaml(
       name: name,
       dependencies: depSpecs,
+    ).toYamlString());
+    File(path.join(location, 'pubspec.lock')).writeAsStringSync(PubspecLock(
+      packages: resolvedDeps,
     ).toYamlString());
     return DartPackage(path: path.canonicalize(location));
   }
