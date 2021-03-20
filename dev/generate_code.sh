@@ -6,5 +6,6 @@ find . -name '*.g.dart' | xargs -I % sh -c 'cat dev/ignored_lint_warning_for_gen
 dev/format_dart_code.sh
 
 if [ -n "$(git status --porcelain -- **/*.g.dart)" ]; then
+  git diff -- **/*.g.dart
   exit 1
 fi
