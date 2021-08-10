@@ -1,3 +1,5 @@
+## [1.4.6] - Dart 2.12+ expects SDK specification in pubspec.yaml
+
 ## [1.4.5+1] - Dart 2.10 and upgraded dependencies
 
 ## [1.4.5] - 2020-09-20

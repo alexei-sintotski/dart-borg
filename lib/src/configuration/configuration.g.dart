@@ -30,12 +30,14 @@ abstract class $BorgConfiguration {
   String toString() =>
       "BorgConfiguration(dartSdkPath: $dartSdkPath, flutterSdkPath: $flutterSdkPath, pathsToScan: $pathsToScan, excludedPaths: $excludedPaths)";
   @override
-  bool operator ==(dynamic other) =>
-      other.runtimeType == runtimeType &&
-      dartSdkPath == other.dartSdkPath &&
-      flutterSdkPath == other.flutterSdkPath &&
-      pathsToScan == other.pathsToScan &&
-      excludedPaths == other.excludedPaths;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BorgConfiguration &&
+          other.runtimeType == runtimeType &&
+          dartSdkPath == other.dartSdkPath &&
+          flutterSdkPath == other.flutterSdkPath &&
+          pathsToScan == other.pathsToScan &&
+          excludedPaths == other.excludedPaths;
   @override
   int get hashCode {
     var result = 17;
