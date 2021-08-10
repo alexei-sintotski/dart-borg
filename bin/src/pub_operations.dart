@@ -126,10 +126,10 @@ String _createPubCommandLine({
     package.isFlutterPackage
         ? configuration.flutterSdkPath.iif(
             some: (flutterSdkPath) => '${path.joinAll([
-              flutterSdkPath,
-              'bin',
-              'flutter'
-            ])} $flutterArguments',
+                  flutterSdkPath,
+                  'bin',
+                  'flutter'
+                ])} $flutterArguments',
             none: () => throw BorgException(
                 'FATAL: Cannot bootstrap Flutter package ${package.path}, '
                 'path to Flutter SDK is not defined'),
