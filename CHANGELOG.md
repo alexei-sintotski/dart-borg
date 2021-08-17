@@ -1,3 +1,7 @@
+## [1.5.0] - Deps
+* Feature: "borg deps" lists external dependencies for multiple packages across repository
+* Improvement: Packages without pubspec.lock are always bootstrapped in all modes
+
 ## [1.4.6] - Dart 2.12+ expects SDK specification in pubspec.yaml
 
 ## [1.4.5+1] - Dart 2.10 and upgraded dependencies
