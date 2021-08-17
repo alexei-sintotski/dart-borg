@@ -87,11 +87,13 @@ class DepsCommand extends Command<void> {
         pubspecLocks.expand((pubspecLock) => pubspecLock.sdks).toSet();
     if (sdkDeps.isNotEmpty) {
       print('=== SDK dependencies:');
-      _printSdks(sdkDeps);
+      _printSdks(sdkDeps, packagesToAnalyze);
       print('');
     }
 
     final externalDeps = getAllExternalPackageDependencies(pubspecLocks);
+
+    print('Analyzing package dependencies...');
 
     final directDependencies = _getDirectDependencies(
       externalDeps,
@@ -99,6 +101,8 @@ class DepsCommand extends Command<void> {
     );
     final transDependencies =
         externalDeps.where((d) => !directDependencies.contains(d));
+
+    print('');
 
     if (directDependencies.isNotEmpty) {
       print('=== Direct external dependencies:');
@@ -119,19 +123,45 @@ class DepsCommand extends Command<void> {
           ? packages
               .where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)))
           : packages;
-}
 
-void _printSdks(Set<SdkDependency> sdkDeps) {
-  final maxSdkNameLen = _getMaxLength(sdkDeps.map((d) => d.sdk));
+  void _printSdks(
+    Set<SdkDependency> sdkDeps,
+    Iterable<DartPackage> packages,
+  ) {
+    final maxSdkNameLen = _getMaxLength(sdkDeps.map((d) => d.sdk));
+    final maxSdkVersionLen = _getMaxLength(sdkDeps.map((d) => d.version));
 
-  final sortedSdkDeps = sdkDeps.toList()
-    ..sort((a, b) {
-      final result = a.sdk.compareTo(b.sdk);
-      return result == 0 ? a.version.compareTo(b.version) : result;
-    });
+    final sortedSdkDeps = sdkDeps.toList()
+      ..sort((a, b) {
+        final result = a.sdk.compareTo(b.sdk);
+        return result == 0 ? a.version.compareTo(b.version) : result;
+      });
 
-  for (final sdk in sortedSdkDeps) {
-    print('${sdk.sdk.padRight(maxSdkNameLen)} ${sdk.version} ');
+    for (final sdk in sortedSdkDeps) {
+      final referredBy = packages.where((p) => p.pubspecLock.iif(
+            some: (pubspecLock) => pubspecLock.sdks.contains(sdk),
+            none: () => throw AssertionError('pubspec.lock is not found for '
+                'package ${path.relative(p.path)}'),
+          ));
+      print('${sdk.sdk.padRight(maxSdkNameLen)} '
+          '${sdk.version.padRight(maxSdkVersionLen)} '
+          '[${_printPackages(referredBy)}]');
+    }
+  }
+
+  String _printPackages(Iterable<DartPackage> packages) {
+    if (getVerboseFlag(argResults)) {
+      return packages.map((p) => p.pubspecYaml.name).join(' ');
+    } else {
+      const packagesToPrint = 5;
+      final result = packages
+          .map((p) => p.pubspecYaml.name)
+          .take(packagesToPrint)
+          .join(' ');
+      return packages.length > packagesToPrint
+          ? '${packages.length} packages: $result ...'
+          : result;
+    }
   }
 }
 
@@ -145,7 +175,7 @@ void _printDependencies(Iterable<PackageDependency> deps) {
 
     for (final dep in sortedDeps) {
       final reference = dep.iswitch(
-        sdk: (d) => d.description,
+        sdk: (d) => '${d.description} SDK',
         hosted: (d) => '${d.url}/packages/${d.package}',
         git: (d) => d.url,
         path: (d) => d.path,
