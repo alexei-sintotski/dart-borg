@@ -186,6 +186,16 @@ class BootCommand extends Command<void> {
           return packages;
         }
 
+        final packagesWithoutPubspecLock = packages.where(
+            (p) => !File(path.join(p.path, 'pubspec.lock')).existsSync());
+        if (packagesWithoutPubspecLock.isNotEmpty) {
+          print('Found packages without pubspec.lock:');
+          for (final package in packagesWithoutPubspecLock) {
+            print('\t${renderPackageName(package.path)}');
+          }
+          print('');
+        }
+
         final packageDiff = {
           ..._getPackageDiff(gitref: ctx.gitref),
           ...ctx.modifiedPackages.map(path.canonicalize),
@@ -204,20 +214,23 @@ class BootCommand extends Command<void> {
           ...changedPackagesOutsideOfScope,
         };
 
-        if (changedPackages.isEmpty) {
-          return <DartPackage>[];
+        if (changedPackages.isNotEmpty) {
+          print('Configuration changes detected for the following packages:');
+          for (final package in changedPackages) {
+            print('\t${renderPackageName(package.path)}');
+          }
+          print('');
         }
 
-        print('Configuration changes detected for the following packages:');
-        for (final package in changedPackages) {
-          print('\t${renderPackageName(package.path)}');
-        }
-        print('');
+        final packagesToAnalyze = [
+          ...changedPackages,
+          ...packagesWithoutPubspecLock
+        ];
 
         print('Analyzing package dependencies...');
         final packagesUnderImpactSinceLastSuccessfulBoot =
             impactBasedOnPubspecYaml(
-          packages: changedPackages,
+          packages: packagesToAnalyze,
           allPackagesInScope: {...packages, ...changedPackagesOutsideOfScope},
         )
                 .where((p) => !changedPackagesOutsideOfScope
