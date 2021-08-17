@@ -31,7 +31,7 @@ import 'package:borg/src/configuration/factory.dart';
 class InitCommand extends Command<void> {
   @override
   String get description =>
-      'Generates configuration file borg.yaml in current directory';
+      'Generates configuration file borg.yaml in current directory.';
 
   @override
   String get name => 'init';

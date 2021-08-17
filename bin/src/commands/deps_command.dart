@@ -47,7 +47,7 @@ class DepsCommand extends Command<void> {
 
   @override
   String get description =>
-      'List external dependencies of multiple packages in monorepo.\n'
+      'Lists external dependencies of multiple packages across repository.\n'
       'Considers all packages by default. To select a subset of packages, '
       'please specify package names in command line.';
 

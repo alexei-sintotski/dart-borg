@@ -56,7 +56,7 @@ class EvolveCommand extends Command<void> {
 
   @override
   String get description =>
-      'Upgrade Dart dependencies consistently across multiple packages';
+      'Upgrades Dart dependencies consistently across multiple packages.';
 
   @override
   String get name => 'evolve';
