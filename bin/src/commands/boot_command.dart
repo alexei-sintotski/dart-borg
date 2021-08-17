@@ -62,7 +62,7 @@ class BootCommand extends Command<void> {
 
   @override
   String get description =>
-      'Executes "pub get" for multiple packages in repository\n\n'
+      'Executes "pub get" for multiple packages in repository.\n\n'
       'Packages to bootstrap can be specified as arguments. If no arguments '
       'are supplied, the command bootstraps all scanned packages.\n'
       '"flutter packages get" is used to resolve dependencies for Flutter '
