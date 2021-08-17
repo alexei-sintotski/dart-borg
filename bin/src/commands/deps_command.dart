@@ -77,7 +77,21 @@ class DepsCommand extends Command<void> {
     }
 
     _assertPubspecLockFilesExist(packagesToAnalyze);
-    final externalDeps = _getAllExternalDeps(packagesToAnalyze);
+
+    final pubspecLocks = packagesToAnalyze.map((p) => p.pubspecLock.valueOr(
+          () => throw AssertionError('pubspec.lock is not found for '
+              'package ${path.relative(p.path)}'),
+        ));
+
+    final sdkDeps =
+        pubspecLocks.expand((pubspecLock) => pubspecLock.sdks).toSet();
+    if (sdkDeps.isNotEmpty) {
+      print('=== SDK dependencies:');
+      _printSdks(sdkDeps);
+      print('');
+    }
+
+    final externalDeps = getAllExternalPackageDependencies(pubspecLocks);
 
     final directDependencies = _getDirectDependencies(
       externalDeps,
@@ -105,6 +119,14 @@ class DepsCommand extends Command<void> {
           ? packages
               .where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)))
           : packages;
+}
+
+void _printSdks(Set<SdkDependency> sdkDeps) {
+  final maxSdkNameLen = _getMaxLength(sdkDeps.map((d) => d.sdk));
+
+  for (final sdk in sdkDeps) {
+    print('${sdk.sdk.padRight(maxSdkNameLen)} ${sdk.version} ');
+  }
 }
 
 void _printDependencies(Iterable<PackageDependency> deps) {
@@ -141,14 +163,6 @@ Iterable<PackageDependency> _getDirectDependencies(
                   'pubspec.lock expected for ${package.path}'),
             )))
         .toList(growable: false);
-
-Iterable<PackageDependency> _getAllExternalDeps(
-  Iterable<DartPackage> packages,
-) =>
-    getAllExternalPackageDependencies(packages.map((p) => p.pubspecLock.valueOr(
-          () => throw AssertionError('pubspec.lock is not found for '
-              'package ${path.relative(p.path)}'),
-        )));
 
 void _assertPubspecLockFilesExist(
   Iterable<DartPackage> packages,
