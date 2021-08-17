@@ -5,6 +5,8 @@ dart bin/main.dart evolve --dry-run --exclude test/integration_test_sets/package
 dart bin/main.dart boot --mode=incremental
 dart bin/main.dart boot --mode=basic
 dart bin/main.dart boot --mode=incremental
+dart bin/main.dart deps
+
 dartanalyzer --fatal-hints .
 pub run test
 # pub run dependency_validator
