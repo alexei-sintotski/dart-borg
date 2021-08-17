@@ -124,7 +124,13 @@ class DepsCommand extends Command<void> {
 void _printSdks(Set<SdkDependency> sdkDeps) {
   final maxSdkNameLen = _getMaxLength(sdkDeps.map((d) => d.sdk));
 
-  for (final sdk in sdkDeps) {
+  final sortedSdkDeps = sdkDeps.toList()
+    ..sort((a, b) {
+      final result = a.sdk.compareTo(b.sdk);
+      return result == 0 ? a.version.compareTo(b.version) : result;
+    });
+
+  for (final sdk in sortedSdkDeps) {
     print('${sdk.sdk.padRight(maxSdkNameLen)} ${sdk.version} ');
   }
 }
@@ -134,7 +140,10 @@ void _printDependencies(Iterable<PackageDependency> deps) {
     final maxPackageNameLen = _getMaxLength(deps.map((d) => d.package()));
     final maxVersionLen = _getMaxLength(deps.map((d) => d.version()));
 
-    for (final dep in deps) {
+    final sortedDeps = deps.toList()
+      ..sort((a, b) => a.package().compareTo(b.package()));
+
+    for (final dep in sortedDeps) {
       final reference = dep.iswitch(
         sdk: (d) => d.description,
         hosted: (d) => '${d.url}/packages/${d.package}',
