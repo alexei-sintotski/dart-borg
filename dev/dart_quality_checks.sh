@@ -11,5 +11,6 @@ dartanalyzer --fatal-hints .
 pub run test
 # pub run dependency_validator
 dev/format_dart_code.sh --set-exit-if-changed
-dev/generate_code.sh
+# Code generation check is switched off until migration to null-safety
+# dev/generate_code.sh
 pub publish --dry-run
