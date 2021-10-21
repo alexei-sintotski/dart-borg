@@ -1,6 +1,6 @@
 name: borg
 description: Dart borg is a command-line tool to support development teams working on large scale Dart and Flutter mono repositories.
-version: 1.5.0
+version: 1.5.1
 homepage: https://github.com/alexei-sintotski/dart-borg
 
 executables:

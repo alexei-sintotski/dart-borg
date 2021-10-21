@@ -1,3 +1,7 @@
+## [1.5.1] - Bootstrapping performance improvement
+* Optimization: Much faster dependency analysis for incremental bootstrapping
+* Kudos to @werediver and @spkersten for finding and fixing it!
+
 ## [1.5.0] - Deps
 * Feature: "borg deps" lists external dependencies for multiple packages across repository
 * Improvement: Packages without pubspec.lock are always bootstrapped in all modes
