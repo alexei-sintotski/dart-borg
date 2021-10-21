@@ -201,13 +201,16 @@ class BootCommand extends Command<void> {
           ...ctx.modifiedPackages.map(path.canonicalize),
         }
             .where((d) => Directory(d).existsSync())
-            .where((d) => File(path.join(d, 'pubspec.yaml')).existsSync());
+            .where((d) => File(path.join(d, 'pubspec.yaml')).existsSync())
+            .toList(growable: false);
 
-        final changedPackagesWithinScope =
-            packages.where((p) => packageDiff.contains(p.path));
+        final changedPackagesWithinScope = packages
+            .where((p) => packageDiff.contains(p.path))
+            .toList(growable: false);
         final changedPackagesOutsideOfScope = packageDiff
             .where((d) => !changedPackagesWithinScope.any((p) => p.path == d))
-            .map((d) => DartPackage(path: d));
+            .map((d) => DartPackage(path: d))
+            .toList(growable: false);
 
         final changedPackages = {
           ...changedPackagesWithinScope,
