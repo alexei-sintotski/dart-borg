@@ -34,11 +34,13 @@ import 'package:path/path.dart' as path;
 import 'package:pubspec_lock/pubspec_lock.dart';
 
 import '../assert_pubspec_yaml_consistency.dart';
+import '../options/correct.dart';
 import '../options/lock.dart';
 import '../options/verbose.dart';
 import '../options/yaml.dart';
 import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
+import '../utils/correct_package_dependency.dart';
 import '../utils/print_dependency_usage_report.dart';
 
 // ignore_for_file: avoid_print
@@ -49,6 +51,7 @@ class ProbeCommand extends Command<void> {
     addPubspecYamlFlag(argParser);
     addPubspecLockFlag(argParser);
     addVerboseFlag(argParser);
+    addCorrectFlag(argParser);
   }
 
   @override
@@ -114,13 +117,16 @@ class ProbeCommand extends Command<void> {
     print('Analyzing dependencies...');
     final inconsistentUsageList = findInconsistentDependencies(pubspecLocks);
 
-    if (inconsistentUsageList.isNotEmpty) {
+    if (inconsistentUsageList.isNotEmpty && getCorrectFlag(argResults)) {
+      correctPackageDependencyBasedOnReport(report: inconsistentUsageList);
+    } else if (inconsistentUsageList.isNotEmpty) {
       printDependencyUsageReport(
         report: inconsistentUsageList,
         formatDependency: _formatDependencyInfo,
       );
       throw const BorgException(
-          'FAILURE: Inconsistent use of external dependencies detected!');
+        'FAILURE: Inconsistent use of external dependencies detected!',
+      );
     }
   }
 }
