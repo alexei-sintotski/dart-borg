@@ -23,38 +23,15 @@
  *
  */
 
-import 'package:borg/borg.dart';
-import 'package:meta/meta.dart';
+import 'package:args/args.dart';
 
-// ignore_for_file: avoid_print
-
-void printDependencyUsageReport<DependencyType>({
-  @required List<DependencyUsageReport<DependencyType>> report,
-  @required String Function(DependencyType dependency) formatDependency,
-}) {
-  final sortedUses = report
-    ..sort((a, b) => a.dependencyName.compareTo(b.dependencyName));
-
-  for (final use in sortedUses) {
-    print(
-      '\n${use.dependencyName}: '
-      'inconsistent dependency specifications detected',
+void addCorrectFlag(ArgParser argParser) => argParser.addFlag(
+      _name,
+      abbr: 'c',
+      help: 'Prompt user to correct found issues.',
     );
-    printDependencyUsage(
-      dependencies: use.references,
-      formatDependency: formatDependency,
-    );
-  }
-}
 
-void printDependencyUsage<DependencyType>({
-  @required Map<DependencyType, List<String>> dependencies,
-  @required String Function(DependencyType dependency) formatDependency,
-}) {
-  for (final dependency in dependencies.keys) {
-    print('\tVersion ${formatDependency(dependency)} is used by:');
-    for (final user in dependencies[dependency]) {
-      print('\t\t$user');
-    }
-  }
-}
+// ignore: avoid_as
+bool getCorrectFlag(ArgResults argResults) => argResults[_name] as bool;
+
+const _name = 'correct';
