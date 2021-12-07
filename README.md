@@ -79,8 +79,14 @@ yaml: inconsistent use detected
         Version 2.2.1 is used by:
                 ./test/pubspec.lock
 
-FAILUE: Inconsistent use of external dependencies detected!
+FAILURE: Inconsistent use of external dependencies detected!
+         Consider to use the --correct option to fix issues.
 ```
+
+Inconsistencies found in pubspec.lock files can be corrected in semi-automatic mode using
+the `--correct` command-line flag:
+
+`borg probe --correct`
 
 ## Output in case of consistent configuration
 

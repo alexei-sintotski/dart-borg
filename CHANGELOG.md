@@ -1,3 +1,7 @@
+## [1.6.0] - Semiautomatic pubspec.lock correction
+* Feature: Semiautomatic correction of pubspec.lock inconsistencies with `probe --correct`
+* Kudos to @RtgrV for design and implementation!
+
 ## [1.5.1] - Bootstrapping performance improvement
 * Optimization: Much faster dependency analysis for incremental bootstrapping
 * Kudos to @werediver and @spkersten for finding and fixing it!
