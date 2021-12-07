@@ -125,7 +125,8 @@ class ProbeCommand extends Command<void> {
         formatDependency: _formatDependencyInfo,
       );
       throw const BorgException(
-        'FAILURE: Inconsistent use of external dependencies detected!',
+        'FAILURE: Inconsistent use of external dependencies detected!\n'
+        '         Consider to use the --correct option to fix issues.',
       );
     }
   }
