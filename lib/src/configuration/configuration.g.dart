@@ -6,39 +6,60 @@ part of 'configuration.dart';
 // FunctionalDataGenerator
 // **************************************************************************
 
-// ignore_for_file: join_return_with_assignment
-// ignore_for_file: avoid_classes_with_only_static_members
-// ignore_for_file: non_constant_identifier_names
-// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
 abstract class $BorgConfiguration {
   const $BorgConfiguration();
+
   Optional<String> get dartSdkPath;
   Optional<String> get flutterSdkPath;
   Iterable<String> get pathsToScan;
   Iterable<String> get excludedPaths;
-  BorgConfiguration copyWith(
-          {Optional<String> dartSdkPath,
-          Optional<String> flutterSdkPath,
-          Iterable<String> pathsToScan,
-          Iterable<String> excludedPaths}) =>
+
+  BorgConfiguration copyWith({
+    Optional<String>? dartSdkPath,
+    Optional<String>? flutterSdkPath,
+    Iterable<String>? pathsToScan,
+    Iterable<String>? excludedPaths,
+  }) =>
       BorgConfiguration(
-          dartSdkPath: dartSdkPath ?? this.dartSdkPath,
-          flutterSdkPath: flutterSdkPath ?? this.flutterSdkPath,
-          pathsToScan: pathsToScan ?? this.pathsToScan,
-          excludedPaths: excludedPaths ?? this.excludedPaths);
+        dartSdkPath: dartSdkPath ?? this.dartSdkPath,
+        flutterSdkPath: flutterSdkPath ?? this.flutterSdkPath,
+        pathsToScan: pathsToScan ?? this.pathsToScan,
+        excludedPaths: excludedPaths ?? this.excludedPaths,
+      );
+
+  BorgConfiguration copyUsing(
+      void Function(BorgConfiguration$Change change) mutator) {
+    final change = BorgConfiguration$Change._(
+      this.dartSdkPath,
+      this.flutterSdkPath,
+      this.pathsToScan,
+      this.excludedPaths,
+    );
+    mutator(change);
+    return BorgConfiguration(
+      dartSdkPath: change.dartSdkPath,
+      flutterSdkPath: change.flutterSdkPath,
+      pathsToScan: change.pathsToScan,
+      excludedPaths: change.excludedPaths,
+    );
+  }
+
   @override
   String toString() =>
       "BorgConfiguration(dartSdkPath: $dartSdkPath, flutterSdkPath: $flutterSdkPath, pathsToScan: $pathsToScan, excludedPaths: $excludedPaths)";
+
   @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) =>
-      identical(this, other) ||
       other is BorgConfiguration &&
-          other.runtimeType == runtimeType &&
-          dartSdkPath == other.dartSdkPath &&
-          flutterSdkPath == other.flutterSdkPath &&
-          pathsToScan == other.pathsToScan &&
-          excludedPaths == other.excludedPaths;
+      other.runtimeType == runtimeType &&
+      dartSdkPath == other.dartSdkPath &&
+      flutterSdkPath == other.flutterSdkPath &&
+      pathsToScan == other.pathsToScan &&
+      excludedPaths == other.excludedPaths;
+
   @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
   int get hashCode {
     var result = 17;
     result = 37 * result + dartSdkPath.hashCode;
@@ -49,19 +70,45 @@ abstract class $BorgConfiguration {
   }
 }
 
+class BorgConfiguration$Change {
+  BorgConfiguration$Change._(
+    this.dartSdkPath,
+    this.flutterSdkPath,
+    this.pathsToScan,
+    this.excludedPaths,
+  );
+
+  Optional<String> dartSdkPath;
+  Optional<String> flutterSdkPath;
+  Iterable<String> pathsToScan;
+  Iterable<String> excludedPaths;
+}
+
+// ignore: avoid_classes_with_only_static_members
 class BorgConfiguration$ {
   static final dartSdkPath = Lens<BorgConfiguration, Optional<String>>(
-      (s_) => s_.dartSdkPath,
-      (s_, dartSdkPath) => s_.copyWith(dartSdkPath: dartSdkPath));
+    (dartSdkPathContainer) => dartSdkPathContainer.dartSdkPath,
+    (dartSdkPathContainer, dartSdkPath) =>
+        dartSdkPathContainer.copyWith(dartSdkPath: dartSdkPath),
+  );
+
   static final flutterSdkPath = Lens<BorgConfiguration, Optional<String>>(
-      (s_) => s_.flutterSdkPath,
-      (s_, flutterSdkPath) => s_.copyWith(flutterSdkPath: flutterSdkPath));
+    (flutterSdkPathContainer) => flutterSdkPathContainer.flutterSdkPath,
+    (flutterSdkPathContainer, flutterSdkPath) =>
+        flutterSdkPathContainer.copyWith(flutterSdkPath: flutterSdkPath),
+  );
+
   static final pathsToScan = Lens<BorgConfiguration, Iterable<String>>(
-      (s_) => s_.pathsToScan,
-      (s_, pathsToScan) => s_.copyWith(pathsToScan: pathsToScan));
+    (pathsToScanContainer) => pathsToScanContainer.pathsToScan,
+    (pathsToScanContainer, pathsToScan) =>
+        pathsToScanContainer.copyWith(pathsToScan: pathsToScan),
+  );
+
   static final excludedPaths = Lens<BorgConfiguration, Iterable<String>>(
-      (s_) => s_.excludedPaths,
-      (s_, excludedPaths) => s_.copyWith(excludedPaths: excludedPaths));
+    (excludedPathsContainer) => excludedPathsContainer.excludedPaths,
+    (excludedPathsContainer, excludedPaths) =>
+        excludedPathsContainer.copyWith(excludedPaths: excludedPaths),
+  );
 }
 
 // ignore_for_file: avoid_annotating_with_dynamic
