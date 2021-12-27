@@ -33,7 +33,10 @@ import 'package:path/path.dart' as path;
 
 @immutable
 class FileFinder {
-  const FileFinder({@required this.filename, @required this.ignored});
+  const FileFinder({
+    required this.filename,
+    required this.ignored,
+  });
 
   final String filename;
   final Iterable<String> ignored;

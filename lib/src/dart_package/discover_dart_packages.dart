@@ -23,9 +23,6 @@
  *
  */
 
-// ignore_for_file: public_member_api_docs
-
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 
 import '../configuration/configuration.dart';
@@ -33,7 +30,7 @@ import '../utils/file_finder.dart';
 import 'dart_package.dart';
 
 Iterable<DartPackage> discoverDartPackages({
-  @required BorgConfiguration configuration,
+  required BorgConfiguration configuration,
 }) =>
     _locationsToScan(configuration)
         .map((location) => DartPackage(path: location));

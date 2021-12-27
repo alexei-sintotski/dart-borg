@@ -31,7 +31,6 @@ import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/configuration/factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
 import 'package:borg/src/get_all_external_package_dependencies.dart';
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:pubspec_lock/pubspec_lock.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
@@ -157,11 +156,11 @@ class EvolveCommand extends Command<void> {
       });
 
   DartPackage _createPackage({
-    @required String name,
-    @required String location,
-    @required Iterable<PackageDependencySpec> depSpecs,
-    @required Iterable<PackageDependency> resolvedDeps,
-    @required Map<String, String> environment,
+    required String name,
+    required String location,
+    required Iterable<PackageDependencySpec> depSpecs,
+    required Iterable<PackageDependency> resolvedDeps,
+    required Map<String, String> environment,
   }) {
     if (getVerboseFlag(argResults)) {
       print('\tusing temporary package at $location...');
@@ -229,16 +228,17 @@ String _printDependencySpecDetail(PackageDependencySpec dep) => dep.iswitch(
       path: (_) => '',
     );
 
-Iterable<PackageDependency> _getResolvedDependencies(
-        {@required Directory location}) =>
+Iterable<PackageDependency> _getResolvedDependencies({
+  required Directory location,
+}) =>
     File(path.join(location.path, 'pubspec.lock'))
         .readAsStringSync()
         .loadPubspecLockFromYaml()
         .packages;
 
 void _printDependencyCorrections({
-  @required Iterable<PackageDependency> actualDependencies,
-  @required Iterable<PackageDependency> correctionSet,
+  required Iterable<PackageDependency> actualDependencies,
+  required Iterable<PackageDependency> correctionSet,
 }) {
   if (correctionSet.isEmpty) {
     print(' => up-to-date');

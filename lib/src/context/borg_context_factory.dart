@@ -55,7 +55,10 @@ class BorgContextFactory {
         none: () => const BorgContext(),
       );
 
-  void save({@required BorgContext context}) => _saveStringToFileSync(
+  void save({
+    required BorgContext context,
+  }) =>
+      _saveStringToFileSync(
         pathToContextFile,
         json2yaml(context.toJson()),
       );

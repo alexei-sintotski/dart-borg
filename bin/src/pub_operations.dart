@@ -27,7 +27,6 @@ import 'dart:io';
 
 import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 
 import 'utils/borg_exception.dart';
@@ -38,8 +37,8 @@ import 'utils/run_system_command.dart';
 enum VerbosityLevel { short, verbose }
 
 void resolveDependencies({
-  @required DartPackage package,
-  @required BorgConfiguration configuration,
+  required DartPackage package,
+  required BorgConfiguration configuration,
   String arguments = '',
   VerbosityLevel verbosity = VerbosityLevel.short,
 }) {
@@ -66,8 +65,8 @@ void resolveDependencies({
 }
 
 void upgradeDependencies({
-  @required DartPackage package,
-  @required BorgConfiguration configuration,
+  required DartPackage package,
+  required BorgConfiguration configuration,
   String arguments = '',
   VerbosityLevel verbosity = VerbosityLevel.short,
 }) {
@@ -94,9 +93,9 @@ void upgradeDependencies({
 }
 
 String _pubGetCommand({
-  @required DartPackage package,
-  @required BorgConfiguration configuration,
-  @required String arguments,
+  required DartPackage package,
+  required BorgConfiguration configuration,
+  required String arguments,
 }) =>
     _createPubCommandLine(
       package: package,
@@ -106,9 +105,9 @@ String _pubGetCommand({
     );
 
 String _upgradeDepsCommand({
-  @required DartPackage package,
-  @required BorgConfiguration configuration,
-  @required String arguments,
+  required DartPackage package,
+  required BorgConfiguration configuration,
+  required String arguments,
 }) =>
     _createPubCommandLine(
       package: package,
@@ -118,10 +117,10 @@ String _upgradeDepsCommand({
     );
 
 String _createPubCommandLine({
-  @required DartPackage package,
-  @required BorgConfiguration configuration,
-  @required String flutterArguments,
-  @required String pubArguments,
+  required DartPackage package,
+  required BorgConfiguration configuration,
+  required String flutterArguments,
+  required String pubArguments,
 }) =>
     package.isFlutterPackage
         ? configuration.flutterSdkPath.iif(

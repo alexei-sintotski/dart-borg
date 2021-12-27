@@ -38,7 +38,9 @@ class BorgContext {
 
   const BorgContext({this.bootContext = const Optional.none()});
 
-  BorgContext copyWith({Optional<BorgBootContext> bootContext}) =>
+  BorgContext copyWith({
+    Optional<BorgBootContext> bootContext = const Optional.none(),
+  }) =>
       BorgContext(bootContext: bootContext ?? this.bootContext);
 
   factory BorgContext.fromJson(Map<String, dynamic> json) => BorgContext(

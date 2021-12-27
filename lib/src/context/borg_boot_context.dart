@@ -41,9 +41,9 @@ class BorgBootContext {
   final BootMode bootMode;
 
   const BorgBootContext({
-    @required this.dartSdkVersion,
-    @required this.gitref,
-    @required this.bootMode,
+    required this.dartSdkVersion,
+    required this.gitref,
+    required this.bootMode,
     this.modifiedPackages = const [],
     this.flutterSdkVersion = const Optional.none(),
   });

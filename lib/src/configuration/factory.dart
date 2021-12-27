@@ -82,7 +82,9 @@ class BorgConfigurationFactory {
     );
   }
 
-  BorgConfiguration createConfiguration({@required ArgResults argResults}) {
+  BorgConfiguration createConfiguration({
+    required ArgResults argResults,
+  }) {
     final dartSdkOption = _getDartSdkOption(argResults);
     final flutterSdkOption = _getFlutterSdkOption(argResults);
     return BorgConfiguration(
@@ -112,8 +114,8 @@ class BorgConfigurationFactory {
 }
 
 BorgConfiguration _constructConfigFromFile({
-  @required Optional<String> Function(String) tryToReadFileSync,
-  @required String Function(String) toAbsolutePath,
+  required Optional<String> Function(String) tryToReadFileSync,
+  required String Function(String) toAbsolutePath,
 }) {
   final configFromFile = tryToReadFileSync(_configurationFileName).iif(
     some: (s) => BorgConfiguration.fromJson(

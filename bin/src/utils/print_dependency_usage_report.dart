@@ -24,13 +24,12 @@
  */
 
 import 'package:borg/borg.dart';
-import 'package:meta/meta.dart';
 
 // ignore_for_file: avoid_print
 
 void printDependencyUsageReport<DependencyType>({
-  @required List<DependencyUsageReport<DependencyType>> report,
-  @required String Function(DependencyType dependency) formatDependency,
+  required List<DependencyUsageReport<DependencyType>> report,
+  required String Function(DependencyType dependency) formatDependency,
 }) {
   final sortedUses = report
     ..sort((a, b) => a.dependencyName.compareTo(b.dependencyName));
@@ -48,8 +47,8 @@ void printDependencyUsageReport<DependencyType>({
 }
 
 void printDependencyUsage<DependencyType>({
-  @required Map<DependencyType, List<String>> dependencies,
-  @required String Function(DependencyType dependency) formatDependency,
+  required Map<DependencyType, List<String>> dependencies,
+  required String Function(DependencyType dependency) formatDependency,
 }) {
   for (final dependency in dependencies.keys) {
     print('\tVersion ${formatDependency(dependency)} is used by:');

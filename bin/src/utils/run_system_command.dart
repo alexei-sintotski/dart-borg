@@ -25,11 +25,9 @@
 
 import 'dart:io';
 
-import 'package:meta/meta.dart';
-
 ProcessResult runSystemCommand({
-  @required String command,
-  @required Directory workingDirectory,
+  required String command,
+  required Directory workingDirectory,
   Map<String, String> environment = const {},
 }) {
   final commandList = command.split(' ');

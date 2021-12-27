@@ -23,7 +23,6 @@
  *
  */
 
-import 'package:meta/meta.dart';
 import 'package:pubspec_lock/pubspec_lock.dart';
 
 /// This function sets a [dependency] to a specific [toVersion] by adjusting
@@ -31,9 +30,9 @@ import 'package:pubspec_lock/pubspec_lock.dart';
 /// list.
 ///
 Map<String, PubspecLock> packageDependencyToVersion({
-  @required PackageDependency dependency,
-  @required String toVersion,
-  @required Map<String, PubspecLock> inPubspecLocks,
+  required PackageDependency dependency,
+  required String toVersion,
+  required Map<String, PubspecLock> inPubspecLocks,
 }) {
   if (dependency.version() == toVersion) {
     return inPubspecLocks;
