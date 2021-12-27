@@ -23,13 +23,10 @@
  *
  */
 
-// ignore_for_file: public_member_api_docs
-
-import 'package:meta/meta.dart';
 import 'package:plain_optional/plain_optional.dart';
 
 class LazyData<T> {
-  LazyData({@required this.populate});
+  LazyData({required this.populate});
 
   final T Function() populate;
   Optional<T> _entry = Optional<T>.none();

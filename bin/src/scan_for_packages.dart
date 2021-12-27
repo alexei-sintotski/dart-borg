@@ -31,15 +31,14 @@ import 'package:args/args.dart';
 import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
 import 'package:borg/src/dart_package/discover_dart_packages.dart';
-import 'package:meta/meta.dart';
 
 import 'options/verbose.dart';
 import 'utils/borg_exception.dart';
 import 'utils/render_package_name.dart';
 
 Iterable<DartPackage> scanForPackages({
-  @required BorgConfiguration configuration,
-  @required ArgResults argResults,
+  required BorgConfiguration configuration,
+  required ArgResults argResults,
 }) {
   stdout.write('Scanning for Dart packages...');
 

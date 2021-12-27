@@ -30,8 +30,10 @@ import 'package:meta/meta.dart';
 @immutable
 class DependencyUsageReport<DependencyType> {
   /// The constructor is used to create report
-  const DependencyUsageReport(
-      {@required this.dependencyName, @required this.references});
+  const DependencyUsageReport({
+    required this.dependencyName,
+    required this.references,
+  });
 
   /// Name of the package dependency
   final String dependencyName;

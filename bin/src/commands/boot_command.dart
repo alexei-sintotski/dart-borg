@@ -34,7 +34,6 @@ import 'package:borg/src/context/borg_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
 import 'package:borg/src/impact/impact_based_on_pubspec_yaml.dart';
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:plain_optional/plain_optional.dart';
 
@@ -138,8 +137,8 @@ class BootCommand extends Command<void> {
   bool _isPartialBootstrappingRequested() => argResults.rest.isNotEmpty;
 
   void _executeBasicBootstrapping({
-    @required Iterable<DartPackage> packages,
-    @required BorgConfiguration configuration,
+    required Iterable<DartPackage> packages,
+    required BorgConfiguration configuration,
   }) {
     final packagesToBoot = _selectPackagesSpecifiedInCommandLine(packages);
 
@@ -162,9 +161,9 @@ class BootCommand extends Command<void> {
           : packages;
 
   void _executeIncrementalBootstrapping({
-    @required Iterable<DartPackage> packages,
-    @required BorgConfiguration configuration,
-    @required Optional<BorgBootContext> context,
+    required Iterable<DartPackage> packages,
+    required BorgConfiguration configuration,
+    required Optional<BorgBootContext> context,
   }) {
     print('Analyzing workspace changes for incremental bootstrapping...\n');
 
@@ -267,8 +266,8 @@ class BootCommand extends Command<void> {
   }
 
   bool _isFlutterVersionChanged({
-    @required BorgBootContext context,
-    @required BorgConfiguration configuration,
+    required BorgBootContext context,
+    required BorgConfiguration configuration,
   }) =>
       context.flutterSdkVersion.iif(
         some: (ctxVersion) => configuration.flutterSdkPath.iif(
@@ -297,8 +296,8 @@ class BootCommand extends Command<void> {
       );
 
   void _bootstrapPackages({
-    @required Iterable<DartPackage> packages,
-    @required BorgConfiguration configuration,
+    required Iterable<DartPackage> packages,
+    required BorgConfiguration configuration,
   }) {
     print('Bootstrapping packages:');
     var i = 1;
@@ -322,7 +321,7 @@ class BootCommand extends Command<void> {
 }
 
 Set<String> _getPackageDiff({
-  @required String gitref,
+  required String gitref,
 }) =>
     gitDiffFiles(gitref: gitref)
         .where(_isPubspecFile)

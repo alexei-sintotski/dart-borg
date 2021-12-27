@@ -26,8 +26,8 @@
 part of '../factory.dart';
 
 void _addPathsMultiOption({
-  @required ArgParser argParser,
-  @required Iterable<String> defaultsTo,
+  required ArgParser argParser,
+  required Iterable<String> defaultsTo,
 }) =>
     argParser.addMultiOption(
       _namePathsMultiOption,

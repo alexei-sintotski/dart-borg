@@ -26,8 +26,8 @@
 part of '../factory.dart';
 
 void _addFlutterSdkOption({
-  @required ArgParser argParser,
-  @required String defaultsTo,
+  required ArgParser argParser,
+  required String defaultsTo,
 }) =>
     argParser.addOption(
       _nameFlutterSdkOption,

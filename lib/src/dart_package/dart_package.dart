@@ -36,7 +36,7 @@ import '../utils/file_io.dart';
 @immutable
 class DartPackage {
   DartPackage({
-    @required this.path,
+    required this.path,
     Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
   })  : pubspecYaml = tryToReadFileSync(join(path, 'pubspec.yaml')).iif(
           some: (content) => content.toPubspecYaml(),

@@ -26,7 +26,6 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:collection/collection.dart';
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:plain_optional/plain_optional.dart';
 import 'package:pubspec_yaml/pubspec_yaml.dart';
@@ -35,8 +34,8 @@ import '../dart_package/dart_package.dart';
 import '../utils/file_io.dart';
 
 Iterable<DartPackage> impactBasedOnPubspecYaml({
-  @required Iterable<DartPackage> packages,
-  @required Iterable<DartPackage> allPackagesInScope,
+  required Iterable<DartPackage> packages,
+  required Iterable<DartPackage> allPackagesInScope,
   Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
 }) {
   final productImpactResolver = _ProductImpactResolver(
@@ -55,8 +54,8 @@ Iterable<DartPackage> impactBasedOnPubspecYaml({
 
 class _ProductImpactResolver {
   _ProductImpactResolver({
-    @required Iterable<DartPackage> allPackagesInScope,
-    @required Optional<String> Function(String) tryToReadFileSync,
+    required Iterable<DartPackage> allPackagesInScope,
+    required Optional<String> Function(String) tryToReadFileSync,
   }) : _impactMap = _createImpactMap(
           allPackagesInScope: allPackagesInScope,
           tryToReadFileSync: tryToReadFileSync,
@@ -68,7 +67,7 @@ class _ProductImpactResolver {
   final Map<DartPackage, Set<DartPackage>> _impactMap;
 
   static Map<DartPackage, Set<DartPackage>> _createImpactMap({
-    @required Iterable<DartPackage> allPackagesInScope,
+    required Iterable<DartPackage> allPackagesInScope,
     Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
   }) {
     final impactMap = _createInitialImpactMap(allPackagesInScope);
@@ -81,8 +80,8 @@ class _ProductImpactResolver {
 
 class _DevImpactResolver {
   _DevImpactResolver({
-    @required Iterable<DartPackage> allPackagesInScope,
-    @required Optional<String> Function(String) tryToReadFileSync,
+    required Iterable<DartPackage> allPackagesInScope,
+    required Optional<String> Function(String) tryToReadFileSync,
   }) : _impactMap = _createImpactMap(
           allPackagesInScope: allPackagesInScope,
           tryToReadFileSync: tryToReadFileSync,
@@ -94,7 +93,7 @@ class _DevImpactResolver {
   final Map<DartPackage, Set<DartPackage>> _impactMap;
 
   static Map<DartPackage, Set<DartPackage>> _createImpactMap({
-    @required Iterable<DartPackage> allPackagesInScope,
+    required Iterable<DartPackage> allPackagesInScope,
     Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
   }) {
     final impactMap = _createInitialImpactMap(allPackagesInScope);

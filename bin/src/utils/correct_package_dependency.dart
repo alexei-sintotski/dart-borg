@@ -27,7 +27,6 @@ import 'dart:io';
 
 import 'package:borg/borg.dart';
 import 'package:borg/src/package_dependency_to_version.dart';
-import 'package:meta/meta.dart';
 import 'package:pubspec_lock/pubspec_lock.dart';
 
 import 'borg_exception.dart';
@@ -36,7 +35,7 @@ import 'print_dependency_usage_report.dart';
 // ignore_for_file: avoid_print
 
 void correctPackageDependencyBasedOnReport({
-  @required List<DependencyUsageReport<PackageDependency>> report,
+  required List<DependencyUsageReport<PackageDependency>> report,
 }) {
   final reports = report
     ..sort((a, b) => a.dependencyName.compareTo(b.dependencyName));
