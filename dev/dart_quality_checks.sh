@@ -8,9 +8,9 @@ dart bin/main.dart boot --mode=incremental
 dart bin/main.dart deps
 
 dartanalyzer --fatal-hints .
-pub run test
+dart run test
 # pub run dependency_validator
 dev/format_dart_code.sh --set-exit-if-changed
 # Code generation check is switched off until migration to null-safety
 # dev/generate_code.sh
-pub publish --dry-run
+dart pub publish --dry-run
