@@ -23,19 +23,12 @@
  *
  */
 
-import 'dart:io';
-import 'dart:math';
-
 import 'package:args/command_runner.dart';
 import 'package:borg/src/configuration/factory.dart';
-import 'package:borg/src/dart_package/dart_package.dart';
-import 'package:borg/src/get_all_external_package_dependencies.dart';
-import 'package:path/path.dart' as path;
-import 'package:pubspec_lock/pubspec_lock.dart';
 
 import '../options/verbose.dart';
-import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
+import 'deps_command_runner.dart';
 
 // ignore_for_file: avoid_print
 
@@ -55,168 +48,14 @@ class DepsCommand extends Command<void> {
   String get name => 'deps';
 
   @override
-  void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
+  void run() => exitWithMessageOnBorgException(
+        action: () => DepsCommandRunner(
+          configurationFactory,
+          argResults!,
+        ).run(),
+        exitCode: 255,
+      );
 
   final BorgConfigurationFactory configurationFactory =
       BorgConfigurationFactory();
-
-  void _run() {
-    final configuration =
-        configurationFactory.createConfiguration(argResults: argResults);
-
-    final packages = scanForPackages(
-      configuration: configuration,
-      argResults: argResults,
-    );
-
-    final packagesToAnalyze = _selectPackagesSpecifiedInCommandLine(packages);
-
-    if (packagesToAnalyze.isEmpty) {
-      print('Dart packages are not found');
-      return;
-    }
-
-    _assertPubspecLockFilesExist(packagesToAnalyze);
-
-    final pubspecLocks = packagesToAnalyze.map((p) => p.pubspecLock.valueOr(
-          () => throw AssertionError('pubspec.lock is not found for '
-              'package ${path.relative(p.path)}'),
-        ));
-
-    final sdkDeps =
-        pubspecLocks.expand((pubspecLock) => pubspecLock.sdks).toSet();
-    if (sdkDeps.isNotEmpty) {
-      print('=== SDK dependencies:');
-      _printSdks(sdkDeps, packagesToAnalyze);
-      print('');
-    }
-
-    final externalDeps = getAllExternalPackageDependencies(pubspecLocks);
-
-    print('Analyzing package dependencies...');
-
-    final directDependencies = _getDirectDependencies(
-      externalDeps,
-      packagesToAnalyze,
-    );
-    final transDependencies =
-        externalDeps.where((d) => !directDependencies.contains(d));
-
-    print('');
-
-    if (directDependencies.isNotEmpty) {
-      print('=== Direct external dependencies:');
-      _printDependencies(directDependencies);
-      print('');
-    }
-
-    if (transDependencies.isNotEmpty) {
-      print('=== Transitive external dependencies:');
-      _printDependencies(transDependencies);
-    }
-  }
-
-  Iterable<DartPackage> _selectPackagesSpecifiedInCommandLine(
-    Iterable<DartPackage> packages,
-  ) =>
-      argResults.rest.isNotEmpty
-          ? packages
-              .where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)))
-          : packages;
-
-  void _printSdks(
-    Set<SdkDependency> sdkDeps,
-    Iterable<DartPackage> packages,
-  ) {
-    final maxSdkNameLen = _getMaxLength(sdkDeps.map((d) => d.sdk));
-    final maxSdkVersionLen = _getMaxLength(sdkDeps.map((d) => d.version));
-
-    final sortedSdkDeps = sdkDeps.toList()
-      ..sort((a, b) {
-        final result = a.sdk.compareTo(b.sdk);
-        return result == 0 ? a.version.compareTo(b.version) : result;
-      });
-
-    for (final sdk in sortedSdkDeps) {
-      final referredBy = packages.where((p) => p.pubspecLock.iif(
-            some: (pubspecLock) => pubspecLock.sdks.contains(sdk),
-            none: () => throw AssertionError('pubspec.lock is not found for '
-                'package ${path.relative(p.path)}'),
-          ));
-      print('${sdk.sdk.padRight(maxSdkNameLen)} '
-          '${sdk.version.padRight(maxSdkVersionLen)} '
-          '[${_printPackages(referredBy)}]');
-    }
-  }
-
-  String _printPackages(Iterable<DartPackage> packages) {
-    if (getVerboseFlag(argResults)) {
-      return packages.map((p) => p.pubspecYaml.name).join(' ');
-    } else {
-      const packagesToPrint = 5;
-      final result = packages
-          .map((p) => p.pubspecYaml.name)
-          .take(packagesToPrint)
-          .join(' ');
-      return packages.length > packagesToPrint
-          ? '${packages.length} packages: $result ...'
-          : result;
-    }
-  }
 }
-
-void _printDependencies(Iterable<PackageDependency> deps) {
-  if (deps.isNotEmpty) {
-    final maxPackageNameLen = _getMaxLength(deps.map((d) => d.package()));
-    final maxVersionLen = _getMaxLength(deps.map((d) => d.version()));
-
-    final sortedDeps = deps.toList()
-      ..sort((a, b) => a.package().compareTo(b.package()));
-
-    for (final dep in sortedDeps) {
-      final reference = dep.iswitch(
-        sdk: (d) => '${d.description} SDK',
-        hosted: (d) => '${d.url}/packages/${d.package}',
-        git: (d) => d.url,
-        path: (d) => d.path,
-      );
-      print('${dep.package().padRight(maxPackageNameLen)} '
-          '${dep.version().padRight(maxVersionLen)} '
-          '$reference');
-    }
-  } else {
-    print('Not found');
-  }
-}
-
-Iterable<PackageDependency> _getDirectDependencies(
-  Iterable<PackageDependency> deps,
-  Iterable<DartPackage> packages,
-) =>
-    deps
-        .where((dep) => packages.any((package) => package.pubspecLock.iif(
-              some: (p) => p.packages.any((d) =>
-                  d.package() == dep.package() &&
-                  d.type() != DependencyType.transitive),
-              none: () => throw AssertionError(
-                  'pubspec.lock expected for ${package.path}'),
-            )))
-        .toList(growable: false);
-
-void _assertPubspecLockFilesExist(
-  Iterable<DartPackage> packages,
-) {
-  final packagesWithoutPubspecLock = packages
-      .where((p) => !File(path.join(p.path, 'pubspec.lock')).existsSync());
-
-  if (packagesWithoutPubspecLock.isNotEmpty) {
-    print('Found packages without pubspec.lock:');
-    for (final p in packagesWithoutPubspecLock) {
-      print('\t${path.relative(p.path)}');
-    }
-    throw const BorgException('\nFAILED: Packages without pubspec.lock found, '
-        'please use "pub get" or "borg boot" to resolve dependencies');
-  }
-}
-
-int _getMaxLength(Iterable<String> ss) => ss.map((s) => s.length).fold(0, max);
