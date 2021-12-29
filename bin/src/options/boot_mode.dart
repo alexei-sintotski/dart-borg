@@ -25,9 +25,8 @@
 
 import 'package:args/args.dart';
 import 'package:borg/src/boot_mode.dart';
-import 'package:meta/meta.dart';
 
-void addBootModeOption(ArgParser argParser, {@required BootMode defaultsTo}) =>
+void addBootModeOption(ArgParser argParser, {required BootMode defaultsTo}) =>
     argParser.addOption(
       _name,
       abbr: 'm',
@@ -53,8 +52,8 @@ void addBootModeOption(ArgParser argParser, {@required BootMode defaultsTo}) =>
 BootMode getBootModeOption(
   ArgResults argResults,
 ) =>
-// ignore: avoid_as
-    _optionString2Enum[argResults[_name] as String];
+    // ignore: avoid_as
+    _optionString2Enum[argResults[_name] as String]!;
 
 const _name = 'mode';
 const _basicValue = 'basic';
