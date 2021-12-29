@@ -37,8 +37,8 @@ class BorgException implements Exception {
 }
 
 void exitWithMessageOnBorgException({
-  @required void Function() action,
-  @required int exitCode,
+  required void Function() action,
+  required int exitCode,
 }) {
   try {
     action();
