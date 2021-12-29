@@ -23,26 +23,13 @@
  *
  */
 
-import 'dart:io';
-
 import 'package:args/command_runner.dart';
-import 'package:borg/borg.dart';
-import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/configuration/factory.dart';
-import 'package:borg/src/dart_package/dart_package.dart';
-import 'package:borg/src/get_all_external_package_dependencies.dart';
-import 'package:path/path.dart' as path;
-import 'package:pubspec_lock/pubspec_lock.dart';
-import 'package:pubspec_yaml/pubspec_yaml.dart';
 
-import '../assert_pubspec_yaml_consistency.dart';
 import '../options/dry_run.dart';
 import '../options/verbose.dart';
-import '../pub_operations.dart';
-import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
-import '../utils/render_package_name.dart';
-import '../utils/with_temp_location.dart';
+import 'evolve_command_runner.dart';
 
 // ignore_for_file: avoid_print
 
@@ -61,205 +48,13 @@ class EvolveCommand extends Command<void> {
   String get name => 'evolve';
 
   @override
-  void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
+  void run() => exitWithMessageOnBorgException(
+      action: () => EvolveCommandRunner(
+            argResults!,
+            configurationFactory: configurationFactory,
+          ).run(),
+      exitCode: 255);
 
   final BorgConfigurationFactory configurationFactory =
       BorgConfigurationFactory();
-  BorgConfiguration configuration;
-  Iterable<DartPackage> packages;
-
-  void _run() {
-    configuration =
-        configurationFactory.createConfiguration(argResults: argResults);
-
-    packages = scanForPackages(
-      configuration: configuration,
-      argResults: argResults,
-    );
-
-    assertPubspecYamlConsistency(packages);
-
-    final allExternalDepSpecs = getAllExternalPackageDependencySpecs(
-      packages.map((p) => p.pubspecYaml),
-    );
-    final allExternalResolvedDeps = getAllExternalPackageDependencies(
-      [
-        for (final p in packages)
-          if (p.pubspecLock.hasValue) p.pubspecLock.valueOr(() => null)
-      ],
-    );
-    final sdkSpec = packages.isNotEmpty
-        ? packages.first.pubspecYaml.environment
-        : {'sdk': '>=2.10.0 <3.0.0'};
-    if (getVerboseFlag(argResults)) {
-      _printDependencySpecs(allExternalDepSpecs);
-    }
-
-    print(
-      '\nResolving ${allExternalDepSpecs.length} direct external dependencies '
-      'used by all found packages...',
-    );
-    final references = _upgradeDependencies(
-      allExternalDepSpecs,
-      allExternalResolvedDeps,
-      sdkSpec,
-    );
-    print(
-      '\tresolved ${references.length} direct and transitive external '
-      'dependencies',
-    );
-
-    if (getDryRunFlag(argResults)) {
-      print(
-        '\nDRY RUN: Previewing evolution of ${packages.length} Dart '
-        'packages...',
-      );
-    } else {
-      print('\nCommencing evolution of ${packages.length} Dart packages...');
-    }
-
-    var i = 1;
-    for (final package in packages) {
-      final counter = '[${i++}/${packages.length}]';
-      if (getDryRunFlag(argResults)) {
-        stdout.write('$counter ${renderPackageName(package.path)}');
-      } else {
-        stdout
-            .write('$counter Evolving ${renderPackageName(package.path)} ...');
-      }
-      _evolvePackage(package, references);
-    }
-
-    print('\nSUCCESS: ${packages.length} packages have been processed');
-  }
-
-  Iterable<PackageDependency> _upgradeDependencies(
-    Iterable<PackageDependencySpec> directDepSpecs,
-    Iterable<PackageDependency> directDeps,
-    Map<String, String> environment,
-  ) =>
-      withTempLocation(action: (location) {
-        final package = _createPackage(
-          name: 'borg_evolve_temp',
-          location: location.path,
-          depSpecs: directDepSpecs,
-          resolvedDeps: directDeps,
-          environment: environment,
-        );
-        upgradeDependencies(
-          package: package,
-          configuration: configuration,
-          arguments: '--no-precompile',
-        );
-        final resolvedDeps = _getResolvedDependencies(location: location);
-        return resolvedDeps;
-      });
-
-  DartPackage _createPackage({
-    required String name,
-    required String location,
-    required Iterable<PackageDependencySpec> depSpecs,
-    required Iterable<PackageDependency> resolvedDeps,
-    required Map<String, String> environment,
-  }) {
-    if (getVerboseFlag(argResults)) {
-      print('\tusing temporary package at $location...');
-    }
-    File(path.join(location, 'pubspec.yaml')).writeAsStringSync(PubspecYaml(
-      name: name,
-      dependencies: depSpecs,
-      environment: environment,
-    ).toYamlString());
-    File(path.join(location, 'pubspec.lock')).writeAsStringSync(PubspecLock(
-      packages: resolvedDeps,
-    ).toYamlString());
-    return DartPackage(path: path.canonicalize(location));
-  }
-
-  void _evolvePackage(
-    DartPackage package,
-    Iterable<PackageDependency> references,
-  ) {
-    final pubspecLockFile = File(path.join(package.path, 'pubspec.lock'));
-    if (!pubspecLockFile.existsSync()) {
-      stdout.write('\n\tpubspec.lock does not exist, creating one...');
-      resolveDependencies(
-        package: package,
-        configuration: configuration,
-      );
-    }
-    final pubspecLock =
-        pubspecLockFile.readAsStringSync().loadPubspecLockFromYaml();
-    final depsCorrectionSet =
-        computePackageDependencyCorrection(pubspecLock.packages, references);
-    if (depsCorrectionSet.isNotEmpty && !getDryRunFlag(argResults)) {
-      final correctedPubspecLock = pubspecLock.copyWith(
-        packages: copyWithPackageDependenciesFromReference(
-            pubspecLock.packages, references),
-      );
-      pubspecLockFile.writeAsStringSync(correctedPubspecLock.toYamlString());
-      resolveDependencies(
-        package: package,
-        configuration: configuration,
-      );
-    }
-
-    _printDependencyCorrections(
-        actualDependencies: pubspecLock.packages,
-        correctionSet: depsCorrectionSet);
-  }
 }
-
-void _printDependencySpecs(Iterable<PackageDependencySpec> deps) {
-  print('Total amount of direct external dependencies: ${deps.length} ');
-  for (final dep in deps.toList()
-    ..sort((a, b) => a.package().compareTo(b.package()))) {
-    print('\t${dep.package()}${_printDependencySpecDetail(dep)}');
-  }
-}
-
-String _printDependencySpecDetail(PackageDependencySpec dep) => dep.iswitch(
-      hosted: (dep) => dep.version.iif(
-        some: (v) => ': $v',
-        none: () => '',
-      ),
-      sdk: (dep) => ': ${dep.sdk} SDK',
-      git: (dep) => ': ${dep.url}',
-      path: (_) => '',
-    );
-
-Iterable<PackageDependency> _getResolvedDependencies({
-  required Directory location,
-}) =>
-    File(path.join(location.path, 'pubspec.lock'))
-        .readAsStringSync()
-        .loadPubspecLockFromYaml()
-        .packages;
-
-void _printDependencyCorrections({
-  required Iterable<PackageDependency> actualDependencies,
-  required Iterable<PackageDependency> correctionSet,
-}) {
-  if (correctionSet.isEmpty) {
-    print(' => up-to-date');
-  } else {
-    stdout.write('\n');
-    for (final correction in correctionSet.toList()
-      ..sort((a, b) => a.package().compareTo(b.package()))) {
-      final orgDep = actualDependencies
-          .firstWhere((d) => d.package() == correction.package());
-      print(
-        '\t${correction.package()}: ${_formatDependencyDetail(orgDep)} => '
-        '${_formatDependencyDetail(correction)}',
-      );
-    }
-    stdout.write('\n');
-  }
-}
-
-String _formatDependencyDetail(PackageDependency dep) => dep.iswitch(
-      sdk: (d) => d.version,
-      hosted: (d) => d.version,
-      git: (d) => '${d.url}:${d.resolvedRef}',
-      path: (d) => d.path,
-    );
