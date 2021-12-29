@@ -23,25 +23,15 @@
  *
  */
 
-import 'dart:io';
-
 import 'package:args/command_runner.dart';
-import 'package:borg/borg.dart';
-import 'package:borg/src/configuration/configuration.dart';
 import 'package:borg/src/configuration/factory.dart';
-import 'package:borg/src/dart_package/dart_package.dart';
-import 'package:path/path.dart' as path;
-import 'package:pubspec_lock/pubspec_lock.dart';
 
-import '../assert_pubspec_yaml_consistency.dart';
 import '../options/correct.dart';
 import '../options/lock.dart';
 import '../options/verbose.dart';
 import '../options/yaml.dart';
-import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
-import '../utils/correct_package_dependency.dart';
-import '../utils/print_dependency_usage_report.dart';
+import 'probe_command_runner.dart';
 
 // ignore_for_file: avoid_print
 
@@ -62,79 +52,13 @@ class ProbeCommand extends Command<void> {
   String get name => 'probe';
 
   @override
-  void run() => exitWithMessageOnBorgException(action: _run, exitCode: 255);
+  void run() => exitWithMessageOnBorgException(
+      action: () => ProbeCommandRunner(
+            configurationFactory,
+            argResults!,
+          ).run(),
+      exitCode: 255);
 
   final BorgConfigurationFactory configurationFactory =
       BorgConfigurationFactory();
-  BorgConfiguration configuration;
-  Iterable<DartPackage> packages;
-
-  void _run() {
-    configuration =
-        configurationFactory.createConfiguration(argResults: argResults);
-
-    packages = scanForPackages(
-      configuration: configuration,
-      argResults: argResults,
-    );
-
-    if (getPubspecYamlFlag(argResults)) {
-      _checkPubspecYamlFiles();
-    } else {
-      print('Analysis of pubspec.yaml files is skipped');
-    }
-    print('');
-    if (getPubspecLockFlag(argResults)) {
-      _checkPubspecLockFiles();
-    } else {
-      print('Analysis of pubspec.lock files is skipped');
-    }
-    if (getPubspecYamlFlag(argResults) || getPubspecLockFlag(argResults)) {
-      print(
-        '\nSUCCESS: All packages use consistent set of external dependencies',
-      );
-    } else {
-      throw const BorgException('FATAL: Nothing to do!');
-    }
-  }
-
-  void _checkPubspecYamlFiles() {
-    print('Analyzing dependency specifications...');
-    assertPubspecYamlConsistency(packages);
-  }
-
-  void _checkPubspecLockFiles() {
-    final pubspecLocks = Map.fromEntries(packages
-        .map((p) => File(path.join(p.path, 'pubspec.lock')))
-        .where((f) =>
-            f.existsSync() &&
-            [FileSystemEntityType.file].contains(f.statSync().type))
-        .map((f) => MapEntry(
-              f.path,
-              f.readAsStringSync().loadPubspecLockFromYaml(),
-            )));
-
-    print('Analyzing dependencies...');
-    final inconsistentUsageList = findInconsistentDependencies(pubspecLocks);
-
-    if (inconsistentUsageList.isNotEmpty && getCorrectFlag(argResults)) {
-      correctPackageDependencyBasedOnReport(report: inconsistentUsageList);
-    } else if (inconsistentUsageList.isNotEmpty) {
-      printDependencyUsageReport(
-        report: inconsistentUsageList,
-        formatDependency: _formatDependencyInfo,
-      );
-      throw const BorgException(
-        'FAILURE: Inconsistent use of external dependencies detected!\n'
-        '         Consider to use the --correct option to fix issues.',
-      );
-    }
-  }
 }
-
-String _formatDependencyInfo(PackageDependency dependency) =>
-    dependency.iswitcho(
-      git: (dep) => '${dep.url}:${dep.resolvedRef}',
-      path: (dep) => dep.path,
-      otherwise: () => dependency.version(),
-    );
