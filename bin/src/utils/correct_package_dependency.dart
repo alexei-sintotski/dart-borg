@@ -54,29 +54,29 @@ void correctPackageDependencyBasedOnReport({
 
     print('\nChange "$dependencyName" version to? $inconsistentVersions');
     final userInput = stdin.readLineSync();
-    if (inconsistentVersions.contains(userInput)) {
-      for (final reference in report.references.entries) {
-        final newPubspecLocks = packageDependencyToVersion(
-          dependency: reference.key,
-          inPubspecLocks: reference.value.asMap().map(
-                (_, path) => MapEntry(
-                  path,
-                  File(path).readAsStringSync().loadPubspecLockFromYaml(),
-                ),
-              ),
-          toVersion: userInput,
-        );
-        for (final newPubspecLock in newPubspecLocks.entries) {
-          File(newPubspecLock.key).writeAsStringSync(
-            newPubspecLock.value.toYamlString(),
-          );
-        }
-      }
-    } else {
+    if (userInput == null || !inconsistentVersions.contains(userInput)) {
       throw BorgException(
         'FAILURE: Version "$userInput" did not match '
         'any $inconsistentVersions',
       );
+    }
+
+    for (final reference in report.references.entries) {
+      final newPubspecLocks = packageDependencyToVersion(
+        dependency: reference.key,
+        inPubspecLocks: reference.value.asMap().map(
+              (_, path) => MapEntry(
+                path,
+                File(path).readAsStringSync().loadPubspecLockFromYaml(),
+              ),
+            ),
+        toVersion: userInput,
+      );
+      for (final newPubspecLock in newPubspecLocks.entries) {
+        File(newPubspecLock.key).writeAsStringSync(
+          newPubspecLock.value.toYamlString(),
+        );
+      }
     }
   }
 }

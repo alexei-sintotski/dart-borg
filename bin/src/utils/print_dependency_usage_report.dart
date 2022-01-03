@@ -52,7 +52,7 @@ void printDependencyUsage<DependencyType>({
 }) {
   for (final dependency in dependencies.keys) {
     print('\tVersion ${formatDependency(dependency)} is used by:');
-    for (final user in dependencies[dependency]) {
+    for (final user in dependencies[dependency]!) {
       print('\t\t$user');
     }
   }

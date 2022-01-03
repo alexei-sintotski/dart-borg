@@ -25,10 +25,8 @@
 
 import 'dart:io';
 
-import 'package:meta/meta.dart';
-
 T withTempLocation<T>({
-  @required T Function(Directory location) action,
+  required T Function(Directory location) action,
 }) {
   const tempPrefix = 'borg-evolve-temp-';
   final tempLocation = Directory.systemTemp.createTempSync(tempPrefix);
