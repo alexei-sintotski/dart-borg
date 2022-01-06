@@ -48,14 +48,14 @@ List<DependencyUsageReport<PackageDependencySpec>>
 }
 
 Map<String, Set<PackageDependencySpec>> _collectAllDepSpecsPerPubspecYaml(
-        Map<String, PubspecYaml> pubspecYamls) =>
-    Map.fromEntries(pubspecYamls.keys
-        .map((k) => MapEntry(k, _getDependencySpecs(pubspecYamls[k]))));
+  Map<String, PubspecYaml> pubspecYamls,
+) =>
+    pubspecYamls.map((k, v) => MapEntry(k, _getDependencySpecs(v)));
 
 Set<PackageDependencySpec> _collectAllDepSpecs(
         Map<String, Set<PackageDependencySpec>> specsPerPubspecYaml) =>
     {
-      for (final k in specsPerPubspecYaml.keys) ...specsPerPubspecYaml[k],
+      for (final values in specsPerPubspecYaml.values) ...values,
     };
 
 Set<PackageDependencySpec> _getDependencySpecs(PubspecYaml pubspecYaml) => {
