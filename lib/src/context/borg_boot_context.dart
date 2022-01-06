@@ -74,7 +74,7 @@ class BorgBootContext {
         if (modifiedPackages.isNotEmpty)
           _modifiedPackagesKey: modifiedPackages.toList(),
         if (flutterSdkVersion.hasValue)
-          _flutterSdkVersionKey: flutterSdkVersion.valueOr(() => null),
+          _flutterSdkVersionKey: flutterSdkVersion.unsafe!,
       };
 }
 
