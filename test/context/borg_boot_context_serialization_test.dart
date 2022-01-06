@@ -93,7 +93,7 @@ void main() {
         final context = factory.createBorgContext();
 
         test('it provides empty string for Dart SDK version', () {
-          expect(context.bootContext.unsafe.dartSdkVersion, isEmpty);
+          expect(context.bootContext.unsafe!.dartSdkVersion, isEmpty);
         });
       });
 
@@ -105,7 +105,7 @@ void main() {
         final context = factory.createBorgContext();
 
         test('it provides correct Dart SDK version', () {
-          expect(context.bootContext.unsafe.dartSdkVersion, dartSdkVersion);
+          expect(context.bootContext.unsafe!.dartSdkVersion, dartSdkVersion);
         });
       });
 
@@ -125,7 +125,7 @@ void main() {
             expect(
                 BorgContext.fromJson(jsonContent)
                     .bootContext
-                    .unsafe
+                    .unsafe!
                     .dartSdkVersion,
                 dartSdkVersion);
           }).save(context: context);
@@ -146,11 +146,11 @@ void main() {
         });
 
         test('it provides correct gitref', () {
-          expect(context.bootContext.unsafe.gitref, gitref);
+          expect(context.bootContext.unsafe!.gitref, gitref);
         });
 
         test('it provides an empty list of modified packages', () {
-          expect(context.bootContext.unsafe.modifiedPackages, isEmpty);
+          expect(context.bootContext.unsafe!.modifiedPackages, isEmpty);
         });
       });
 
@@ -182,7 +182,7 @@ void main() {
           BorgContextFactory(saveStringToFileSync: (_, content) {
             final jsonContent = json.decode(json.encode(loadYaml(content)))
                 as Map<String, dynamic>;
-            expect(BorgContext.fromJson(jsonContent).bootContext.unsafe.gitref,
+            expect(BorgContext.fromJson(jsonContent).bootContext.unsafe!.gitref,
                 gitref);
           }).save(context: context);
         });
@@ -197,7 +197,7 @@ void main() {
             bootMode: BootMode.basic,
           )),
         );
-        String contextString;
+        String? contextString;
         BorgContextFactory(
                 saveStringToFileSync: (_, content) => contextString = content)
             .save(context: context);
@@ -220,7 +220,7 @@ void main() {
         final context = factory.createBorgContext();
 
         test('it produces context with boot mode basic', () {
-          expect(context.bootContext.unsafe.bootMode, BootMode.basic);
+          expect(context.bootContext.unsafe!.bootMode, BootMode.basic);
         });
       });
 
@@ -231,7 +231,7 @@ void main() {
         final context = factory.createBorgContext();
 
         test('it produces context with boot mode basic', () {
-          expect(context.bootContext.unsafe.bootMode, BootMode.basic);
+          expect(context.bootContext.unsafe!.bootMode, BootMode.basic);
         });
       });
 
@@ -243,7 +243,7 @@ void main() {
         final context = factory.createBorgContext();
 
         test('it produces context with boot mode incremental', () {
-          expect(context.bootContext.unsafe.bootMode, BootMode.incremental);
+          expect(context.bootContext.unsafe!.bootMode, BootMode.incremental);
         });
       });
 
@@ -261,7 +261,7 @@ void main() {
             final jsonContent = json.decode(json.encode(loadYaml(content)))
                 as Map<String, dynamic>;
             expect(
-                BorgContext.fromJson(jsonContent).bootContext.unsafe.bootMode,
+                BorgContext.fromJson(jsonContent).bootContext.unsafe!.bootMode,
                 BootMode.basic);
           }).save(context: context);
         });
@@ -281,7 +281,7 @@ void main() {
             final jsonContent = json.decode(json.encode(loadYaml(content)))
                 as Map<String, dynamic>;
             expect(
-                BorgContext.fromJson(jsonContent).bootContext.unsafe.bootMode,
+                BorgContext.fromJson(jsonContent).bootContext.unsafe!.bootMode,
                 BootMode.incremental);
           }).save(context: context);
         });
@@ -300,7 +300,7 @@ void main() {
           final context = factory.createBorgContext();
 
           test('it provides an empty list of modified packages', () {
-            expect(context.bootContext.unsafe.modifiedPackages, isEmpty);
+            expect(context.bootContext.unsafe!.modifiedPackages, isEmpty);
           });
         },
       );
@@ -317,7 +317,7 @@ void main() {
 
           test('it provides correct list of modified packages', () {
             expect(
-              context.bootContext.unsafe.modifiedPackages,
+              context.bootContext.unsafe!.modifiedPackages,
               ['a', 'b', 'c'],
             );
           });
@@ -340,7 +340,7 @@ void main() {
             expect(
                 BorgContext.fromJson(jsonContent)
                     .bootContext
-                    .unsafe
+                    .unsafe!
                     .modifiedPackages,
                 isEmpty);
           }).save(context: context);
@@ -366,7 +366,7 @@ void main() {
             expect(
                 BorgContext.fromJson(jsonContent)
                     .bootContext
-                    .unsafe
+                    .unsafe!
                     .modifiedPackages,
                 modifiedPackages);
           }).save(context: context);
@@ -384,7 +384,7 @@ void main() {
 
         test('it provides context object without Flutter SDK version', () {
           expect(
-              context.bootContext.unsafe.flutterSdkVersion.hasValue, isFalse);
+              context.bootContext.unsafe!.flutterSdkVersion.hasValue, isFalse);
         });
       });
 
@@ -398,7 +398,7 @@ void main() {
         final context = factory.createBorgContext();
 
         test('it provides correct Flutter SDK version', () {
-          expect(context.bootContext.unsafe.flutterSdkVersion.unsafe,
+          expect(context.bootContext.unsafe!.flutterSdkVersion.unsafe,
               flutterSdkVersion);
         });
       });
@@ -421,7 +421,7 @@ void main() {
             expect(
                 BorgContext.fromJson(jsonContent)
                     .bootContext
-                    .unsafe
+                    .unsafe!
                     .flutterSdkVersion
                     .hasValue,
                 isFalse);
@@ -447,7 +447,7 @@ void main() {
             expect(
                 BorgContext.fromJson(jsonContent)
                     .bootContext
-                    .unsafe
+                    .unsafe!
                     .flutterSdkVersion
                     .unsafe,
                 flutterSdkVersion);
