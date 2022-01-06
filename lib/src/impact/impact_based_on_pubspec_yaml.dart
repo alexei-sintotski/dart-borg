@@ -61,8 +61,7 @@ class _ProductImpactResolver {
           tryToReadFileSync: tryToReadFileSync,
         );
 
-  Set<DartPackage> impact(DartPackage package) =>
-      _impactMap.containsKey(package) ? _impactMap[package] : {};
+  Set<DartPackage> impact(DartPackage package) => _impactMap[package] ?? {};
 
   final Map<DartPackage, Set<DartPackage>> _impactMap;
 
@@ -87,8 +86,7 @@ class _DevImpactResolver {
           tryToReadFileSync: tryToReadFileSync,
         );
 
-  Set<DartPackage> impact(DartPackage package) =>
-      _impactMap.containsKey(package) ? _impactMap[package] : {};
+  Set<DartPackage> impact(DartPackage package) => _impactMap[package] ?? {};
 
   final Map<DartPackage, Set<DartPackage>> _impactMap;
 
@@ -148,8 +146,12 @@ void _populateDirectDependencies(
               )),
       otherwise: () => null,
     );
-    if (impactMap.containsKey(dp)) {
-      impactMap[dp].add(package);
+    if (dp == null) {
+      continue;
+    }
+    final directDeps = impactMap[dp];
+    if (directDeps != null) {
+      directDeps.add(package);
     } else {
       impactMap[dp] = {dp};
       _populateDirectDependencies(
@@ -168,8 +170,8 @@ void _growTransitiveDependencies(
     previousFingerprint = currentFingerprint;
     for (final package in impactMap.keys) {
       final totalImpact = {
-        for (final impactedPackage in impactMap[package])
-          ...impactMap[impactedPackage]
+        for (final impactedPackage in impactMap[package]!)
+          ...?impactMap[impactedPackage]
       };
       impactMap[package] = totalImpact;
     }
