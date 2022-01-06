@@ -97,10 +97,11 @@ List<DependencyUsageReport<PackageDependency>> _createReport(
           dependencyName: name,
           references: Map.fromEntries(dependencies
               .where((d) => d.package() == name)
+              .where((d) => normalizedDependencyMap.containsKey(d))
               .map((d) => MapEntry(
-                    normalizedDependencyMap[d],
+                    normalizedDependencyMap[d]!,
                     _referencesToDependency(
-                        normalizedDependencyMap[d], pubspecLocks),
+                        normalizedDependencyMap[d]!, pubspecLocks),
                   )))))
       .toList();
 }
