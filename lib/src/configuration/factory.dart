@@ -103,9 +103,9 @@ class BorgConfigurationFactory {
     );
   }
 
-  void createInitialConfigurationFile(
-      {void Function(String, String) saveStringToFileSync =
-          saveStringToFileSync}) {
+  void createInitialConfigurationFile({
+    void Function(String, String) saveStringToFileSync = saveStringToFileSync,
+  }) {
     saveStringToFileSync(
       _configurationFileName,
       _initialConfigurationFileContent,

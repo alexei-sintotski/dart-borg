@@ -23,6 +23,8 @@
  *
  */
 
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:args/args.dart';
@@ -32,7 +34,6 @@ import 'package:borg/src/find_inconsistent_dependencies.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path;
 import 'package:pubspec_lock/pubspec_lock.dart';
-import 'package:pubspec_lock/src/pubspec_lock.dart';
 
 import '../assert_pubspec_yaml_consistency.dart';
 import '../options/correct.dart';
