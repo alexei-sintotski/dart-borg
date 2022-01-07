@@ -59,14 +59,14 @@ class BorgConfiguration extends $BorgConfiguration {
 }
 
 Optional<String> _getString(Map<String, dynamic> json, String key) {
-  if (json == null || !json.containsKey(key)) {
+  if (!json.containsKey(key)) {
     return const Optional.none();
   }
   return Optional(json[key] as String); // ignore: avoid_as
 }
 
 Iterable<String> _getStringIterable(Map<String, dynamic> json, String key) {
-  if (json == null || !json.containsKey(key)) {
+  if (!json.containsKey(key)) {
     return [];
   }
   final dynamic value = json[key];

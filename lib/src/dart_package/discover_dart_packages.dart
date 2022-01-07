@@ -23,6 +23,8 @@
  *
  */
 
+// ignore_for_file: public_member_api_docs
+
 import 'package:path/path.dart' as path;
 
 import '../configuration/configuration.dart';
