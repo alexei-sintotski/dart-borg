@@ -50,7 +50,9 @@ class DependencyUsageReport<DependencyType> {
   // ignore: avoid_annotating_with_dynamic
   bool operator ==(dynamic other) =>
       other.runtimeType == runtimeType &&
+      // ignore: avoid_dynamic_calls
       dependencyName == other.dependencyName &&
+      // ignore: avoid_dynamic_calls
       const DeepCollectionEquality().equals(references, other.references);
 
   @override
