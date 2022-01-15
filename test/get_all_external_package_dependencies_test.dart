@@ -94,35 +94,42 @@ void main() {
   );
 }
 
-const _hostedDependencyA = PackageDependency.hosted(HostedPackageDependency(
-  package: 'a',
-  version: '1.0.0',
-  name: 'a',
-  url: 'https://pub.dartlang.org',
-  type: DependencyType.direct,
-));
+const _hostedDependencyA = PackageDependency.hosted(
+  HostedPackageDependency(
+    package: 'a',
+    version: '1.0.0',
+    name: 'a',
+    url: 'https://pub.dartlang.org',
+    type: DependencyType.direct,
+  ),
+);
 
-const _hostedDependencyB = PackageDependency.hosted(HostedPackageDependency(
-  package: 'b',
-  version: '2.0.0',
-  name: 'b',
-  url: 'https://pub.dartlang.org',
-  type: DependencyType.direct,
-));
+const _hostedDependencyB = PackageDependency.hosted(
+  HostedPackageDependency(
+    package: 'b',
+    version: '2.0.0',
+    name: 'b',
+    url: 'https://pub.dartlang.org',
+    type: DependencyType.direct,
+  ),
+);
 
-const _hostedDependencyATransitive =
-    PackageDependency.hosted(HostedPackageDependency(
-  package: 'a',
-  version: '1.0.0',
-  name: 'a',
-  url: 'https://pub.dartlang.org',
-  type: DependencyType.transitive,
-));
+const _hostedDependencyATransitive = PackageDependency.hosted(
+  HostedPackageDependency(
+    package: 'a',
+    version: '1.0.0',
+    name: 'a',
+    url: 'https://pub.dartlang.org',
+    type: DependencyType.transitive,
+  ),
+);
 
-const _pathDependencyA = PackageDependency.path(PathPackageDependency(
-  package: 'a',
-  version: '0.0.1',
-  path: '../package1',
-  relative: true,
-  type: DependencyType.direct,
-));
+const _pathDependencyA = PackageDependency.path(
+  PathPackageDependency(
+    package: 'a',
+    version: '0.0.1',
+    path: '../package1',
+    relative: true,
+    type: DependencyType.direct,
+  ),
+);

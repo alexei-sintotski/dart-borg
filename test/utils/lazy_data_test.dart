@@ -33,10 +33,12 @@ void main() {
     group('given populate function', () {
       const value = 7;
       var numberOfCalls = 0;
-      final data = LazyData(populate: () {
-        numberOfCalls++;
-        return value;
-      });
+      final data = LazyData(
+        populate: () {
+          numberOfCalls++;
+          return value;
+        },
+      );
 
       test('it provides data entry according to the provided populate function',
           () {

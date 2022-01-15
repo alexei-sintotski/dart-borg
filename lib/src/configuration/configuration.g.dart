@@ -115,4 +115,5 @@ class BorgConfiguration$ {
 // ignore_for_file: lines_longer_than_80_chars
 // ignore_for_file: prefer_single_quotes
 // ignore_for_file: public_member_api_docs
+// ignore_for_file: require_trailing_commas
 // ignore_for_file: unnecessary_this

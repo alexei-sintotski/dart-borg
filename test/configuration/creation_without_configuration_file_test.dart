@@ -54,7 +54,8 @@ void main() {
 
       group('given command-line with undefined paths', () {
         final config = factory.createConfiguration(
-            argResults: argParser.parse(['--paths=']));
+          argResults: argParser.parse(['--paths=']),
+        );
         test('it creates configuration object with empty list of paths', () {
           expect(config.pathsToScan, isEmpty);
         });
@@ -62,7 +63,8 @@ void main() {
 
       group('given command-line with undefined excluded paths', () {
         final config = factory.createConfiguration(
-            argResults: argParser.parse(['--exclude=']));
+          argResults: argParser.parse(['--exclude=']),
+        );
         test(
             'it creates configuration object with empty list of excluded paths',
             () {
@@ -72,7 +74,8 @@ void main() {
 
       group('given command-line with undefined Dart SDK path', () {
         final config = factory.createConfiguration(
-            argResults: argParser.parse(['--dartsdk=']));
+          argResults: argParser.parse(['--dartsdk=']),
+        );
         test('it creates configuration object with undefined Dart SDK path',
             () {
           expect(config.dartSdkPath.hasValue, isFalse);
@@ -81,7 +84,8 @@ void main() {
 
       group('given command-line with undefined Flutter SDK path', () {
         final config = factory.createConfiguration(
-            argResults: argParser.parse(['--fluttersdk=']));
+          argResults: argParser.parse(['--fluttersdk=']),
+        );
         test('it creates configuration object with undefined Flutter SDK path',
             () {
           expect(config.flutterSdkPath.hasValue, isFalse);
@@ -90,7 +94,8 @@ void main() {
 
       group('given command-line with defined paths', () {
         final config = factory.createConfiguration(
-            argResults: argParser.parse(['--paths=$_pathsValue']));
+          argResults: argParser.parse(['--paths=$_pathsValue']),
+        );
         test('it creates configuration object with correct paths value', () {
           expect(config.pathsToScan, [_pathsValue]);
         });
@@ -98,7 +103,8 @@ void main() {
 
       group('given command-line with defined excluded paths', () {
         final config = factory.createConfiguration(
-            argResults: argParser.parse(['--exclude=$_excludeValue']));
+          argResults: argParser.parse(['--exclude=$_excludeValue']),
+        );
         test('it creates configuration object with correct exclude value', () {
           expect(config.excludedPaths, [_excludeValue]);
         });
@@ -106,7 +112,8 @@ void main() {
 
       group('given command-line with defined path to Dart SDK', () {
         final config = factory.createConfiguration(
-            argResults: argParser.parse(['--dartsdk=$_dartsdkValue']));
+          argResults: argParser.parse(['--dartsdk=$_dartsdkValue']),
+        );
         test('it creates configuration object with correct dartsdk value', () {
           expect(config.dartSdkPath, const Optional(_dartsdkValue));
         });
@@ -114,7 +121,8 @@ void main() {
 
       group('given command-line with defined path to Flutter SDK', () {
         final config = factory.createConfiguration(
-            argResults: argParser.parse(['--fluttersdk=$_fluttersdkValue']));
+          argResults: argParser.parse(['--fluttersdk=$_fluttersdkValue']),
+        );
         test('it creates configuration object with correct fluttersdk value',
             () {
           expect(config.flutterSdkPath, const Optional(_fluttersdkValue));

@@ -41,7 +41,8 @@ void main() {
       test('it produces the specified dependency', () {
         expect(r, const [
           PackageDependencySpec.hosted(
-              HostedPackageDependencySpec(package: 'a'))
+            HostedPackageDependencySpec(package: 'a'),
+          )
         ]);
       });
     });
@@ -69,7 +70,8 @@ void main() {
       test('it produces the specified dependency', () {
         expect(r, const [
           PackageDependencySpec.sdk(
-              SdkPackageDependencySpec(package: 'a', sdk: sdk))
+            SdkPackageDependencySpec(package: 'a', sdk: sdk),
+          )
         ]);
       });
     });
@@ -85,7 +87,8 @@ void main() {
       test('it produces the specified dependency', () {
         expect(r, const [
           PackageDependencySpec.git(
-              GitPackageDependencySpec(package: 'a', url: url))
+            GitPackageDependencySpec(package: 'a', url: url),
+          )
         ]);
       });
     });
@@ -111,17 +114,21 @@ void main() {
     group('provided with pubspec.yaml with a dependency override', () {
       const overridenVersion = '^2.0.0';
       final pubspecYaml = PubspecYaml.loadFromYamlString(
-        _prependPackageName('dependencies: {a: ^1.0.0}\n'
-            'dependency_overrides: {a: $overridenVersion}'),
+        _prependPackageName(
+          'dependencies: {a: ^1.0.0}\n'
+          'dependency_overrides: {a: $overridenVersion}',
+        ),
       );
       final r = getAllExternalPackageDependencySpecs([pubspecYaml]);
 
       test('it produces the overriden dependency', () {
         expect(r, const [
-          PackageDependencySpec.hosted(HostedPackageDependencySpec(
-            package: 'a',
-            version: Optional(overridenVersion),
-          ))
+          PackageDependencySpec.hosted(
+            HostedPackageDependencySpec(
+              package: 'a',
+              version: Optional(overridenVersion),
+            ),
+          )
         ]);
       });
     });
@@ -144,10 +151,12 @@ void main() {
           expect(
             r,
             const [
-              PackageDependencySpec.hosted(HostedPackageDependencySpec(
-                package: 'a',
-                version: Optional('1.0.0'),
-              ))
+              PackageDependencySpec.hosted(
+                HostedPackageDependencySpec(
+                  package: 'a',
+                  version: Optional('1.0.0'),
+                ),
+              )
             ],
           );
         });

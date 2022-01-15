@@ -145,7 +145,7 @@ void main() {
 final _packageA = DartPackage(
     path: canonicalize('a'), tryToReadFileSync: (_) => const Optional('''
 name: a
-'''));
+''')); // ignore: require_trailing_commas
 
 final _packageB = DartPackage(
     path: canonicalize('b'), tryToReadFileSync: (_) => const Optional('''
@@ -154,7 +154,7 @@ dependencies:
   y:
 dev_dependencies:
   z:
-'''));
+''')); // ignore: require_trailing_commas
 
 final _packageC = DartPackage(
     path: canonicalize('c'), tryToReadFileSync: (_) => const Optional('''
@@ -164,7 +164,7 @@ dependencies:
     path: ../a
   b:
     path: ../b
-'''));
+''')); // ignore: require_trailing_commas
 
 final _packageD = DartPackage(
     path: canonicalize('d'), tryToReadFileSync: (_) => const Optional('''
@@ -172,7 +172,7 @@ name: d
 dependencies:
   c:
     path: ../c
-'''));
+''')); // ignore: require_trailing_commas
 
 final _packageE = DartPackage(
     path: canonicalize('e'), tryToReadFileSync: (_) => const Optional('''
@@ -180,7 +180,7 @@ name: e
 dev_dependencies:
   a:
     path: ../a
-'''));
+''')); // ignore: require_trailing_commas
 
 final _packageF = DartPackage(
     path: canonicalize('f'), tryToReadFileSync: (_) => const Optional('''
@@ -188,7 +188,7 @@ name: f
 dev_dependencies:
   e:
     path: ../e
-'''));
+''')); // ignore: require_trailing_commas
 
 final _packageG = DartPackage(
     path: canonicalize('g'), tryToReadFileSync: (_) => const Optional('''
@@ -198,7 +198,7 @@ dependencies:
 dependency_overrides:
   a:
     path: ../a
-'''));
+''')); // ignore: require_trailing_commas
 
 final _packageH = DartPackage(
     path: canonicalize('h'), tryToReadFileSync: (_) => const Optional('''
@@ -208,7 +208,7 @@ dev_dependencies:
 dependency_overrides:
   a:
     path: ../a
-'''));
+''')); // ignore: require_trailing_commas
 
 final _packageI = DartPackage(
     path: canonicalize('i'), tryToReadFileSync: (_) => const Optional('''
@@ -216,4 +216,4 @@ name: i
 dependencies:
   z:
     path: ../z
-'''));
+''')); // ignore: require_trailing_commas

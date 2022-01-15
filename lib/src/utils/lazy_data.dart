@@ -34,10 +34,11 @@ class LazyData<T> {
   Optional<T> _entry = Optional<T>.none();
 
   T get entry => _entry.iif(
-      some: (e) => e,
-      none: () {
-        final data = populate();
-        _entry = Optional(data);
-        return data;
-      });
+        some: (e) => e,
+        none: () {
+          final data = populate();
+          _entry = Optional(data);
+          return data;
+        },
+      );
 }

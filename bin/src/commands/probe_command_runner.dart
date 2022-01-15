@@ -86,15 +86,21 @@ class ProbeCommandRunner {
   }
 
   void _checkPubspecLockFiles(Iterable<DartPackage> packages) {
-    final pubspecLocks = Map.fromEntries(packages
-        .map((p) => File(path.join(p.path, 'pubspec.lock')))
-        .where((f) =>
-            f.existsSync() &&
-            [FileSystemEntityType.file].contains(f.statSync().type))
-        .map((f) => MapEntry(
+    final pubspecLocks = Map.fromEntries(
+      packages
+          .map((p) => File(path.join(p.path, 'pubspec.lock')))
+          .where(
+            (f) =>
+                f.existsSync() &&
+                [FileSystemEntityType.file].contains(f.statSync().type),
+          )
+          .map(
+            (f) => MapEntry(
               f.path,
               f.readAsStringSync().loadPubspecLockFromYaml(),
-            )));
+            ),
+          ),
+    );
 
     print('Analyzing dependencies...');
     final inconsistentUsageList = findInconsistentDependencies(pubspecLocks);

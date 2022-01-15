@@ -39,11 +39,13 @@ import 'boot_command_runner.dart';
 class BootCommand extends Command<void> {
   BootCommand() : context = contextFactory.createBorgContext() {
     configurationFactory.populateConfigurationArgs(argParser);
-    addBootModeOption(argParser,
-        defaultsTo: context.bootContext.iif(
-          some: (ctx) => ctx.bootMode,
-          none: () => BootMode.incremental,
-        ));
+    addBootModeOption(
+      argParser,
+      defaultsTo: context.bootContext.iif(
+        some: (ctx) => ctx.bootMode,
+        none: () => BootMode.incremental,
+      ),
+    );
     addVerboseFlag(argParser);
   }
 
@@ -60,12 +62,13 @@ class BootCommand extends Command<void> {
 
   @override
   void run() => exitWithMessageOnBorgException(
-      action: () => BootCommandRunner(
-            configurationFactory,
-            contextFactory,
-            argResults!,
-          ).run(),
-      exitCode: 255);
+        action: () => BootCommandRunner(
+          configurationFactory,
+          contextFactory,
+          argResults!,
+        ).run(),
+        exitCode: 255,
+      );
 
   static final BorgConfigurationFactory configurationFactory =
       BorgConfigurationFactory();

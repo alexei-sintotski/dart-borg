@@ -103,53 +103,65 @@ void main() {
   );
 }
 
-const _hostedDependencyAv1 = PackageDependency.hosted(HostedPackageDependency(
-  package: 'a',
-  version: '1.0.0',
-  name: 'a',
-  url: 'https://pub.dartlang.org',
-  type: DependencyType.direct,
-));
+const _hostedDependencyAv1 = PackageDependency.hosted(
+  HostedPackageDependency(
+    package: 'a',
+    version: '1.0.0',
+    name: 'a',
+    url: 'https://pub.dartlang.org',
+    type: DependencyType.direct,
+  ),
+);
 
-const _hostedDependencyAv1Transitive =
-    PackageDependency.hosted(HostedPackageDependency(
-  package: 'a',
-  version: '1.0.0',
-  name: 'a',
-  url: 'https://pub.dartlang.org',
-  type: DependencyType.transitive,
-));
+const _hostedDependencyAv1Transitive = PackageDependency.hosted(
+  HostedPackageDependency(
+    package: 'a',
+    version: '1.0.0',
+    name: 'a',
+    url: 'https://pub.dartlang.org',
+    type: DependencyType.transitive,
+  ),
+);
 
-const _hostedDependencyAv2 = PackageDependency.hosted(HostedPackageDependency(
-  package: 'a',
-  version: '2.0.0',
-  name: 'a',
-  url: 'https://pub.dartlang.org',
-  type: DependencyType.development,
-));
+const _hostedDependencyAv2 = PackageDependency.hosted(
+  HostedPackageDependency(
+    package: 'a',
+    version: '2.0.0',
+    name: 'a',
+    url: 'https://pub.dartlang.org',
+    type: DependencyType.development,
+  ),
+);
 
 final _reportAv1Av2 = [
   //ignore: prefer_const_constructors, prefer_const_literals_to_create_immutables
-  DependencyUsageReport<PackageDependency>(dependencyName: 'a', references: {
-    // ignore: prefer_const_literals_to_create_immutables
-    _hostedDependencyAv1: ['a1'],
-    // ignore: prefer_const_literals_to_create_immutables
-    _hostedDependencyAv2: ['a2'],
-  })
+  DependencyUsageReport<PackageDependency>(
+    dependencyName: 'a',
+    references: {
+      // ignore: prefer_const_literals_to_create_immutables
+      _hostedDependencyAv1: ['a1'],
+      // ignore: prefer_const_literals_to_create_immutables
+      _hostedDependencyAv2: ['a2'],
+    },
+  )
 ];
 
-const _pathDependencyAv1 = PackageDependency.path(PathPackageDependency(
-  package: 'a',
-  version: '0.0.1',
-  path: '../package1',
-  relative: true,
-  type: DependencyType.direct,
-));
+const _pathDependencyAv1 = PackageDependency.path(
+  PathPackageDependency(
+    package: 'a',
+    version: '0.0.1',
+    path: '../package1',
+    relative: true,
+    type: DependencyType.direct,
+  ),
+);
 
-const _pathDependencyAv2 = PackageDependency.path(PathPackageDependency(
-  package: 'a',
-  version: '0.0.2',
-  path: '../../package1',
-  relative: true,
-  type: DependencyType.direct,
-));
+const _pathDependencyAv2 = PackageDependency.path(
+  PathPackageDependency(
+    package: 'a',
+    version: '0.0.2',
+    path: '../../package1',
+    relative: true,
+    type: DependencyType.direct,
+  ),
+);

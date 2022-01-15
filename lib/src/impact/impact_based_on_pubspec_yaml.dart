@@ -70,8 +70,12 @@ class _ProductImpactResolver {
     Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
   }) {
     final impactMap = _createInitialImpactMap(allPackagesInScope);
-    _inflateDirectDependencies(allPackagesInScope,
-        (p) => p.pubspecYaml.dependencies, impactMap, tryToReadFileSync);
+    _inflateDirectDependencies(
+      allPackagesInScope,
+      (p) => p.pubspecYaml.dependencies,
+      impactMap,
+      tryToReadFileSync,
+    );
     _growTransitiveDependencies(impactMap);
     return impactMap;
   }
@@ -95,14 +99,19 @@ class _DevImpactResolver {
     Optional<String> Function(String) tryToReadFileSync = tryToReadFileSync,
   }) {
     final impactMap = _createInitialImpactMap(allPackagesInScope);
-    _inflateDirectDependencies(allPackagesInScope,
-        (p) => p.pubspecYaml.devDependencies, impactMap, tryToReadFileSync);
+    _inflateDirectDependencies(
+      allPackagesInScope,
+      (p) => p.pubspecYaml.devDependencies,
+      impactMap,
+      tryToReadFileSync,
+    );
     return impactMap;
   }
 }
 
 Map<DartPackage, Set<DartPackage>> _createInitialImpactMap(
-        Iterable<DartPackage> allPackagesInScope) =>
+  Iterable<DartPackage> allPackagesInScope,
+) =>
     <DartPackage, Set<DartPackage>>{
       for (final p in allPackagesInScope) ...{
         p: {p}
@@ -132,18 +141,19 @@ void _populateDirectDependencies(
   Optional<String> Function(String) tryToReadFileSync,
 ) {
   for (final d in dependencies(package)
-      .map((p) =>
-          _overrideDependency(p, package.pubspecYaml.dependencyOverrides))
+      .map(
+        (p) => _overrideDependency(p, package.pubspecYaml.dependencyOverrides),
+      )
       .where(_isPathDependency)) {
     final dp = d.iswitcho(
       path: (pathDep) => impactMap.keys.firstWhere(
-          (pp) =>
-              pp.path ==
-              path.canonicalize(path.join(package.path, pathDep.path)),
-          orElse: () => DartPackage(
-                path: path.canonicalize(path.join(package.path, pathDep.path)),
-                tryToReadFileSync: tryToReadFileSync,
-              )),
+        (pp) =>
+            pp.path == path.canonicalize(path.join(package.path, pathDep.path)),
+        orElse: () => DartPackage(
+          path: path.canonicalize(path.join(package.path, pathDep.path)),
+          tryToReadFileSync: tryToReadFileSync,
+        ),
+      ),
       otherwise: () => null,
     );
     if (dp == null) {
@@ -155,7 +165,11 @@ void _populateDirectDependencies(
     } else {
       impactMap[dp] = {dp};
       _populateDirectDependencies(
-          dp, dependencies, impactMap, tryToReadFileSync);
+        dp,
+        dependencies,
+        impactMap,
+        tryToReadFileSync,
+      );
     }
   }
 }
@@ -180,7 +194,8 @@ void _growTransitiveDependencies(
 }
 
 Map<DartPackage, int> _fingerprint(
-        Map<DartPackage, Set<DartPackage>> impactMap) =>
+  Map<DartPackage, Set<DartPackage>> impactMap,
+) =>
     impactMap.map((p, d) => MapEntry(p, d.length));
 
 PackageDependencySpec _overrideDependency(

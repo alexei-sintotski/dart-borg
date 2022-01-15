@@ -119,8 +119,8 @@ BorgConfiguration _constructConfigFromFile({
 }) {
   final configFromFile = tryToReadFileSync(_configurationFileName).iif(
     some: (s) => BorgConfiguration.fromJson(
-        json.decode(json.encode(loadYaml(s)))
-            as Map<String, dynamic>), // ignore: avoid_as
+      json.decode(json.encode(loadYaml(s))) as Map<String, dynamic>,
+    ), // ignore: avoid_as
     none: () => const BorgConfiguration(),
   );
   return configFromFile.copyWith(

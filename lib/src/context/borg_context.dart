@@ -45,10 +45,12 @@ class BorgContext {
         bootContext: json == null
             ? const Optional.none()
             : json.containsKey(_bootContextKey)
-                ? Optional(BorgBootContext.fromJson(
-                    // ignore: avoid_as
-                    json[_bootContextKey] as Map<String, dynamic>,
-                  ))
+                ? Optional(
+                    BorgBootContext.fromJson(
+                      // ignore: avoid_as
+                      json[_bootContextKey] as Map<String, dynamic>,
+                    ),
+                  )
                 : const Optional.none(),
       );
 

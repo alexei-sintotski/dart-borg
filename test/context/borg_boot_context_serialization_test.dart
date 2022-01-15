@@ -57,7 +57,8 @@ void main() {
 
     group('given valid YAML file without boot context section', () {
       final factory = BorgContextFactory(
-          tryToReadFileSync: (_) => const Optional('some_key:'));
+        tryToReadFileSync: (_) => const Optional('some_key:'),
+      );
       final context = factory.createBorgContext();
       test('it provides context without boot context', () {
         expect(context.bootContext.hasValue, false);
@@ -69,16 +70,20 @@ void main() {
 
       test('it saves content to a file', () {
         var savedToFile = false;
-        BorgContextFactory(saveStringToFileSync: (_, content) {
-          savedToFile = true;
-        }).save(context: context);
+        BorgContextFactory(
+          saveStringToFileSync: (_, content) {
+            savedToFile = true;
+          },
+        ).save(context: context);
         expect(savedToFile, isTrue);
       });
 
       test('it provides no content to save', () {
-        BorgContextFactory(saveStringToFileSync: (_, content) {
-          expect(content, isEmpty);
-        }).save(context: context);
+        BorgContextFactory(
+          saveStringToFileSync: (_, content) {
+            expect(content, isEmpty);
+          },
+        ).save(context: context);
       });
     });
 
@@ -111,24 +116,29 @@ void main() {
 
       group('given context object with boot context', () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(
-            dartSdkVersion: dartSdkVersion,
-            gitref: gitref,
-            bootMode: BootMode.basic,
-          )),
+          bootContext: Optional(
+            BorgBootContext(
+              dartSdkVersion: dartSdkVersion,
+              gitref: gitref,
+              bootMode: BootMode.basic,
+            ),
+          ),
         );
 
         test('it creates context file with correct Dart SDK version', () {
-          BorgContextFactory(saveStringToFileSync: (_, content) {
-            final jsonContent = json.decode(json.encode(loadYaml(content)))
-                as Map<String, dynamic>;
-            expect(
+          BorgContextFactory(
+            saveStringToFileSync: (_, content) {
+              final jsonContent = json.decode(json.encode(loadYaml(content)))
+                  as Map<String, dynamic>;
+              expect(
                 BorgContext.fromJson(jsonContent)
                     .bootContext
                     .unsafe!
                     .dartSdkVersion,
-                dartSdkVersion);
-          }).save(context: context);
+                dartSdkVersion,
+              );
+            },
+          ).save(context: context);
         });
       });
     });
@@ -156,51 +166,65 @@ void main() {
 
       group('given context object with boot context', () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(
-            dartSdkVersion: dartSdkVersion,
-            gitref: gitref,
-            bootMode: BootMode.basic,
-          )),
+          bootContext: Optional(
+            BorgBootContext(
+              dartSdkVersion: dartSdkVersion,
+              gitref: gitref,
+              bootMode: BootMode.basic,
+            ),
+          ),
         );
 
         test('it provides content to save', () {
-          BorgContextFactory(saveStringToFileSync: (_, content) {
-            expect(content, isNotEmpty);
-          }).save(context: context);
+          BorgContextFactory(
+            saveStringToFileSync: (_, content) {
+              expect(content, isNotEmpty);
+            },
+          ).save(context: context);
         });
 
         test('it provides content with boot context', () {
-          BorgContextFactory(saveStringToFileSync: (_, content) {
-            final jsonContent = json.decode(json.encode(loadYaml(content)))
-                as Map<String, dynamic>;
-            expect(
-                BorgContext.fromJson(jsonContent).bootContext.hasValue, isTrue);
-          }).save(context: context);
+          BorgContextFactory(
+            saveStringToFileSync: (_, content) {
+              final jsonContent = json.decode(json.encode(loadYaml(content)))
+                  as Map<String, dynamic>;
+              expect(
+                BorgContext.fromJson(jsonContent).bootContext.hasValue,
+                isTrue,
+              );
+            },
+          ).save(context: context);
         });
 
         test('it provides boot context with correct gitref value', () {
-          BorgContextFactory(saveStringToFileSync: (_, content) {
-            final jsonContent = json.decode(json.encode(loadYaml(content)))
-                as Map<String, dynamic>;
-            expect(BorgContext.fromJson(jsonContent).bootContext.unsafe!.gitref,
-                gitref);
-          }).save(context: context);
+          BorgContextFactory(
+            saveStringToFileSync: (_, content) {
+              final jsonContent = json.decode(json.encode(loadYaml(content)))
+                  as Map<String, dynamic>;
+              expect(
+                BorgContext.fromJson(jsonContent).bootContext.unsafe!.gitref,
+                gitref,
+              );
+            },
+          ).save(context: context);
         });
       });
 
       group('given last successful boot gitref covertible to a number in YAML',
           () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(
-            dartSdkVersion: dartSdkVersion,
-            gitref: gitrefThatLooksLikeANumber,
-            bootMode: BootMode.basic,
-          )),
+          bootContext: Optional(
+            BorgBootContext(
+              dartSdkVersion: dartSdkVersion,
+              gitref: gitrefThatLooksLikeANumber,
+              bootMode: BootMode.basic,
+            ),
+          ),
         );
         String? contextString;
         BorgContextFactory(
-                saveStringToFileSync: (_, content) => contextString = content)
-            .save(context: context);
+          saveStringToFileSync: (_, content) => contextString = content,
+        ).save(context: context);
 
         test('it does not crash while loading context containing this gitref',
             () {
@@ -249,41 +273,51 @@ void main() {
 
       group('given context object with boot mode basic', () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(
-            dartSdkVersion: dartSdkVersion,
-            gitref: gitref,
-            bootMode: BootMode.basic,
-          )),
+          bootContext: Optional(
+            BorgBootContext(
+              dartSdkVersion: dartSdkVersion,
+              gitref: gitref,
+              bootMode: BootMode.basic,
+            ),
+          ),
         );
 
         test('it save boot context with boot mode basic', () {
-          BorgContextFactory(saveStringToFileSync: (_, content) {
-            final jsonContent = json.decode(json.encode(loadYaml(content)))
-                as Map<String, dynamic>;
-            expect(
+          BorgContextFactory(
+            saveStringToFileSync: (_, content) {
+              final jsonContent = json.decode(json.encode(loadYaml(content)))
+                  as Map<String, dynamic>;
+              expect(
                 BorgContext.fromJson(jsonContent).bootContext.unsafe!.bootMode,
-                BootMode.basic);
-          }).save(context: context);
+                BootMode.basic,
+              );
+            },
+          ).save(context: context);
         });
       });
 
       group('given context object with boot mode incremental', () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(
-            dartSdkVersion: dartSdkVersion,
-            gitref: gitref,
-            bootMode: BootMode.incremental,
-          )),
+          bootContext: Optional(
+            BorgBootContext(
+              dartSdkVersion: dartSdkVersion,
+              gitref: gitref,
+              bootMode: BootMode.incremental,
+            ),
+          ),
         );
 
         test('it save boot context with boot mode incremental', () {
-          BorgContextFactory(saveStringToFileSync: (_, content) {
-            final jsonContent = json.decode(json.encode(loadYaml(content)))
-                as Map<String, dynamic>;
-            expect(
+          BorgContextFactory(
+            saveStringToFileSync: (_, content) {
+              final jsonContent = json.decode(json.encode(loadYaml(content)))
+                  as Map<String, dynamic>;
+              expect(
                 BorgContext.fromJson(jsonContent).bootContext.unsafe!.bootMode,
-                BootMode.incremental);
-          }).save(context: context);
+                BootMode.incremental,
+              );
+            },
+          ).save(context: context);
         });
       });
     });
@@ -326,24 +360,29 @@ void main() {
 
       group('given context object with empty list of modified packages', () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(
-            dartSdkVersion: dartSdkVersion,
-            gitref: gitref,
-            bootMode: BootMode.basic,
-          )),
+          bootContext: Optional(
+            BorgBootContext(
+              dartSdkVersion: dartSdkVersion,
+              gitref: gitref,
+              bootMode: BootMode.basic,
+            ),
+          ),
         );
         test('it produces context file with empty list of modified_packages',
             () {
-          BorgContextFactory(saveStringToFileSync: (_, content) {
-            final jsonContent = json.decode(json.encode(loadYaml(content)))
-                as Map<String, dynamic>;
-            expect(
+          BorgContextFactory(
+            saveStringToFileSync: (_, content) {
+              final jsonContent = json.decode(json.encode(loadYaml(content)))
+                  as Map<String, dynamic>;
+              expect(
                 BorgContext.fromJson(jsonContent)
                     .bootContext
                     .unsafe!
                     .modifiedPackages,
-                isEmpty);
-          }).save(context: context);
+                isEmpty,
+              );
+            },
+          ).save(context: context);
         });
       });
 
@@ -351,25 +390,30 @@ void main() {
           () {
         const modifiedPackages = ['a', 'b', 'c'];
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(
-            dartSdkVersion: dartSdkVersion,
-            gitref: gitref,
-            bootMode: BootMode.basic,
-            modifiedPackages: modifiedPackages,
-          )),
+          bootContext: Optional(
+            BorgBootContext(
+              dartSdkVersion: dartSdkVersion,
+              gitref: gitref,
+              bootMode: BootMode.basic,
+              modifiedPackages: modifiedPackages,
+            ),
+          ),
         );
         test('it produces context file with empty list of modified_packages',
             () {
-          BorgContextFactory(saveStringToFileSync: (_, content) {
-            final jsonContent = json.decode(json.encode(loadYaml(content)))
-                as Map<String, dynamic>;
-            expect(
+          BorgContextFactory(
+            saveStringToFileSync: (_, content) {
+              final jsonContent = json.decode(json.encode(loadYaml(content)))
+                  as Map<String, dynamic>;
+              expect(
                 BorgContext.fromJson(jsonContent)
                     .bootContext
                     .unsafe!
                     .modifiedPackages,
-                modifiedPackages);
-          }).save(context: context);
+                modifiedPackages,
+              );
+            },
+          ).save(context: context);
         });
       });
     });
@@ -384,7 +428,9 @@ void main() {
 
         test('it provides context object without Flutter SDK version', () {
           expect(
-              context.bootContext.unsafe!.flutterSdkVersion.hasValue, isFalse);
+            context.bootContext.unsafe!.flutterSdkVersion.hasValue,
+            isFalse,
+          );
         });
       });
 
@@ -398,8 +444,10 @@ void main() {
         final context = factory.createBorgContext();
 
         test('it provides correct Flutter SDK version', () {
-          expect(context.bootContext.unsafe!.flutterSdkVersion.unsafe,
-              flutterSdkVersion);
+          expect(
+            context.bootContext.unsafe!.flutterSdkVersion.unsafe,
+            flutterSdkVersion,
+          );
         });
       });
 
@@ -407,51 +455,61 @@ void main() {
           'given context object with boot context without Flutter SDK version',
           () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(
-            dartSdkVersion: dartSdkVersion,
-            gitref: gitref,
-            bootMode: BootMode.basic,
-          )),
+          bootContext: Optional(
+            BorgBootContext(
+              dartSdkVersion: dartSdkVersion,
+              gitref: gitref,
+              bootMode: BootMode.basic,
+            ),
+          ),
         );
 
         test('it creates context file without Flutter SDK version', () {
-          BorgContextFactory(saveStringToFileSync: (_, content) {
-            final jsonContent = json.decode(json.encode(loadYaml(content)))
-                as Map<String, dynamic>;
-            expect(
+          BorgContextFactory(
+            saveStringToFileSync: (_, content) {
+              final jsonContent = json.decode(json.encode(loadYaml(content)))
+                  as Map<String, dynamic>;
+              expect(
                 BorgContext.fromJson(jsonContent)
                     .bootContext
                     .unsafe!
                     .flutterSdkVersion
                     .hasValue,
-                isFalse);
-          }).save(context: context);
+                isFalse,
+              );
+            },
+          ).save(context: context);
         });
       });
 
       group('given context object with boot context with Flutter SDK version',
           () {
         const context = BorgContext(
-          bootContext: Optional(BorgBootContext(
-            dartSdkVersion: dartSdkVersion,
-            gitref: gitref,
-            bootMode: BootMode.basic,
-            flutterSdkVersion: Optional(flutterSdkVersion),
-          )),
+          bootContext: Optional(
+            BorgBootContext(
+              dartSdkVersion: dartSdkVersion,
+              gitref: gitref,
+              bootMode: BootMode.basic,
+              flutterSdkVersion: Optional(flutterSdkVersion),
+            ),
+          ),
         );
 
         test('it creates context file with correct Flutter SDK version', () {
-          BorgContextFactory(saveStringToFileSync: (_, content) {
-            final jsonContent = json.decode(json.encode(loadYaml(content)))
-                as Map<String, dynamic>;
-            expect(
+          BorgContextFactory(
+            saveStringToFileSync: (_, content) {
+              final jsonContent = json.decode(json.encode(loadYaml(content)))
+                  as Map<String, dynamic>;
+              expect(
                 BorgContext.fromJson(jsonContent)
                     .bootContext
                     .unsafe!
                     .flutterSdkVersion
                     .unsafe,
-                flutterSdkVersion);
-          }).save(context: context);
+                flutterSdkVersion,
+              );
+            },
+          ).save(context: context);
         });
       });
     });

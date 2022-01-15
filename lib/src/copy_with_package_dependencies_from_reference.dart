@@ -37,14 +37,17 @@ Iterable<PackageDependency> copyWithPackageDependenciesFromReference(
   Iterable<PackageDependency> deps,
   Iterable<PackageDependency> references,
 ) =>
-    deps.map((dep) => references
-        .firstWhere(
-          (ref) => ref.package() == dep.package(),
-          orElse: () => dep,
-        )
-        .iswitch(
-          sdk: (d) => PackageDependency.sdk(d.copyWith(type: dep.type())),
-          hosted: (d) => PackageDependency.hosted(d.copyWith(type: dep.type())),
-          git: (d) => PackageDependency.git(d.copyWith(type: dep.type())),
-          path: (d) => PackageDependency.path(d.copyWith(type: dep.type())),
-        ));
+    deps.map(
+      (dep) => references
+          .firstWhere(
+            (ref) => ref.package() == dep.package(),
+            orElse: () => dep,
+          )
+          .iswitch(
+            sdk: (d) => PackageDependency.sdk(d.copyWith(type: dep.type())),
+            hosted: (d) =>
+                PackageDependency.hosted(d.copyWith(type: dep.type())),
+            git: (d) => PackageDependency.git(d.copyWith(type: dep.type())),
+            path: (d) => PackageDependency.path(d.copyWith(type: dep.type())),
+          ),
+    );

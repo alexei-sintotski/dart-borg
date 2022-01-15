@@ -33,8 +33,9 @@ void main() {
   group('$DartPackage', () {
     group('given a Dart package definition', () {
       final package = DartPackage(
-          path: packagePath,
-          tryToReadFileSync: (_) => const Optional(dartPackageDefinition));
+        path: packagePath,
+        tryToReadFileSync: (_) => const Optional(dartPackageDefinition),
+      );
 
       test('it provides correct package path', () {
         expect(package.path, packagePath);
@@ -48,8 +49,9 @@ void main() {
 
   group('given a Flutter package definition', () {
     final package = DartPackage(
-        path: packagePath,
-        tryToReadFileSync: (_) => const Optional(flutterPackageDefinition));
+      path: packagePath,
+      tryToReadFileSync: (_) => const Optional(flutterPackageDefinition),
+    );
 
     test('it identifies package as a Flutter package', () {
       expect(package.isFlutterPackage, true);

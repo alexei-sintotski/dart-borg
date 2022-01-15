@@ -35,10 +35,15 @@ import 'utils/render_package_name.dart';
 
 void assertPubspecYamlConsistency(Iterable<DartPackage> packages) {
   final inconsistentSpecList = findInconsistentDependencySpecs(
-      Map.fromEntries(packages.map((p) => MapEntry(
-            renderPackageName(p.path),
-            p.pubspecYaml,
-          ))));
+    Map.fromEntries(
+      packages.map(
+        (p) => MapEntry(
+          renderPackageName(p.path),
+          p.pubspecYaml,
+        ),
+      ),
+    ),
+  );
 
   if (inconsistentSpecList.isNotEmpty) {
     printDependencyUsageReport(
@@ -47,7 +52,8 @@ void assertPubspecYamlConsistency(Iterable<DartPackage> packages) {
     );
 
     throw const BorgException(
-        'FAILURE: Inconsistent package dependency specifications detected!');
+      'FAILURE: Inconsistent package dependency specifications detected!',
+    );
   }
 }
 
