@@ -37,8 +37,8 @@ void main() {
     });
 
     group('given a single pubspec.yaml file', () {
-      final pubspecYamlWithSingleDepSpec =
-          PubspecYaml.loadFromYamlString('dependencies: {a:}');
+      final pubspecYamlWithSingleDepSpec = PubspecYaml.loadFromYamlString(
+          _prependPackageName('dependencies: {a:}'));
       final report =
           findInconsistentDependencySpecs({'x': pubspecYamlWithSingleDepSpec});
       test('it produces empty report', () {
@@ -47,10 +47,10 @@ void main() {
     });
 
     group('given two pubspec.yaml files with conflicting dependency specs', () {
-      final pubspecYamlWithVersion1 =
-          PubspecYaml.loadFromYamlString('dependencies: {a: 1.0.0}');
-      final pubspecYamlWithVersion2 =
-          PubspecYaml.loadFromYamlString('dependencies: {a: 2.0.0}');
+      final pubspecYamlWithVersion1 = PubspecYaml.loadFromYamlString(
+          _prependPackageName('dependencies: {a: 1.0.0}'));
+      final pubspecYamlWithVersion2 = PubspecYaml.loadFromYamlString(
+          _prependPackageName('dependencies: {a: 2.0.0}'));
       final report = findInconsistentDependencySpecs(
           {'x': pubspecYamlWithVersion1, 'y': pubspecYamlWithVersion2});
       test('it produces correct report', () {
@@ -67,10 +67,10 @@ void main() {
     });
 
     group('given two pubspec.yaml files with consistent dependency specs', () {
-      final pubspecYaml =
-          PubspecYaml.loadFromYamlString('dependencies: {a: ^1.0.0}');
-      final anotherPubspecYaml =
-          PubspecYaml.loadFromYamlString('dependencies: {a: ^1.0.0}');
+      final pubspecYaml = PubspecYaml.loadFromYamlString(
+          _prependPackageName('dependencies: {a: ^1.0.0}'));
+      final anotherPubspecYaml = PubspecYaml.loadFromYamlString(
+          _prependPackageName('dependencies: {a: ^1.0.0}'));
       final report = findInconsistentDependencySpecs(
           {'x': pubspecYaml, 'y': anotherPubspecYaml});
       test('it produces empty report', () {
@@ -83,10 +83,10 @@ void main() {
       'dev_dependency specs',
       () {
         final pubspecYamlWithDep = PubspecYaml.loadFromYamlString(
-          'dependencies: {a: ^1.0.0}',
+          _prependPackageName('dependencies: {a: ^1.0.0}'),
         );
         final pubspecYamlWithDevDep = PubspecYaml.loadFromYamlString(
-          'dev_dependencies: {a: ^2.0.0}',
+          _prependPackageName('dev_dependencies: {a: ^2.0.0}'),
         );
         final report = findInconsistentDependencySpecs(
           {'x': pubspecYamlWithDep, 'y': pubspecYamlWithDevDep},
@@ -110,11 +110,11 @@ void main() {
       'dependency override',
       () {
         final pubspecYaml = PubspecYaml.loadFromYamlString(
-          'dependencies: {a:}',
+          _prependPackageName('dependencies: {a:}'),
         );
         final pubspecYamlWithOverride = PubspecYaml.loadFromYamlString(
-          'dev_dependencies: {a: ^1.0.0}\n'
-          'dependency_overrides: {a: ^2.0.0}',
+          _prependPackageName('dev_dependencies: {a: ^1.0.0}\n'
+              'dependency_overrides: {a: ^2.0.0}'),
         );
         final report = findInconsistentDependencySpecs(
           {'x': pubspecYaml, 'y': pubspecYamlWithOverride},
@@ -129,10 +129,10 @@ void main() {
       'given two pubspec.yaml files with path dependency with different paths',
       () {
         final pubspecYaml = PubspecYaml.loadFromYamlString(
-          'dependencies: {a: {path: x}}',
+          _prependPackageName('dependencies: {a: {path: x}}'),
         );
         final anotherPubspecYaml = PubspecYaml.loadFromYamlString(
-          'dependencies: {a: {path: xx}}',
+          _prependPackageName('dependencies: {a: {path: xx}}'),
         );
         final report = findInconsistentDependencySpecs(
           {'x': pubspecYaml, 'y': anotherPubspecYaml},
@@ -148,10 +148,10 @@ void main() {
       'version specified and ommitted',
       () {
         final pubspecYamlNoVersion = PubspecYaml.loadFromYamlString(
-          'dependencies: {a:}',
+          _prependPackageName('dependencies: {a:}'),
         );
         final pubspecYamlWithVersion = PubspecYaml.loadFromYamlString(
-          'dependencies: {a: 1.0.0}',
+          _prependPackageName('dependencies: {a: 1.0.0}'),
         );
         final report = findInconsistentDependencySpecs(
           {'x': pubspecYamlNoVersion, 'y': pubspecYamlWithVersion},
@@ -167,10 +167,10 @@ void main() {
       'hosted dependency ommitted version specifications',
       () {
         final pubspecYaml = PubspecYaml.loadFromYamlString(
-          'dependencies: {a:}',
+          _prependPackageName('dependencies: {a:}'),
         );
         final anotherpubspecYaml = PubspecYaml.loadFromYamlString(
-          'dependencies: {a:}',
+          _prependPackageName('dependencies: {a:}'),
         );
         final report = findInconsistentDependencySpecs(
           {'x': pubspecYaml, 'y': anotherpubspecYaml},
@@ -182,3 +182,5 @@ void main() {
     );
   });
 }
+
+String _prependPackageName(String yamlBody) => 'name: package\n$yamlBody';
