@@ -59,7 +59,7 @@ class BorgConfiguration extends $BorgConfiguration {
 }
 
 Optional<String> _getString(Map<String, dynamic> json, String key) {
-  if (!json.containsKey(key)) {
+  if (!json.containsKey(key) || json[key] == null) {
     return const Optional.none();
   }
   return Optional(json[key] as String); // ignore: avoid_as
