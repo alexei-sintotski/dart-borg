@@ -50,7 +50,7 @@ class BorgContextFactory {
         // ignore: avoid_as
         some: (content) => BorgContext.fromJson(
           // ignore: avoid_as
-          json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>,
+          json.decode(json.encode(loadYaml(content))) as Map<String, dynamic>?,
         ),
         none: () => const BorgContext(),
       );
@@ -60,7 +60,7 @@ class BorgContextFactory {
   }) =>
       _saveStringToFileSync(
         pathToContextFile,
-        json2yaml(context.toJson()),
+        json2yaml(context.toJson()).trim(),
       );
 }
 

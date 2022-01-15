@@ -484,8 +484,7 @@ const flutterSdkVersion = '''
 Flutter 1.17.2 • channel stable • https://github.com/flutter/flutter.git
 Framework • revision 5f21edf8b6 (10 days ago) • 2020-05-28 12:44:12 -0700
 Engine • revision b851c71829
-Tools • Dart 2.8.3
-''';
+Tools • Dart 2.8.3''';
 const contextWithFlutterSdkVersion = '''
 last_successful_bootstrap:
   dart_sdk_version: $dartSdkVersion
@@ -494,19 +493,16 @@ last_successful_bootstrap:
     Flutter 1.17.2 • channel stable • https://github.com/flutter/flutter.git
     Framework • revision 5f21edf8b6 (10 days ago) • 2020-05-28 12:44:12 -0700
     Engine • revision b851c71829
-    Tools • Dart 2.8.3
- ''';
+    Tools • Dart 2.8.3''';
 
 const contextWithBootModeBasic = '''
 last_successful_bootstrap:
   gitref: $gitref
   dart_sdk_version: $dartSdkVersion
-  boot_mode: basic
-''';
+  boot_mode: basic''';
 
 const contextWithBootModeIncremental = '''
 last_successful_bootstrap:
   gitref: $gitref
   dart_sdk_version: $dartSdkVersion
-  boot_mode: incremental
-''';
+  boot_mode: incremental''';
