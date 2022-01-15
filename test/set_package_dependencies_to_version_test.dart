@@ -61,22 +61,30 @@ void main() {
       const version = '1.1.0';
 
       final pubspecLocks = {
-        'a': const PubspecLock(packages: [
-          _hostedDependencyAv1,
-          _hostedDependencyAv2,
-        ]),
-        'b': const PubspecLock(packages: [
-          _hostedDependencyAv1,
-          _hostedDependencyAv2,
-        ]),
-        'c': const PubspecLock(packages: [
-          _hostedDependencyAv1,
-          _hostedDependencyAv2,
-        ]),
-        'd': const PubspecLock(packages: [
-          _hostedDependencyAv1,
-          _hostedDependencyAv2,
-        ])
+        'a': const PubspecLock(
+          packages: [
+            _hostedDependencyAv1,
+            _hostedDependencyAv2,
+          ],
+        ),
+        'b': const PubspecLock(
+          packages: [
+            _hostedDependencyAv1,
+            _hostedDependencyAv2,
+          ],
+        ),
+        'c': const PubspecLock(
+          packages: [
+            _hostedDependencyAv1,
+            _hostedDependencyAv2,
+          ],
+        ),
+        'd': const PubspecLock(
+          packages: [
+            _hostedDependencyAv1,
+            _hostedDependencyAv2,
+          ],
+        )
       };
 
       final newPubspecLocks = packageDependencyToVersion(
@@ -108,18 +116,22 @@ void main() {
   });
 }
 
-const _hostedDependencyAv1 = PackageDependency.hosted(HostedPackageDependency(
-  package: 'a',
-  version: '1.0.0',
-  name: 'a',
-  url: 'https://pub.dartlang.org',
-  type: DependencyType.direct,
-));
+const _hostedDependencyAv1 = PackageDependency.hosted(
+  HostedPackageDependency(
+    package: 'a',
+    version: '1.0.0',
+    name: 'a',
+    url: 'https://pub.dartlang.org',
+    type: DependencyType.direct,
+  ),
+);
 
-const _hostedDependencyAv2 = PackageDependency.hosted(HostedPackageDependency(
-  package: 'b',
-  version: '2.0.0',
-  name: 'b',
-  url: 'https://pub.dartlang.org',
-  type: DependencyType.development,
-));
+const _hostedDependencyAv2 = PackageDependency.hosted(
+  HostedPackageDependency(
+    package: 'b',
+    version: '2.0.0',
+    name: 'b',
+    url: 'https://pub.dartlang.org',
+    type: DependencyType.development,
+  ),
+);

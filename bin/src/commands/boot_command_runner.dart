@@ -99,7 +99,8 @@ class BootCommandRunner {
     if (!_isPartialBootstrappingRequested()) {
       contextFactory.save(
         context: context.copyWith(
-          bootContext: Optional(BorgBootContext(
+          bootContext: Optional(
+            BorgBootContext(
               dartSdkVersion: dartSdkVersion,
               gitref: gitHead(),
               bootMode: getBootModeOption(argResults),
@@ -109,7 +110,9 @@ class BootCommandRunner {
                 some: (flutterSdkPath) =>
                     Optional(flutterSdkVersion(flutterSdkPath: flutterSdkPath)),
                 none: () => const Optional.none(),
-              ))),
+              ),
+            ),
+          ),
         ),
       );
     }
@@ -125,7 +128,8 @@ class BootCommandRunner {
 
     if (packagesToBoot.isEmpty) {
       throw const BorgException(
-          '\nFATAL: Nothing to do, please check command line');
+        '\nFATAL: Nothing to do, please check command line',
+      );
     }
 
     _bootstrapPackages(
@@ -144,7 +148,9 @@ class BootCommandRunner {
     final packagesToBoot = context.iif(
       some: (ctx) {
         if (_isFlutterVersionChanged(
-            context: ctx, configuration: configuration)) {
+          context: ctx,
+          configuration: configuration,
+        )) {
           return packages;
         }
 
@@ -160,7 +166,8 @@ class BootCommandRunner {
         }
 
         final packagesWithoutPubspecLock = packages.where(
-            (p) => !File(path.join(p.path, 'pubspec.lock')).existsSync());
+          (p) => !File(path.join(p.path, 'pubspec.lock')).existsSync(),
+        );
         if (packagesWithoutPubspecLock.isNotEmpty) {
           print('Found packages without pubspec.lock:');
           for (final package in packagesWithoutPubspecLock) {
@@ -209,8 +216,11 @@ class BootCommandRunner {
           packages: packagesToAnalyze,
           allPackagesInScope: {...packages, ...changedPackagesOutsideOfScope},
         )
-                .where((p) => !changedPackagesOutsideOfScope
-                    .any((pp) => pp.path == p.path))
+                .where(
+                  (p) => !changedPackagesOutsideOfScope.any(
+                    (pp) => pp.path == p.path,
+                  ),
+                )
                 .toSet();
         print('');
 
@@ -222,7 +232,8 @@ class BootCommandRunner {
 
         if (packages.isEmpty) {
           throw const BorgException(
-              '\nFATAL: Nothing to do, please check command line');
+            '\nFATAL: Nothing to do, please check command line',
+          );
         }
 
         return packages;
@@ -249,17 +260,21 @@ class BootCommandRunner {
             final actualVersion =
                 flutterSdkVersion(flutterSdkPath: flutterSdkPath);
             if (actualVersion != ctxVersion) {
-              print('Flutter version change detected, '
-                  'bootstrapping of all packages required\n\n'
-                  '$ctxVersion\n\n'
-                  '=>\n\n'
-                  '$actualVersion\n');
+              print(
+                'Flutter version change detected, '
+                'bootstrapping of all packages required\n\n'
+                '$ctxVersion\n\n'
+                '=>\n\n'
+                '$actualVersion\n',
+              );
             }
             return ctxVersion != actualVersion;
           },
           none: () {
-            print('Path to Flutter SDK has become undefined\n'
-                'Bootstrapping of all packages required\n');
+            print(
+              'Path to Flutter SDK has become undefined\n'
+              'Bootstrapping of all packages required\n',
+            );
             return true;
           },
         ),
@@ -269,7 +284,8 @@ class BootCommandRunner {
         ),
       );
   Iterable<DartPackage> _selectPackagesSpecifiedInCommandLine(
-          Iterable<DartPackage> packages) =>
+    Iterable<DartPackage> packages,
+  ) =>
       _isPartialBootstrappingRequested()
           ? packages
               .where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)))

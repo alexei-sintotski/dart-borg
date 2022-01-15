@@ -49,11 +49,12 @@ class EvolveCommand extends Command<void> {
 
   @override
   void run() => exitWithMessageOnBorgException(
-      action: () => EvolveCommandRunner(
-            argResults!,
-            configurationFactory: configurationFactory,
-          ).run(),
-      exitCode: 255);
+        action: () => EvolveCommandRunner(
+          argResults!,
+          configurationFactory: configurationFactory,
+        ).run(),
+        exitCode: 255,
+      );
 
   final BorgConfigurationFactory configurationFactory =
       BorgConfigurationFactory();

@@ -52,7 +52,8 @@ void main() {
 
       group('given command line with included paths defined', () {
         final config = factory.createConfiguration(
-            argResults: argParser.parse(['--paths=$_includedLocation2']));
+          argResults: argParser.parse(['--paths=$_includedLocation2']),
+        );
         test(
           'it produces configuration with included paths according to the '
           'command line',
@@ -85,7 +86,8 @@ void main() {
 
       group('given command line with excluded paths defined', () {
         final config = factory.createConfiguration(
-            argResults: argParser.parse(['--paths=$_excludedLocation2']));
+          argResults: argParser.parse(['--paths=$_excludedLocation2']),
+        );
         test(
           'it produces configuration with excluded paths according to '
           'the command line',
@@ -118,7 +120,8 @@ void main() {
 
       group('given command line with path to Dart SDK defined', () {
         final config = factory.createConfiguration(
-            argResults: argParser.parse(['--dartsdk=$_dartSdkLocation2']));
+          argResults: argParser.parse(['--dartsdk=$_dartSdkLocation2']),
+        );
         test(
           'it produces configuration with Dart SDK path according to '
           'the command line',
@@ -151,8 +154,8 @@ void main() {
 
       group('given command line with path to Flutter SDK defined', () {
         final config = factory.createConfiguration(
-            argResults:
-                argParser.parse(['--fluttersdk=$_flutterSdkLocation2']));
+          argResults: argParser.parse(['--fluttersdk=$_flutterSdkLocation2']),
+        );
         test(
           'it produces configuration with Flutter SDK path according to '
           'the command line',

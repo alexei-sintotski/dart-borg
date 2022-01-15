@@ -47,7 +47,8 @@ class FileFinder {
 
   List<String> _findFilesAtLocationSpec(String locationSpec) {
     final globbedLocations = Glob(locationSpec).listSync().where(
-        (item) => item.statSync().type == FileSystemEntityType.directory);
+          (item) => item.statSync().type == FileSystemEntityType.directory,
+        );
     final locationsToScan = <Directory>[
       Directory(locationSpec),
       ...globbedLocations.map((entity) => Directory(entity.path))
@@ -63,9 +64,11 @@ class FileFinder {
           ...dir
               .listSync(recursive: true)
               .where(_isNotIgnored)
-              .where((item) =>
-                  item.statSync().type == FileSystemEntityType.file &&
-                  item.path.endsWith(filename))
+              .where(
+                (item) =>
+                    item.statSync().type == FileSystemEntityType.file &&
+                    item.path.endsWith(filename),
+              )
               .map((entity) => entity.path)
               .toList()
       ];

@@ -34,30 +34,34 @@ import 'package:yaml/yaml.dart';
 void main() {
   group('$BorgConfigurationFactory', () {
     final factory = BorgConfigurationFactory(
-        tryToReadFileSync: (_) => const Optional.none());
+      tryToReadFileSync: (_) => const Optional.none(),
+    );
 
     test(
         'creates initial configuration file with include entry referring to '
         'current directory', () {
       factory.createInitialConfigurationFile(
-          saveStringToFileSync: (_, content) {
-        final savedConfig = BorgConfiguration.fromJson(_toJson(content));
-        expect(savedConfig.pathsToScan, contains('.'));
-      });
+        saveStringToFileSync: (_, content) {
+          final savedConfig = BorgConfiguration.fromJson(_toJson(content));
+          expect(savedConfig.pathsToScan, contains('.'));
+        },
+      );
     });
 
     test('creates initial configuration file with exclude entry', () {
       factory.createInitialConfigurationFile(
-          saveStringToFileSync: (_, content) {
-        expect(_toJson(content).keys, contains('exclude'));
-      });
+        saveStringToFileSync: (_, content) {
+          expect(_toJson(content).keys, contains('exclude'));
+        },
+      );
     });
 
     test('creates initial configuration file with dartsdk entry', () {
       factory.createInitialConfigurationFile(
-          saveStringToFileSync: (_, content) {
-        expect(_toJson(content).keys, contains('dart_sdk'));
-      });
+        saveStringToFileSync: (_, content) {
+          expect(_toJson(content).keys, contains('dart_sdk'));
+        },
+      );
     });
   });
 }

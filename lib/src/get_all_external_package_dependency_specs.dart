@@ -31,7 +31,8 @@ import 'package:pubspec_yaml/pubspec_yaml.dart';
 /// Package dependency overrides are taken into account.
 ///
 Iterable<PackageDependencySpec> getAllExternalPackageDependencySpecs(
-        Iterable<PubspecYaml> pubspecYamls) =>
+  Iterable<PubspecYaml> pubspecYamls,
+) =>
     _filterOutRedundantHostedSpecs(
       {
         for (final pubspecYaml in pubspecYamls)
@@ -48,20 +49,25 @@ Set<PackageDependencySpec> _getDependencySpecs(PubspecYaml pubspecYaml) => {
     }.map((dep) => _correctForOverride(dep, pubspecYaml)).toSet();
 
 PackageDependencySpec _correctForOverride(
-        PackageDependencySpec dep, PubspecYaml pubspecYaml) =>
+  PackageDependencySpec dep,
+  PubspecYaml pubspecYaml,
+) =>
     pubspecYaml.dependencyOverrides
         .firstWhere((d) => d.package() == dep.package(), orElse: () => dep);
 
 Iterable<PackageDependencySpec> _filterOutRedundantHostedSpecs(
-        Iterable<PackageDependencySpec> specs) =>
-    specs.where((s) => s.iswitcho(
-          hosted: (hs) =>
-              hs.version.hasValue ||
-              specs
-                  .where((s) => s.package() == hs.package)
-                  .every((s) => s.iswitcho(
-                        hosted: (h) => !h.version.hasValue,
-                        otherwise: () => true,
-                      )),
-          otherwise: () => true,
-        ));
+  Iterable<PackageDependencySpec> specs,
+) =>
+    specs.where(
+      (s) => s.iswitcho(
+        hosted: (hs) =>
+            hs.version.hasValue ||
+            specs.where((s) => s.package() == hs.package).every(
+                  (s) => s.iswitcho(
+                    hosted: (h) => !h.version.hasValue,
+                    otherwise: () => true,
+                  ),
+                ),
+        otherwise: () => true,
+      ),
+    );

@@ -43,16 +43,17 @@ void resolveDependencies({
   VerbosityLevel verbosity = VerbosityLevel.short,
 }) {
   final result = runSystemCommand(
-      command: _pubGetCommand(
-        package: package,
-        configuration: configuration,
-        arguments: arguments,
-      ),
-      workingDirectory: Directory(package.path),
-      environment: configuration.flutterSdkPath.iif(
-        some: (flutterSdkPath) => {'FLUTTER_ROOT': flutterSdkPath},
-        none: () => {},
-      ));
+    command: _pubGetCommand(
+      package: package,
+      configuration: configuration,
+      arguments: arguments,
+    ),
+    workingDirectory: Directory(package.path),
+    environment: configuration.flutterSdkPath.iif(
+      some: (flutterSdkPath) => {'FLUTTER_ROOT': flutterSdkPath},
+      none: () => {},
+    ),
+  );
 
   if (result.exitCode != 0 || verbosity == VerbosityLevel.verbose) {
     stdout.write('\n');
@@ -71,16 +72,17 @@ void upgradeDependencies({
   VerbosityLevel verbosity = VerbosityLevel.short,
 }) {
   final result = runSystemCommand(
-      command: _upgradeDepsCommand(
-        package: package,
-        configuration: configuration,
-        arguments: arguments,
-      ),
-      workingDirectory: Directory(package.path),
-      environment: configuration.flutterSdkPath.iif(
-        some: (flutterSdkPath) => {'FLUTTER_ROOT': flutterSdkPath},
-        none: () => {},
-      ));
+    command: _upgradeDepsCommand(
+      package: package,
+      configuration: configuration,
+      arguments: arguments,
+    ),
+    workingDirectory: Directory(package.path),
+    environment: configuration.flutterSdkPath.iif(
+      some: (flutterSdkPath) => {'FLUTTER_ROOT': flutterSdkPath},
+      none: () => {},
+    ),
+  );
 
   if (result.exitCode != 0 || verbosity == VerbosityLevel.verbose) {
     stdout.write('\n');
@@ -130,8 +132,9 @@ String _createPubCommandLine({
                   'flutter'
                 ])} $flutterArguments',
             none: () => throw BorgException(
-                'FATAL: Cannot bootstrap Flutter package ${package.path}, '
-                'path to Flutter SDK is not defined'),
+              'FATAL: Cannot bootstrap Flutter package ${package.path}, '
+              'path to Flutter SDK is not defined',
+            ),
           )
         : '${_pub(configuration)} $pubArguments';
 

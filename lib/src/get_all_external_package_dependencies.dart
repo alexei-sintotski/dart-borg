@@ -45,9 +45,11 @@ Iterable<PackageDependency> _collectAllDependencies(
 Iterable<PackageDependency> _filterOutPathOnlyDependencies(
   Iterable<PackageDependency> dependencies,
 ) =>
-    dependencies.where((d) => dependencies
-        .where((dd) => dd.package() == d.package())
-        .any((dd) => dd.iswitcho(path: (_) => false, otherwise: () => true)));
+    dependencies.where(
+      (d) => dependencies
+          .where((dd) => dd.package() == d.package())
+          .any((dd) => dd.iswitcho(path: (_) => false, otherwise: () => true)),
+    );
 
 Iterable<PackageDependency> _normalizeDependencyType(
   Iterable<PackageDependency> dependencies,

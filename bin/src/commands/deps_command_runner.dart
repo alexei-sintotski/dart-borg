@@ -68,10 +68,14 @@ class DepsCommandRunner {
 
     _assertPubspecLockFilesExist(packagesToAnalyze);
 
-    final pubspecLocks = packagesToAnalyze.map((p) => p.pubspecLock.valueOr(
-          () => throw AssertionError('pubspec.lock is not found for '
-              'package ${path.relative(p.path)}'),
-        ));
+    final pubspecLocks = packagesToAnalyze.map(
+      (p) => p.pubspecLock.valueOr(
+        () => throw AssertionError(
+          'pubspec.lock is not found for '
+          'package ${path.relative(p.path)}',
+        ),
+      ),
+    );
 
     final sdkDeps =
         pubspecLocks.expand((pubspecLock) => pubspecLock.sdks).toSet();
@@ -120,14 +124,20 @@ class DepsCommandRunner {
       });
 
     for (final sdk in sortedSdkDeps) {
-      final referredBy = packages.where((p) => p.pubspecLock.iif(
-            some: (pubspecLock) => pubspecLock.sdks.contains(sdk),
-            none: () => throw AssertionError('pubspec.lock is not found for '
-                'package ${path.relative(p.path)}'),
-          ));
-      print('${sdk.sdk.padRight(maxSdkNameLen)} '
-          '${sdk.version.padRight(maxSdkVersionLen)} '
-          '[${_printPackages(referredBy)}]');
+      final referredBy = packages.where(
+        (p) => p.pubspecLock.iif(
+          some: (pubspecLock) => pubspecLock.sdks.contains(sdk),
+          none: () => throw AssertionError(
+            'pubspec.lock is not found for '
+            'package ${path.relative(p.path)}',
+          ),
+        ),
+      );
+      print(
+        '${sdk.sdk.padRight(maxSdkNameLen)} '
+        '${sdk.version.padRight(maxSdkVersionLen)} '
+        '[${_printPackages(referredBy)}]',
+      );
     }
   }
 
@@ -166,8 +176,10 @@ void _assertPubspecLockFilesExist(
     for (final p in packagesWithoutPubspecLock) {
       print('\t${path.relative(p.path)}');
     }
-    throw const BorgException('\nFAILED: Packages without pubspec.lock found, '
-        'please use "pub get" or "borg boot" to resolve dependencies');
+    throw const BorgException(
+      '\nFAILED: Packages without pubspec.lock found, '
+      'please use "pub get" or "borg boot" to resolve dependencies',
+    );
   }
 }
 
@@ -176,13 +188,20 @@ Iterable<PackageDependency> _getDirectDependencies(
   Iterable<DartPackage> packages,
 ) =>
     deps
-        .where((dep) => packages.any((package) => package.pubspecLock.iif(
-              some: (p) => p.packages.any((d) =>
-                  d.package() == dep.package() &&
-                  d.type() != DependencyType.transitive),
+        .where(
+          (dep) => packages.any(
+            (package) => package.pubspecLock.iif(
+              some: (p) => p.packages.any(
+                (d) =>
+                    d.package() == dep.package() &&
+                    d.type() != DependencyType.transitive,
+              ),
               none: () => throw AssertionError(
-                  'pubspec.lock expected for ${package.path}'),
-            )))
+                'pubspec.lock expected for ${package.path}',
+              ),
+            ),
+          ),
+        )
         .toList(growable: false);
 
 void _printDependencies(Iterable<PackageDependency> deps) {
@@ -200,9 +219,11 @@ void _printDependencies(Iterable<PackageDependency> deps) {
         git: (d) => d.url,
         path: (d) => d.path,
       );
-      print('${dep.package().padRight(maxPackageNameLen)} '
-          '${dep.version().padRight(maxVersionLen)} '
-          '$reference');
+      print(
+        '${dep.package().padRight(maxPackageNameLen)} '
+        '${dep.version().padRight(maxVersionLen)} '
+        '$reference',
+      );
     }
   } else {
     print('Not found');

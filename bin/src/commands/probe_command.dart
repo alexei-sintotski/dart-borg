@@ -53,11 +53,12 @@ class ProbeCommand extends Command<void> {
 
   @override
   void run() => exitWithMessageOnBorgException(
-      action: () => ProbeCommandRunner(
-            configurationFactory,
-            argResults!,
-          ).run(),
-      exitCode: 255);
+        action: () => ProbeCommandRunner(
+          configurationFactory,
+          argResults!,
+        ).run(),
+        exitCode: 255,
+      );
 
   final BorgConfigurationFactory configurationFactory =
       BorgConfigurationFactory();

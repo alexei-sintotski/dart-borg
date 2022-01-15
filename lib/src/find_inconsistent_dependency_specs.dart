@@ -53,7 +53,8 @@ Map<String, Set<PackageDependencySpec>> _collectAllDepSpecsPerPubspecYaml(
     pubspecYamls.map((k, v) => MapEntry(k, _getDependencySpecs(v)));
 
 Set<PackageDependencySpec> _collectAllDepSpecs(
-        Map<String, Set<PackageDependencySpec>> specsPerPubspecYaml) =>
+  Map<String, Set<PackageDependencySpec>> specsPerPubspecYaml,
+) =>
     {
       for (final values in specsPerPubspecYaml.values) ...values,
     };
@@ -64,33 +65,44 @@ Set<PackageDependencySpec> _getDependencySpecs(PubspecYaml pubspecYaml) => {
     }.map((dep) => _correctForOverride(dep, pubspecYaml)).toSet();
 
 PackageDependencySpec _correctForOverride(
-        PackageDependencySpec dep, PubspecYaml pubspecYaml) =>
+  PackageDependencySpec dep,
+  PubspecYaml pubspecYaml,
+) =>
     pubspecYaml.dependencyOverrides
         .firstWhere((d) => d.package() == dep.package(), orElse: () => dep);
 
 Iterable<PackageDependencySpec> _filterOutPathOnlySpecs(
-        Iterable<PackageDependencySpec> specs) =>
-    specs.where((spec) => specs.where((s) => s.package() == spec.package()).any(
-        (spec) => spec.iswitcho(path: (_) => false, otherwise: () => true)));
+  Iterable<PackageDependencySpec> specs,
+) =>
+    specs.where(
+      (spec) => specs.where((s) => s.package() == spec.package()).any(
+            (spec) => spec.iswitcho(path: (_) => false, otherwise: () => true),
+          ),
+    );
 
 Iterable<PackageDependencySpec> _filterOutRedundantHostedSpecs(
-        Iterable<PackageDependencySpec> specs) =>
-    specs.where((s) => s.iswitcho(
-          hosted: (hs) =>
-              hs.version.hasValue ||
-              specs
-                  .where((s) => s.package() == hs.package)
-                  .every((s) => s.iswitcho(
-                        hosted: (h) => !h.version.hasValue,
-                        otherwise: () => true,
-                      )),
-          otherwise: () => true,
-        ));
+  Iterable<PackageDependencySpec> specs,
+) =>
+    specs.where(
+      (s) => s.iswitcho(
+        hosted: (hs) =>
+            hs.version.hasValue ||
+            specs.where((s) => s.package() == hs.package).every(
+                  (s) => s.iswitcho(
+                    hosted: (h) => !h.version.hasValue,
+                    otherwise: () => true,
+                  ),
+                ),
+        otherwise: () => true,
+      ),
+    );
 
 Iterable<PackageDependencySpec> _filterOutSingularReferences(
-        Iterable<PackageDependencySpec> specs) =>
+  Iterable<PackageDependencySpec> specs,
+) =>
     specs.where(
-        (s) => specs.where((ss) => s.package() == ss.package()).length > 1);
+      (s) => specs.where((ss) => s.package() == ss.package()).length > 1,
+    );
 
 List<DependencyUsageReport<PackageDependencySpec>> _createReport(
   Iterable<PackageDependencySpec> specs,
@@ -98,13 +110,19 @@ List<DependencyUsageReport<PackageDependencySpec>> _createReport(
 ) {
   final names = specs.map((d) => d.package()).toSet();
   return names
-      .map((name) => DependencyUsageReport(
+      .map(
+        (name) => DependencyUsageReport(
           dependencyName: name,
           references: Map.fromEntries(
-              specs.where((d) => d.package() == name).map((d) => MapEntry(
+            specs.where((d) => d.package() == name).map(
+                  (d) => MapEntry(
                     d,
                     _referencesToDependency(d, specsPerPubspecYaml),
-                  )))))
+                  ),
+                ),
+          ),
+        ),
+      )
       .toList();
 }
 

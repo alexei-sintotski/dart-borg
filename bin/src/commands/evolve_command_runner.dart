@@ -71,10 +71,12 @@ class EvolveCommandRunner {
     final allExternalDepSpecs = getAllExternalPackageDependencySpecs(
       packages.map((p) => p.pubspecYaml),
     );
-    final allExternalResolvedDeps = getAllExternalPackageDependencies(packages
-        .map((p) => p.pubspecLock)
-        .where((p) => p.hasValue)
-        .map((p) => p.unsafe!));
+    final allExternalResolvedDeps = getAllExternalPackageDependencies(
+      packages
+          .map((p) => p.pubspecLock)
+          .where((p) => p.hasValue)
+          .map((p) => p.unsafe!),
+    );
     final sdkSpec = packages.isNotEmpty
         ? packages.first.pubspecYaml.environment
         : {'sdk': '>=2.10.0 <3.0.0'};
@@ -125,22 +127,24 @@ class EvolveCommandRunner {
     Iterable<PackageDependency> directDeps,
     Map<String, String> environment,
   ) =>
-      withTempLocation(action: (location) {
-        final package = _createPackage(
-          name: 'borg_evolve_temp',
-          location: location.path,
-          depSpecs: directDepSpecs,
-          resolvedDeps: directDeps,
-          environment: environment,
-        );
-        upgradeDependencies(
-          package: package,
-          configuration: configuration,
-          arguments: '--no-precompile',
-        );
-        final resolvedDeps = _getResolvedDependencies(location: location);
-        return resolvedDeps;
-      });
+      withTempLocation(
+        action: (location) {
+          final package = _createPackage(
+            name: 'borg_evolve_temp',
+            location: location.path,
+            depSpecs: directDepSpecs,
+            resolvedDeps: directDeps,
+            environment: environment,
+          );
+          upgradeDependencies(
+            package: package,
+            configuration: configuration,
+            arguments: '--no-precompile',
+          );
+          final resolvedDeps = _getResolvedDependencies(location: location);
+          return resolvedDeps;
+        },
+      );
 
   DartPackage _createPackage({
     required String name,
@@ -152,14 +156,18 @@ class EvolveCommandRunner {
     if (getVerboseFlag(argResults)) {
       print('\tusing temporary package at $location...');
     }
-    File(path.join(location, 'pubspec.yaml')).writeAsStringSync(PubspecYaml(
-      name: name,
-      dependencies: depSpecs,
-      environment: environment,
-    ).toYamlString());
-    File(path.join(location, 'pubspec.lock')).writeAsStringSync(PubspecLock(
-      packages: resolvedDeps,
-    ).toYamlString());
+    File(path.join(location, 'pubspec.yaml')).writeAsStringSync(
+      PubspecYaml(
+        name: name,
+        dependencies: depSpecs,
+        environment: environment,
+      ).toYamlString(),
+    );
+    File(path.join(location, 'pubspec.lock')).writeAsStringSync(
+      PubspecLock(
+        packages: resolvedDeps,
+      ).toYamlString(),
+    );
     return DartPackage(path: path.canonicalize(location));
   }
 
@@ -182,7 +190,9 @@ class EvolveCommandRunner {
     if (depsCorrectionSet.isNotEmpty && !getDryRunFlag(argResults)) {
       final correctedPubspecLock = pubspecLock.copyWith(
         packages: copyWithPackageDependenciesFromReference(
-            pubspecLock.packages, references),
+          pubspecLock.packages,
+          references,
+        ),
       );
       pubspecLockFile.writeAsStringSync(correctedPubspecLock.toYamlString());
       resolveDependencies(
@@ -191,8 +201,9 @@ class EvolveCommandRunner {
       );
     }
     _printDependencyCorrections(
-        actualDependencies: pubspecLock.packages,
-        correctionSet: depsCorrectionSet);
+      actualDependencies: pubspecLock.packages,
+      correctionSet: depsCorrectionSet,
+    );
   }
 }
 
