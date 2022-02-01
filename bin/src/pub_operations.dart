@@ -39,14 +39,12 @@ enum VerbosityLevel { short, verbose }
 void resolveDependencies({
   required DartPackage package,
   required BorgConfiguration configuration,
-  String arguments = '',
   VerbosityLevel verbosity = VerbosityLevel.short,
 }) {
   final result = runSystemCommand(
     command: _pubGetCommand(
       package: package,
       configuration: configuration,
-      arguments: arguments,
     ),
     workingDirectory: Directory(package.path),
     environment: configuration.flutterSdkPath.iif(
@@ -97,13 +95,12 @@ void upgradeDependencies({
 String _pubGetCommand({
   required DartPackage package,
   required BorgConfiguration configuration,
-  required String arguments,
 }) =>
     _createPubCommandLine(
       package: package,
       configuration: configuration,
-      flutterArguments: 'packages get',
-      pubArguments: 'get $arguments',
+      flutterArguments: 'pub get',
+      pubArguments: 'pub get',
     );
 
 String _upgradeDepsCommand({
@@ -114,8 +111,8 @@ String _upgradeDepsCommand({
     _createPubCommandLine(
       package: package,
       configuration: configuration,
-      flutterArguments: 'packages upgrade',
-      pubArguments: 'upgrade $arguments',
+      flutterArguments: 'pub upgrade',
+      pubArguments: 'pub upgrade $arguments',
     );
 
 String _createPubCommandLine({
@@ -125,20 +122,26 @@ String _createPubCommandLine({
   required String pubArguments,
 }) =>
     package.isFlutterPackage
-        ? configuration.flutterSdkPath.iif(
-            some: (flutterSdkPath) => '${path.joinAll([
-                  flutterSdkPath,
-                  'bin',
-                  'flutter'
-                ])} $flutterArguments',
-            none: () => throw BorgException(
-              'FATAL: Cannot bootstrap Flutter package ${package.path}, '
-              'path to Flutter SDK is not defined',
-            ),
-          )
-        : '${_pub(configuration)} $pubArguments';
+        ? '${_flutter(
+            package: package,
+            configuration: configuration,
+          )} $flutterArguments'
+        : '${_dart(configuration)} $pubArguments';
 
-String _pub(BorgConfiguration config) => config.dartSdkPath.iif(
-      some: (location) => path.joinAll([location, 'bin', 'pub']),
-      none: () => 'pub',
+String _flutter({
+  required DartPackage package,
+  required BorgConfiguration configuration,
+}) =>
+    configuration.flutterSdkPath.iif(
+      some: (flutterSdkPath) =>
+          path.joinAll([flutterSdkPath, 'bin', 'flutter']),
+      none: () => throw BorgException(
+        'FATAL: Cannot bootstrap Flutter package ${package.path}, '
+        'path to Flutter SDK is not defined',
+      ),
+    );
+
+String _dart(BorgConfiguration configuration) => configuration.dartSdkPath.iif(
+      some: (dartSdkPath) => path.joinAll([dartSdkPath, 'bin', 'dart']),
+      none: () => 'dart',
     );
