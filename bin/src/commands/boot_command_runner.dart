@@ -68,7 +68,7 @@ class BootCommandRunner {
     final packages = scanForPackages(
       configuration: configuration,
       argResults: argResults,
-    );
+    ).toList(growable: false);
 
     switch (getBootModeOption(argResults)) {
       case BootMode.basic:
@@ -124,7 +124,8 @@ class BootCommandRunner {
     required Iterable<DartPackage> packages,
     required BorgConfiguration configuration,
   }) {
-    final packagesToBoot = _selectPackagesSpecifiedInCommandLine(packages);
+    final packagesToBoot =
+        _selectPackagesSpecifiedInCommandLine(packages).toList(growable: false);
 
     if (packagesToBoot.isEmpty) {
       throw const BorgException(
@@ -165,9 +166,11 @@ class BootCommandRunner {
           return packages;
         }
 
-        final packagesWithoutPubspecLock = packages.where(
-          (p) => !File(path.join(p.path, 'pubspec.lock')).existsSync(),
-        );
+        final packagesWithoutPubspecLock = packages
+            .where(
+              (p) => !File(path.join(p.path, 'pubspec.lock')).existsSync(),
+            )
+            .toList(growable: false);
         if (packagesWithoutPubspecLock.isNotEmpty) {
           print('Found packages without pubspec.lock:');
           for (final package in packagesWithoutPubspecLock) {
@@ -238,7 +241,7 @@ class BootCommandRunner {
 
         return packages;
       },
-    );
+    ).toList(growable: false);
 
     if (packagesToBoot.isEmpty) {
       print('SUCCESS: Workspace is up-to-date, bootstrapping is not required');
@@ -283,6 +286,7 @@ class BootCommandRunner {
           none: () => false,
         ),
       );
+
   Iterable<DartPackage> _selectPackagesSpecifiedInCommandLine(
     Iterable<DartPackage> packages,
   ) =>
@@ -290,6 +294,7 @@ class BootCommandRunner {
           ? packages
               .where((p) => argResults.rest.any((arg) => p.path.endsWith(arg)))
           : packages;
+
   void _bootstrapPackages({
     required Iterable<DartPackage> packages,
     required BorgConfiguration configuration,

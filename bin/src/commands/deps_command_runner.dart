@@ -57,9 +57,10 @@ class DepsCommandRunner {
     final packages = scanForPackages(
       configuration: configuration,
       argResults: argResults,
-    );
+    ).toList(growable: false);
 
-    final packagesToAnalyze = _selectPackagesSpecifiedInCommandLine(packages);
+    final packagesToAnalyze =
+        _selectPackagesSpecifiedInCommandLine(packages).toList(growable: false);
 
     if (packagesToAnalyze.isEmpty) {
       print('Dart packages are not found');
@@ -68,14 +69,16 @@ class DepsCommandRunner {
 
     _assertPubspecLockFilesExist(packagesToAnalyze);
 
-    final pubspecLocks = packagesToAnalyze.map(
-      (p) => p.pubspecLock.valueOr(
-        () => throw AssertionError(
-          'pubspec.lock is not found for '
-          'package ${path.relative(p.path)}',
-        ),
-      ),
-    );
+    final pubspecLocks = packagesToAnalyze
+        .map(
+          (p) => p.pubspecLock.valueOr(
+            () => throw AssertionError(
+              'pubspec.lock is not found for '
+              'package ${path.relative(p.path)}',
+            ),
+          ),
+        )
+        .toList(growable: false);
 
     final sdkDeps =
         pubspecLocks.expand((pubspecLock) => pubspecLock.sdks).toSet();
@@ -85,16 +88,19 @@ class DepsCommandRunner {
       print('');
     }
 
-    final externalDeps = getAllExternalPackageDependencies(pubspecLocks);
+    final externalDeps = getAllExternalPackageDependencies(pubspecLocks).toList(
+      growable: false,
+    );
 
     print('Analyzing package dependencies...');
 
     final directDependencies = _getDirectDependencies(
       externalDeps,
       packagesToAnalyze,
-    );
-    final transDependencies =
-        externalDeps.where((d) => !directDependencies.contains(d));
+    ).toList(growable: false);
+    final transDependencies = externalDeps
+        .where((d) => !directDependencies.contains(d))
+        .toList(growable: false);
 
     print('');
 

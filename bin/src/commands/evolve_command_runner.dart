@@ -64,19 +64,19 @@ class EvolveCommandRunner {
     final packages = scanForPackages(
       configuration: configuration,
       argResults: argResults,
-    );
+    ).toList(growable: false);
 
     assertPubspecYamlConsistency(packages);
 
     final allExternalDepSpecs = getAllExternalPackageDependencySpecs(
       packages.map((p) => p.pubspecYaml),
-    );
+    ).toList(growable: false);
     final allExternalResolvedDeps = getAllExternalPackageDependencies(
       packages
           .map((p) => p.pubspecLock)
           .where((p) => p.hasValue)
           .map((p) => p.unsafe!),
-    );
+    ).toList(growable: false);
     final sdkSpec = packages.isNotEmpty
         ? packages.first.pubspecYaml.environment
         : {'sdk': '>=2.10.0 <3.0.0'};
@@ -92,7 +92,7 @@ class EvolveCommandRunner {
       allExternalDepSpecs,
       allExternalResolvedDeps,
       sdkSpec,
-    );
+    ).toList(growable: false);
     print(
       '\tresolved ${references.length} direct and transitive external '
       'dependencies',
@@ -185,8 +185,10 @@ class EvolveCommandRunner {
     }
     final pubspecLock =
         pubspecLockFile.readAsStringSync().loadPubspecLockFromYaml();
-    final depsCorrectionSet =
-        computePackageDependencyCorrection(pubspecLock.packages, references);
+    final depsCorrectionSet = computePackageDependencyCorrection(
+      pubspecLock.packages,
+      references,
+    ).toList(growable: false);
     if (depsCorrectionSet.isNotEmpty && !getDryRunFlag(argResults)) {
       final correctedPubspecLock = pubspecLock.copyWith(
         packages: copyWithPackageDependenciesFromReference(

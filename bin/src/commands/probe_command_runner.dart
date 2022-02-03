@@ -58,7 +58,7 @@ class ProbeCommandRunner {
     final packages = scanForPackages(
       configuration: configuration,
       argResults: argResults,
-    );
+    ).toList(growable: false);
 
     if (getPubspecYamlFlag(argResults)) {
       _checkPubspecYamlFiles(packages);
