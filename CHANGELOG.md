@@ -1,3 +1,7 @@
+## [2.0.0] - Null safety
+* Null safety support
+* Performance optimizations for all commands
+
 ## [1.6.0] - Semiautomatic pubspec.lock correction
 * Feature: Semiautomatic correction of pubspec.lock inconsistencies with `probe --correct`
 * Kudos to @RtgrV for design and implementation!

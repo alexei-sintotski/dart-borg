@@ -16,11 +16,10 @@ Feature roadmap:
 
 | version | Major feature                                                                                                            |
 |---------|--------------------------------------------------------------------------------------------------------------------------|
-| 2.0     | Null-safe implementation                                                                                                 |
-| 2.1     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
-| 2.2     | List outdated packages                                                                                                   |
-| 2.3     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository   |
-| 2.4     | Ability to define commands in the configuration file                                                                        |
+| 2.1     | Ability to define commands in the configuration file                                                                        |
+| 2.2     | Upgrade of only selected (not all) external dependencies consistently across repository                                  |
+| 2.3     | List outdated packages                                                                                                   |
+| 2.4     | Pinning configuration of a new package with pubspec.lock without upgrading configuration of other packages in repository   |
 
 # Installation
 
