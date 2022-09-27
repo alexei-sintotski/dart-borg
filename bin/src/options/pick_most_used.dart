@@ -23,45 +23,15 @@
  *
  */
 
-import 'package:args/command_runner.dart';
-import 'package:borg/src/configuration/factory.dart';
+import 'package:args/args.dart';
 
-import '../options/correct.dart';
-import '../options/lock.dart';
-import '../options/pick_most_used.dart';
-import '../options/verbose.dart';
-import '../options/yaml.dart';
-import '../utils/borg_exception.dart';
-import 'probe_command_runner.dart';
+void addPickMostUsedFlag(ArgParser argParser) => argParser.addFlag(
+      _name,
+      abbr: 'm',
+      help: 'Pick most used version instead of prompting user',
+    );
 
-// ignore_for_file: avoid_print
+// ignore: avoid_as
+bool getPickMostUsedFlag(ArgResults argResults) => argResults[_name] as bool;
 
-class ProbeCommand extends Command<void> {
-  ProbeCommand() {
-    configurationFactory.populateConfigurationArgs(argParser);
-    addPubspecYamlFlag(argParser);
-    addPubspecLockFlag(argParser);
-    addVerboseFlag(argParser);
-    addCorrectFlag(argParser);
-    addPickMostUsedFlag(argParser);
-  }
-
-  @override
-  String get description =>
-      'Checks consistency of Dart dependencies across multiple packages.';
-
-  @override
-  String get name => 'probe';
-
-  @override
-  void run() => exitWithMessageOnBorgException(
-        action: () => ProbeCommandRunner(
-          configurationFactory,
-          argResults!,
-        ).run(),
-        exitCode: 255,
-      );
-
-  final BorgConfigurationFactory configurationFactory =
-      BorgConfigurationFactory();
-}
+const _name = 'pick-most-used';
