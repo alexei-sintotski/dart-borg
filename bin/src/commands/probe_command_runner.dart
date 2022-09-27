@@ -38,6 +38,7 @@ import 'package:pubspec_lock/pubspec_lock.dart';
 import '../assert_pubspec_yaml_consistency.dart';
 import '../options/correct.dart';
 import '../options/lock.dart';
+import '../options/pick_most_used.dart';
 import '../options/yaml.dart';
 import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
@@ -106,7 +107,10 @@ class ProbeCommandRunner {
     final inconsistentUsageList = findInconsistentDependencies(pubspecLocks);
 
     if (inconsistentUsageList.isNotEmpty && getCorrectFlag(argResults)) {
-      correctPackageDependencyBasedOnReport(report: inconsistentUsageList);
+      correctPackageDependencyBasedOnReport(
+        report: inconsistentUsageList,
+        pickMostUsed: getPickMostUsedFlag(argResults),
+      );
     } else if (inconsistentUsageList.isNotEmpty) {
       printDependencyUsageReport(
         report: inconsistentUsageList,
@@ -114,7 +118,8 @@ class ProbeCommandRunner {
       );
       throw const BorgException(
         'FAILURE: Inconsistent use of external dependencies detected!\n'
-        '         Consider to use the --correct option to fix issues.',
+        '         Consider using the --correct and --pick-most-used options '
+        'to fix issues.',
       );
     }
   }
