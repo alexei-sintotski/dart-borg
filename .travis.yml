@@ -1,8 +1,11 @@
 language: dart
 
+install:
+  - dart pub get
+
 script:
   - dev/dart_quality_checks.sh
 
 after_success:
-  - pub run test_coverage
+  - dart pub run test_coverage
   - bash <(curl -s https://codecov.io/bash)
