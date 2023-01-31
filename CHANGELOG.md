@@ -1,3 +1,6 @@
+## [2.0.1] - Null safety
+* Removed linter rule (invariant_booleans) that got deprecated in dart 2.19
+
 ## [2.0.0] - Null safety
 * Null safety support
 * Performance optimizations for all commands
