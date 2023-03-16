@@ -31,7 +31,7 @@ import 'src/commands/evolve_command.dart';
 import 'src/commands/init_command.dart';
 import 'src/commands/probe_command.dart';
 
-void main(List<String> args) => CommandRunner<void>(
+Future<void> main(List<String> args) => Future.sync(() => CommandRunner<void>(
       'borg',
       'Dart borg is a command-line tool to support development teams working '
           'on large scale Dart and Flutter mono repositories.',
@@ -41,4 +41,4 @@ void main(List<String> args) => CommandRunner<void>(
       ..addCommand(InitCommand())
       ..addCommand(BootCommand())
       ..addCommand(DepsCommand())
-      ..run(args);
+      ..run(args));
