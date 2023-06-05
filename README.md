@@ -87,6 +87,11 @@ the `--correct` command-line flag:
 
 `borg probe --correct`
 
+Use the `pick-most-used` flag to automatically pick the version the is used by
+most packages:
+
+`borg probe --correct --pick-most-used`
+
 ## Output in case of consistent configuration
 
 In case of consistent usage of dependencies the tool returns with exit code 0:

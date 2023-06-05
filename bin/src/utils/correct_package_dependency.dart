@@ -27,6 +27,8 @@ import 'dart:io';
 
 import 'package:borg/borg.dart';
 import 'package:borg/src/package_dependency_to_version.dart';
+import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 import 'package:pubspec_lock/pubspec_lock.dart';
 
 import 'borg_exception.dart';
@@ -36,6 +38,7 @@ import 'print_dependency_usage_report.dart';
 
 void correctPackageDependencyBasedOnReport({
   required List<DependencyUsageReport<PackageDependency>> report,
+  required bool pickMostUsed,
 }) {
   final reports = report
     ..sort((a, b) => a.dependencyName.compareTo(b.dependencyName));
@@ -52,13 +55,21 @@ void correctPackageDependencyBasedOnReport({
       (package) => package.version(),
     );
 
-    print('\nChange "$dependencyName" version to? $inconsistentVersions');
-    final userInput = stdin.readLineSync();
-    if (userInput == null || !inconsistentVersions.contains(userInput)) {
-      throw BorgException(
-        'FAILURE: Version "$userInput" did not match '
-        'any $inconsistentVersions',
-      );
+    final String toVersion;
+    final mostUsedVersion = determineMostUsedVersion(report.references);
+    if (pickMostUsed && mostUsedVersion != null) {
+      print('\nChanging "$dependencyName" version to $mostUsedVersion');
+      toVersion = mostUsedVersion;
+    } else {
+      print('\nChange "$dependencyName" version to? $inconsistentVersions');
+      final userInput = stdin.readLineSync();
+      if (userInput == null || !inconsistentVersions.contains(userInput)) {
+        throw BorgException(
+          'FAILURE: Version "$userInput" did not match '
+          'any $inconsistentVersions',
+        );
+      }
+      toVersion = userInput;
     }
 
     for (final reference in report.references.entries) {
@@ -70,7 +81,7 @@ void correctPackageDependencyBasedOnReport({
                 File(path).readAsStringSync().loadPubspecLockFromYaml(),
               ),
             ),
-        toVersion: userInput,
+        toVersion: toVersion,
       );
       for (final newPubspecLock in newPubspecLocks.entries) {
         File(newPubspecLock.key).writeAsStringSync(
@@ -79,4 +90,18 @@ void correctPackageDependencyBasedOnReport({
       }
     }
   }
+}
+
+@visibleForTesting
+String? determineMostUsedVersion(
+  Map<PackageDependency, List<String>> references,
+) {
+  final usageCountPerVersion = references.entries
+      .groupListsBy((entry) => entry.value.length)
+      .map<int, List<PackageDependency>>(
+        (key, value) => MapEntry(key, value.map((e) => e.key).toList()),
+      );
+  final sortedVersionUsage = usageCountPerVersion.entries.toList()
+    ..sortBy<num>((element) => element.key);
+  return sortedVersionUsage.last.value.singleOrNull?.version();
 }
