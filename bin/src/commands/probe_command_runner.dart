@@ -30,9 +30,9 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:borg/src/configuration/factory.dart';
 import 'package:borg/src/dart_package/dart_package.dart';
+import 'package:borg/src/find_circular_dependencies.dart';
 import 'package:borg/src/find_inconsistent_dependencies.dart';
 import 'package:meta/meta.dart';
-import 'package:path/path.dart' as path;
 import 'package:pubspec_lock/pubspec_lock.dart';
 
 import '../assert_pubspec_yaml_consistency.dart';
@@ -88,34 +88,53 @@ class ProbeCommandRunner {
   void _checkPubspecLockFiles(Iterable<DartPackage> packages) {
     final pubspecLocks = Map.fromEntries(
       packages
-          .map((p) => File(path.join(p.path, 'pubspec.lock')))
           .where(
-            (f) =>
-                f.existsSync() &&
-                [FileSystemEntityType.file].contains(f.statSync().type),
+            (package) =>
+                package.pubspecLockFile.existsSync() &&
+                [FileSystemEntityType.file]
+                    .contains(package.pubspecLockFile.statSync().type),
           )
           .map(
-            (f) => MapEntry(
-              f.path,
-              f.readAsStringSync().loadPubspecLockFromYaml(),
+            (package) => MapEntry(
+              package,
+              package.pubspecLockFile
+                  .readAsStringSync()
+                  .loadPubspecLockFromYaml(),
             ),
           ),
     );
 
     print('Analyzing dependencies...');
     final inconsistentUsageList = findInconsistentDependencies(pubspecLocks);
+    final circularDependenciesReport =
+        findCircularDependencies(pubspecLocks).toList();
 
     if (inconsistentUsageList.isNotEmpty && getCorrectFlag(argResults)) {
       correctPackageDependencyBasedOnReport(report: inconsistentUsageList);
-    } else if (inconsistentUsageList.isNotEmpty) {
-      printDependencyUsageReport(
-        report: inconsistentUsageList,
-        formatDependency: _formatDependencyInfo,
-      );
-      throw const BorgException(
-        'FAILURE: Inconsistent use of external dependencies detected!\n'
-        '         Consider to use the --correct option to fix issues.',
-      );
+    } else {
+      if (inconsistentUsageList.isNotEmpty) {
+        printInconsistentDependencyUsageReport(
+          report: inconsistentUsageList,
+          formatDependency: _formatDependencyInfo,
+        );
+      }
+
+      if (circularDependenciesReport.isNotEmpty) {
+        printCircularDependencyUsageReport(
+          report: circularDependenciesReport,
+          formatDependency: _formatDependencyInfo,
+        );
+      }
+
+      if (inconsistentUsageList.isNotEmpty ||
+          circularDependenciesReport.isNotEmpty) {
+        throw BorgException(
+          'FAILURE: Inconsistent use of (external) dependencies detected!',
+          supportMessage: inconsistentUsageList.isNotEmpty
+              ? 'Consider to use the --correct option to fix issues.'
+              : null,
+        );
+      }
     }
   }
 }

@@ -27,7 +27,7 @@ import 'package:borg/borg.dart';
 
 // ignore_for_file: avoid_print
 
-void printDependencyUsageReport<DependencyType>({
+void printInconsistentDependencyUsageReport<DependencyType>({
   required List<DependencyUsageReport<DependencyType>> report,
   required String Function(DependencyType dependency) formatDependency,
 }) {
@@ -39,11 +39,33 @@ void printDependencyUsageReport<DependencyType>({
       '\n${use.dependencyName}: '
       'inconsistent dependency specifications detected',
     );
+
     printDependencyUsage(
       dependencies: use.references,
       formatDependency: formatDependency,
     );
   }
+
+  print('');
+}
+
+void printCircularDependencyUsageReport<DependencyType>({
+  required List<DependencyUsageReport<DependencyType>> report,
+  required String Function(DependencyType dependency) formatDependency,
+}) {
+  for (final use in report) {
+    print(
+      '\n${use.dependencyName}: '
+      'circular dependency detected',
+    );
+
+    printDependencyUsage(
+      dependencies: use.references,
+      formatDependency: formatDependency,
+    );
+  }
+
+  print('');
 }
 
 void printDependencyUsage<DependencyType>({

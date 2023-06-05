@@ -25,6 +25,7 @@
 
 import 'package:pubspec_lock/pubspec_lock.dart';
 
+import 'dart_package/dart_package.dart';
 import 'generic_dependency_usage_report.dart';
 
 /// Finds inconsistent set of external dependencies in the provided set of
@@ -38,7 +39,7 @@ import 'generic_dependency_usage_report.dart';
 /// compared as strings, not semantically.
 ///
 List<DependencyUsageReport<PackageDependency>> findInconsistentDependencies(
-  Map<String, PubspecLock> pubspecLocks,
+  Map<DartPackage, PubspecLock> pubspecLocks,
 ) {
   final dependencies = _collectAllDependencies(pubspecLocks).toSet();
   final externalDependencies =
@@ -56,7 +57,7 @@ List<DependencyUsageReport<PackageDependency>> findInconsistentDependencies(
 }
 
 Iterable<PackageDependency> _collectAllDependencies(
-  Map<String, PubspecLock> pubspecLocks,
+  Map<DartPackage, PubspecLock> pubspecLocks,
 ) =>
     pubspecLocks.values.expand((pubspecLock) => pubspecLock.packages);
 
@@ -106,7 +107,7 @@ Iterable<PackageDependency> _filterOutConsistentDependencies(
 List<DependencyUsageReport<PackageDependency>> _createReport(
   Iterable<PackageDependency> dependencies,
   Map<PackageDependency, PackageDependency> normalizedDependencyMap,
-  Map<String, PubspecLock> pubspecLocks,
+  Map<DartPackage, PubspecLock> pubspecLocks,
 ) {
   final names = dependencies.map((d) => d.package()).toSet();
   return names
@@ -115,13 +116,14 @@ List<DependencyUsageReport<PackageDependency>> _createReport(
           dependencyName: name,
           references: Map.fromEntries(
             dependencies
-                .where((d) => d.package() == name)
-                .where((d) => normalizedDependencyMap.containsKey(d))
+                .where((dependency) => dependency.package() == name)
+                .where((dependency) =>
+                    normalizedDependencyMap.containsKey(dependency))
                 .map(
-                  (d) => MapEntry(
-                    normalizedDependencyMap[d]!,
+                  (dependency) => MapEntry(
+                    normalizedDependencyMap[dependency]!,
                     _referencesToDependency(
-                      normalizedDependencyMap[d]!,
+                      normalizedDependencyMap[dependency]!,
                       pubspecLocks,
                     ),
                   ),
@@ -133,10 +135,12 @@ List<DependencyUsageReport<PackageDependency>> _createReport(
 }
 
 List<String> _referencesToDependency(
-  PackageDependency d,
-  Map<String, PubspecLock> pubspecLocks,
+  PackageDependency dependency,
+  Map<DartPackage, PubspecLock> pubspecLocks,
 ) =>
     [
       for (final pubspecLock in pubspecLocks.entries)
-        if (pubspecLock.value.packages.contains(d)) ...[pubspecLock.key]
+        if (pubspecLock.value.packages.contains(dependency)) ...[
+          pubspecLock.key.pubspecLockFile.path
+        ]
     ];

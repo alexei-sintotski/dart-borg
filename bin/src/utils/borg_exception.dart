@@ -31,9 +31,13 @@ import 'package:meta/meta.dart';
 
 @immutable
 class BorgException implements Exception {
-  const BorgException(this.message);
+  const BorgException(
+    this.message, {
+    this.supportMessage,
+  });
 
   final String message;
+  final String? supportMessage;
 }
 
 void exitWithMessageOnBorgException({
@@ -42,8 +46,12 @@ void exitWithMessageOnBorgException({
 }) {
   try {
     action();
-  } on BorgException catch (e) {
-    print(e.message);
+  } on BorgException catch (exception) {
+    print(exception.message);
+    if (exception.supportMessage != null) {
+      print(exception.supportMessage);
+    }
+
     exit(exitCode);
   }
 }

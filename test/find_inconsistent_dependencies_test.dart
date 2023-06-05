@@ -28,6 +28,8 @@ import 'package:borg/src/generic_dependency_usage_report.dart';
 import 'package:pubspec_lock/pubspec_lock.dart';
 import 'package:test/test.dart';
 
+import 'dart_package_utils.dart';
+
 void main() {
   group('findInconsistentDependencies', () {
     group('when provided with empty input', () {
@@ -39,7 +41,7 @@ void main() {
 
     group('when provided with single pubspec.lock', () {
       final report = findInconsistentDependencies({
-        'a': const PubspecLock(packages: [_hostedDependencyAv1])
+        dartPackage('a'): const PubspecLock(packages: [_hostedDependencyAv1])
       });
       test('it provides empty report', () {
         expect(report, isEmpty);
@@ -48,8 +50,8 @@ void main() {
 
     group('when provided with two conherent instances of pubspec.lock', () {
       final report = findInconsistentDependencies({
-        'a1': const PubspecLock(packages: [_hostedDependencyAv1]),
-        'a2': const PubspecLock(packages: [_hostedDependencyAv1]),
+        dartPackage('a1'): const PubspecLock(packages: [_hostedDependencyAv1]),
+        dartPackage('a2'): const PubspecLock(packages: [_hostedDependencyAv1]),
       });
       test('it provides empty report', () {
         expect(report, isEmpty);
@@ -59,8 +61,8 @@ void main() {
     group('when provided with two distinct versions of a hosted dependency',
         () {
       final report = findInconsistentDependencies({
-        'a1': const PubspecLock(packages: [_hostedDependencyAv1]),
-        'a2': const PubspecLock(packages: [_hostedDependencyAv2]),
+        dartPackage('a1'): const PubspecLock(packages: [_hostedDependencyAv1]),
+        dartPackage('a2'): const PubspecLock(packages: [_hostedDependencyAv2]),
       });
       test('provides correct report', () {
         expect(report, _reportAv1Av2);
@@ -70,8 +72,8 @@ void main() {
 
   group('when provided with two distinct versions of a path dependency', () {
     final report = findInconsistentDependencies({
-      'a1': const PubspecLock(packages: [_pathDependencyAv1]),
-      'a2': const PubspecLock(packages: [_pathDependencyAv2]),
+      dartPackage('a1'): const PubspecLock(packages: [_pathDependencyAv1]),
+      dartPackage('a2'): const PubspecLock(packages: [_pathDependencyAv2]),
     });
     test('it provides empty report', () {
       expect(report, isEmpty);
@@ -80,8 +82,8 @@ void main() {
 
   group('when provided with two hosted and path versions of a dependency', () {
     final report = findInconsistentDependencies({
-      'a1': const PubspecLock(packages: [_hostedDependencyAv1]),
-      'a2': const PubspecLock(packages: [_pathDependencyAv1]),
+      dartPackage('a1'): const PubspecLock(packages: [_hostedDependencyAv1]),
+      dartPackage('a2'): const PubspecLock(packages: [_pathDependencyAv1]),
     });
     test('it provides report with a single entry', () {
       expect(report.length, 1);
@@ -93,8 +95,9 @@ void main() {
     'dependency type only',
     () {
       final report = findInconsistentDependencies({
-        'a1': const PubspecLock(packages: [_hostedDependencyAv1]),
-        'a2': const PubspecLock(packages: [_hostedDependencyAv1Transitive]),
+        dartPackage('a1'): const PubspecLock(packages: [_hostedDependencyAv1]),
+        dartPackage('a2'):
+            const PubspecLock(packages: [_hostedDependencyAv1Transitive]),
       });
       test('it provides empty report', () {
         expect(report, isEmpty);
@@ -139,9 +142,9 @@ final _reportAv1Av2 = [
     dependencyName: 'a',
     references: {
       // ignore: prefer_const_literals_to_create_immutables
-      _hostedDependencyAv1: ['a1'],
+      _hostedDependencyAv1: ['/a1/pubspec.lock'],
       // ignore: prefer_const_literals_to_create_immutables
-      _hostedDependencyAv2: ['a2'],
+      _hostedDependencyAv2: ['/a2/pubspec.lock'],
     },
   )
 ];

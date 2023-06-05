@@ -23,6 +23,8 @@
  *
  */
 
+import 'dart:io';
+
 import 'package:meta/meta.dart';
 import 'package:path/path.dart';
 import 'package:plain_optional/plain_optional.dart';
@@ -47,11 +49,13 @@ class DartPackage {
         pubspecLock = tryToReadFileSync(join(path, 'pubspec.lock')).iif(
           some: (content) => Optional(content.loadPubspecLockFromYaml()),
           none: () => const Optional.none(),
-        );
+        ),
+        pubspecLockFile = File(join(path, 'pubspec.lock'));
 
   final String path;
   final PubspecYaml pubspecYaml;
   final Optional<PubspecLock> pubspecLock;
+  final File pubspecLockFile;
 
   bool get isFlutterPackage =>
       pubspecYaml.dependencies.any((d) => d.package() == 'flutter');

@@ -46,7 +46,7 @@ void assertPubspecYamlConsistency(Iterable<DartPackage> packages) {
   );
 
   if (inconsistentSpecList.isNotEmpty) {
-    printDependencyUsageReport(
+    printInconsistentDependencyUsageReport(
       report: inconsistentSpecList,
       formatDependency: _formatDependencySpec,
     );
