@@ -70,7 +70,6 @@ class FileFinder {
                     item.path.endsWith(filename),
               )
               .map((entity) => entity.path)
-              .toList()
       ];
 
   bool _isNotIgnored(FileSystemEntity f) =>

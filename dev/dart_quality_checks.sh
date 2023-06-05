@@ -7,7 +7,7 @@ dart bin/main.dart boot --mode=basic
 dart bin/main.dart boot --mode=incremental
 dart bin/main.dart deps
 
-dartanalyzer --fatal-hints .
+dart analyze --fatal-infos .
 dart run test
 # pub run dependency_validator
 dev/format_dart_code.sh --set-exit-if-changed
