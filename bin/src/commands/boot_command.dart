@@ -30,6 +30,7 @@ import 'package:borg/src/context/borg_context.dart';
 import 'package:borg/src/context/borg_context_factory.dart';
 
 import '../options/boot_mode.dart';
+import '../options/profiler.dart';
 import '../options/verbose.dart';
 import '../utils/borg_exception.dart';
 import 'boot_command_runner.dart';
@@ -47,6 +48,7 @@ class BootCommand extends Command<void> {
       ),
     );
     addVerboseFlag(argParser);
+    addProfilerFlag(argParser);
   }
 
   @override
@@ -72,6 +74,7 @@ class BootCommand extends Command<void> {
 
   static final BorgConfigurationFactory configurationFactory =
       BorgConfigurationFactory();
+
   // ignore: prefer_const_constructors
   static final BorgContextFactory contextFactory = BorgContextFactory();
   final BorgContext context;
