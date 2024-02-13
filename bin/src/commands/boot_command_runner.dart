@@ -40,17 +40,19 @@ import 'package:path/path.dart' as path;
 import 'package:plain_optional/plain_optional.dart';
 
 import '../options/boot_mode.dart';
+import '../options/profiler.dart';
 import '../options/verbose.dart';
 import '../pub_operations.dart';
 import '../scan_for_packages.dart';
 import '../utils/borg_exception.dart';
 import '../utils/git.dart';
 import '../utils/platform_version.dart';
+import '../utils/print_colors.dart';
 import '../utils/render_package_name.dart';
 
 @immutable
 class BootCommandRunner {
-  const BootCommandRunner(
+  BootCommandRunner(
     this.configurationFactory,
     this.contextFactory,
     this.argResults,
@@ -59,6 +61,7 @@ class BootCommandRunner {
   final BorgConfigurationFactory configurationFactory;
   final BorgContextFactory contextFactory;
   final ArgResults argResults;
+  final Map<String, Duration> packageBootstrapDurations = <String, Duration>{};
 
   void run() {
     final configuration =
@@ -300,6 +303,9 @@ class BootCommandRunner {
     required BorgConfiguration configuration,
   }) {
     print('Bootstrapping packages:');
+
+    final fullDurationStopwatch = Stopwatch()..start();
+
     var i = 1;
     for (final package in packages) {
       final counter = '[${i++}/${packages.length}]';
@@ -307,6 +313,8 @@ class BootCommandRunner {
         '$counter ${package.isFlutterPackage ? 'Flutter' : 'Dart'} '
         'package ${renderPackageName(package.path)}...',
       );
+
+      final packageStopwatch = Stopwatch()..start();
       resolveDependencies(
         package: package,
         configuration: configuration,
@@ -314,9 +322,47 @@ class BootCommandRunner {
             ? VerbosityLevel.verbose
             : VerbosityLevel.short,
       );
+      packageStopwatch.stop();
+
+      if (getProfilerFlag(argResults)) {
+        _printDurationInColor(
+          packageStopwatch.elapsedMilliseconds,
+          package.path,
+        );
+        packageBootstrapDurations[package.path] = packageStopwatch.elapsed;
+      }
     }
 
+    fullDurationStopwatch.stop();
+
     print('\nSUCCESS: ${packages.length} packages have been bootstrapped');
+    print('Total duration: ${fullDurationStopwatch.elapsed.inSeconds} seconds');
+
+    _printProfilerReport();
+  }
+
+  void _printProfilerReport() {
+    if (!getProfilerFlag(argResults)) {
+      return;
+    }
+
+    print('==== Packages sorted by duration ====');
+    final packagesSortedByDuration = packageBootstrapDurations.entries.toList()
+      ..sort((lhs, rhs) => rhs.value.compareTo(lhs.value));
+
+    for (final p in packagesSortedByDuration) {
+      _printDurationInColor(p.value.inMilliseconds, p.key);
+    }
+  }
+
+  void _printDurationInColor(int durationInMS, String package) {
+    if (durationInMS <= 1000) {
+      printGreen('$durationInMS ms ${renderPackageName(package)}');
+    } else if (durationInMS <= 2000) {
+      printOrange('$durationInMS ms ${renderPackageName(package)}');
+    } else {
+      printRed('$durationInMS ms ${renderPackageName(package)}');
+    }
   }
 }
 
