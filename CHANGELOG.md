@@ -1,3 +1,8 @@
+## [2.0.1] - Dart 3 & Usability improvements
+* Detection of circular dependencies by @Xylez01
+* Automatic correction by picking up most used versions by @spkersten
+* Bootstrapping profiler support by @jeanherfs
+
 ## [2.0.0] - Null safety
 * Null safety support
 * Performance optimizations for all commands
