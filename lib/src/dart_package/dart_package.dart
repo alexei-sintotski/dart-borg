@@ -64,10 +64,10 @@ class DartPackage {
   String toString() => 'DartPackage(path: $path)';
 
   @override
-  // ignore: avoid_annotating_with_dynamic
-  bool operator ==(dynamic other) =>
-      // ignore: avoid_dynamic_calls
-      other.runtimeType == runtimeType && path == other.path;
+  bool operator ==(Object other) =>
+      other is DartPackage &&
+      other.runtimeType == runtimeType &&
+      path == other.path;
 
   @override
   int get hashCode {
